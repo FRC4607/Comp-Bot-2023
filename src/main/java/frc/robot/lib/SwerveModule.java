@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -47,13 +48,30 @@ public class SwerveModule {
     private String m_label;
     private final DataLog m_log;
 
+    /*
+     * Logging:
+     *      SparkMax:
+     *          Motor Velocity  - Frame 1
+     *          Motor Temp      - Frame 1
+     *          Motor Voltage   - Frame 1
+     *          Motor Current   - Frame 1
+     *          Motor Position  - Frame 2
+     *          
+     */
+
+    private final DoubleLogEntry m_driveMotorSetpointLog;
     private final DoubleLogEntry m_driveMotorPositionLog;
     private final DoubleLogEntry m_driveMotorVelocityLog;
-    private final DoubleLogEntry m_driveMotorSetpointLog;
+    private final DoubleLogEntry m_driveMotorCurrentLog;
+    private final DoubleLogEntry m_driveMotorVoltageLog;
+    private final DoubleLogEntry m_driveMotorTempLog;
 
+    private final DoubleLogEntry m_turnMotorSetpointLog;
     private final DoubleLogEntry m_turnMotorPositionLog;
     private final DoubleLogEntry m_turnMotorVelocityLog;
-    private final DoubleLogEntry m_turnMotorSetpointLog;
+    private final DoubleLogEntry m_turnMotorCurrentLog;
+    private final DoubleLogEntry m_turnMotorVoltageLog;
+    private final DoubleLogEntry m_turnMotorTempLog;
 
     private final DoubleLogEntry m_homeLog;
     private final DoubleLogEntry m_turnAbsoluteEncoderLog;
@@ -85,6 +103,19 @@ public class SwerveModule {
 
         m_driveMotor.setSmartCurrentLimit(20, 40);
         m_turnMotor.setSmartCurrentLimit(20, 40);
+
+        m_driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535); // Max Period - Analog Sensor
+        m_driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 65535); // Max Period - Alternate Encoder
+        m_driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535); // Max Period - Duty Cycle Encoder Position
+        m_driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 65535); // Max Period - Duty Cycle Encoder Velocity
+
+        m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535); // Max Period - Analog Sensor
+        m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 65535); // Max Period - Alternate Encoder
+        m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535); // Max Period - Duty Cycle Encoder Position
+        m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 65535); // Max Period - Duty Cycle Encoder Velocity
+
+        m_turnMotor.clearFaults();
+        m_driveMotor.clearFaults();
 
         m_drivePIDController = m_driveMotor.getPIDController();
         m_turnPIDController = m_turnMotor.getPIDController();
@@ -118,9 +149,7 @@ public class SwerveModule {
             layout.addNumber("Absolute Encoder", this::getAbsoluteEncoder);
             layout.addNumber("Turn Encoder", this::getTurnPos);
             layout.addNumber("Turn Target", this::getTurnTarget);
-            layout.addNumber("Wheel Velocity", () -> {
-                return m_driveTarget - getWheelVelocity();
-            });
+            layout.addNumber("Wheel Velocity", this::getWheelVelocity);
             layout.addNumber("Turn Error", () -> {
                 return m_turnTarget - getTurnPos();
             });
@@ -129,13 +158,19 @@ public class SwerveModule {
 
         m_log = DataLogManager.getLog();
 
+        m_driveMotorSetpointLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/setpoint", m_label));
         m_driveMotorPositionLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/position", m_label));
         m_driveMotorVelocityLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/velocity", m_label));
-        m_driveMotorSetpointLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/setpoint", m_label));
+        m_driveMotorCurrentLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/current", m_label));
+        m_driveMotorVoltageLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/voltage", m_label));
+        m_driveMotorTempLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/temp", m_label));
 
+        m_turnMotorSetpointLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/setpoint", m_label));
         m_turnMotorPositionLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/position", m_label));
         m_turnMotorVelocityLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/velocity", m_label));
-        m_turnMotorSetpointLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/setpoint", m_label));
+        m_turnMotorCurrentLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/current", m_label));
+        m_turnMotorVoltageLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/voltage", m_label));
+        m_turnMotorTempLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/temp", m_label));
 
         m_homeLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/home", m_label));
         m_turnAbsoluteEncoderLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn_enc/absolute", m_label));
@@ -266,13 +301,19 @@ public class SwerveModule {
      * Logs the position, velocity, and targets of the swerve module.
      */
     private void logData() {
+        m_driveMotorSetpointLog.append(m_driveTarget);
         m_driveMotorPositionLog.append(m_driveEncoder.getPosition());
         m_driveMotorVelocityLog.append(m_driveEncoder.getVelocity());
-        m_driveMotorSetpointLog.append(m_driveTarget);
+        m_driveMotorCurrentLog.append(m_driveMotor.getOutputCurrent());
+        m_driveMotorVoltageLog.append(m_driveMotor.getBusVoltage());
+        m_driveMotorTempLog.append(m_driveMotor.getMotorTemperature());
 
+        m_turnMotorSetpointLog.append(m_turnTarget);
         m_turnMotorPositionLog.append(m_turnRelativeEncoder.getPosition());
         m_turnMotorVelocityLog.append(m_turnRelativeEncoder.getVelocity());
-        m_turnMotorSetpointLog.append(m_turnTarget);
+        m_turnMotorCurrentLog.append(m_turnMotor.getOutputCurrent());
+        m_turnMotorVoltageLog.append(m_turnMotor.getBusVoltage());
+        m_turnMotorTempLog.append(m_turnMotor.getMotorTemperature());
 
         m_turnAbsoluteEncoderLog.append(m_turnAbsoluteEncoder.getDistance());
     }
