@@ -1,0 +1,286 @@
+package frc.robot.lib;
+
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import frc.robot.Calibrations.SwerveCalibrations;
+import frc.robot.Constants.SwerveConstants;
+
+/**
+ * A class that encapsulates a swerve module.
+ */
+public class SwerveModule {
+
+    // ******* Control *******
+
+    private CANSparkMax m_driveMotor;
+    private CANSparkMax m_turnMotor;
+
+    private DutyCycleEncoder m_turnAbsoluteEncoder;
+    private RelativeEncoder m_turnRelativeEncoder;
+    private RelativeEncoder m_driveEncoder;
+
+    private SparkMaxPIDController m_turnPIDController;
+    private SparkMaxPIDController m_drivePIDController;
+
+    private SwerveModuleState m_state;
+
+    private double m_home;
+    private double m_turnTarget = 0.0;
+    private double m_driveTarget = 0.0;
+
+    // ******* Logs *******
+
+    private String m_label;
+    private final DataLog m_log;
+
+    private final DoubleLogEntry m_driveMotorPositionLog;
+    private final DoubleLogEntry m_driveMotorVelocityLog;
+    private final DoubleLogEntry m_driveMotorSetpointLog;
+
+    private final DoubleLogEntry m_turnMotorPositionLog;
+    private final DoubleLogEntry m_turnMotorVelocityLog;
+    private final DoubleLogEntry m_turnMotorSetpointLog;
+
+    private final DoubleLogEntry m_homeLog;
+    private final DoubleLogEntry m_turnAbsoluteEncoderLog;
+
+    /**
+     * An encapsulates of a swerve module.
+     *
+     * @param driveMotorID The CAN ID of the drive motor
+     * @param turnMotorID  The CAN ID of the turn motor
+     * @param absEncoder   The roborio DIO port the absolute encoder is on
+     * @param debug        Whether a value is sent to Shuffleboard
+     */
+    public SwerveModule(String label, int driveMotorID, int turnMotorID, int absEncoder,
+            boolean driverReversed, boolean debug) {
+
+        m_label = label;
+
+        m_home = Preferences.getDouble(m_label + ":home", 0.0);
+
+        m_turnAbsoluteEncoder = new DutyCycleEncoder(absEncoder);
+        m_driveMotor = new CANSparkMax(driveMotorID, MotorType.kBrushless);
+        m_turnMotor = new CANSparkMax(turnMotorID, MotorType.kBrushless);
+
+        m_driveMotor.restoreFactoryDefaults();
+        m_turnMotor.restoreFactoryDefaults();
+
+        m_driveMotor.setIdleMode(IdleMode.kBrake);
+        m_turnMotor.setIdleMode(IdleMode.kBrake);
+
+        m_driveMotor.setSmartCurrentLimit(20, 40);
+        m_turnMotor.setSmartCurrentLimit(20, 40);
+
+        m_drivePIDController = m_driveMotor.getPIDController();
+        m_turnPIDController = m_turnMotor.getPIDController();
+
+        m_driveEncoder = m_driveMotor.getEncoder();
+        m_turnRelativeEncoder = m_turnMotor.getEncoder();
+
+        m_driveEncoder
+                .setVelocityConversionFactor(
+                        SwerveConstants.WHEEL_CIRCUMFERENCE_METERS / SwerveConstants.DRIVE_GEAR_RATIO / 60);
+        m_driveEncoder.setPositionConversionFactor(
+                SwerveConstants.WHEEL_CIRCUMFERENCE_METERS / SwerveConstants.DRIVE_GEAR_RATIO);
+
+        m_driveMotor.setInverted(driverReversed);
+
+        m_turnRelativeEncoder.setPositionConversionFactor(2 * Math.PI / SwerveConstants.TURN_GEAR_RATIO);
+
+        m_turnPIDController.setP(SwerveCalibrations.TURN_KP);
+        m_turnPIDController.setI(SwerveCalibrations.TURN_KI);
+        m_turnPIDController.setD(SwerveCalibrations.TURN_KD);
+
+        m_drivePIDController.setP(SwerveCalibrations.DRIVE_KP);
+        m_drivePIDController.setI(SwerveCalibrations.DRIVE_KI);
+        m_drivePIDController.setD(SwerveCalibrations.DRIVE_KD);
+        m_drivePIDController.setFF(SwerveCalibrations.DRIVE_KF);
+
+        if (debug) {
+
+            ShuffleboardLayout layout = Shuffleboard.getTab("Drivetrain").getLayout(label, "list");
+            layout.addNumber("Home", this::getHome);
+            layout.addNumber("Absolute Encoder", this::getAbsoluteEncoder);
+            layout.addNumber("Turn Encoder", this::getTurnPos);
+            layout.addNumber("Turn Target", this::getTurnTarget);
+            layout.addNumber("Wheel Velocity", () -> {
+                return m_driveTarget - getWheelVelocity();
+            });
+            layout.addNumber("Turn Error", () -> {
+                return m_turnTarget - getTurnPos();
+            });
+
+        }
+
+        m_log = DataLogManager.getLog();
+
+        m_driveMotorPositionLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/position", m_label));
+        m_driveMotorVelocityLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/velocity", m_label));
+        m_driveMotorSetpointLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/setpoint", m_label));
+
+        m_turnMotorPositionLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/position", m_label));
+        m_turnMotorVelocityLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/velocity", m_label));
+        m_turnMotorSetpointLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/setpoint", m_label));
+
+        m_homeLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/home", m_label));
+        m_turnAbsoluteEncoderLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn_enc/absolute", m_label));
+
+        logData();
+        m_homeLog.append(m_home);
+    }
+
+    // ******* Getters *******
+
+    /**
+     * Returns the position of the relative turn encoder in radian.
+     */
+    public double getTurnPos() {
+        return m_turnRelativeEncoder.getPosition();
+        // m_turnRelativeEncoder.set
+    }
+
+    /**
+     * Returns the absolute position of the turn encoder in radian.
+     */
+    public double getAbsoluteEncoder() {
+        return m_turnAbsoluteEncoder.getAbsolutePosition() * 2 * Math.PI;
+    }
+
+    /**
+     * Returns the home position in rad.
+     *
+     * @return home position in rad.
+     */
+    public double getHome() {
+        return m_home;
+    }
+
+    /**
+     * Returns the turn target in rad.
+     *
+     * @return turn target in rad.
+     */
+    public double getTurnTarget() {
+        return m_turnTarget;
+    }
+
+    /**
+     * Returns the drive wheel's velocity in m/s.
+     *
+     * @return drive wheel's velocity in m/s.
+     */
+    public double getWheelVelocity() {
+        return m_driveEncoder.getVelocity();
+    }
+
+    /**
+     * Returns the rotation of the drive wheel and the swerve module rotation.
+     *
+     * @return Drive wheel position and Swerve module rotation.
+     */
+    public SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(m_driveEncoder.getPosition(), Rotation2d.fromDegrees(getTurnPos()));
+    }
+
+    // ******* Setters *******
+
+    /**
+     * Sets the current position of the module as home.
+     */
+    public void setCurrentHome() {
+        m_home = getAbsoluteEncoder();
+
+        Preferences.setDouble(m_label + ":home", m_home);
+
+        m_homeLog.append(m_home);
+
+        homeEncoder();
+    }
+
+    /**
+     * Sets the relative encoder based on the absolute encoder.
+     */
+    public void homeEncoder() {
+        m_turnRelativeEncoder.setPosition(getAbsoluteEncoder() - m_home);
+    }
+
+    /**
+     * Tells the turnPIDController to go to 0.
+     */
+    public void holdZero() {
+        m_turnTarget = 0.0;
+        m_turnPIDController.setReference(0, ControlType.kPosition);
+        logData();
+    }
+
+    /**
+     * Sets the target module state.
+     */
+    public void setModuleState(SwerveModuleState state) {
+        m_state = SwerveModuleState.optimize(state, new Rotation2d(getTurnPos()));
+
+        double relativeEncoderValue = m_turnRelativeEncoder.getPosition();
+        double target = m_state.angle.getRadians();
+
+        // adds the closest int number of rotations to the target
+        target += Math.round((relativeEncoderValue - target) / (2 * Math.PI)) * 2 * Math.PI;
+
+        // TODO: Implement trapezoidal profile
+        m_turnTarget = target;
+        m_turnPIDController.setReference(target, ControlType.kPosition);
+
+        m_driveTarget = m_state.speedMetersPerSecond;
+        m_drivePIDController.setReference(m_state.speedMetersPerSecond, ControlType.kVelocity);
+
+        logData();
+    }
+
+    /**
+     * Sets the idle mode.
+     *
+     * @param brakeMode sets idle mode true = brake false = coast.
+     */
+    public void setBrakeMode(boolean brakeMode) {
+        m_driveMotor.setIdleMode(brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
+        m_turnMotor.setIdleMode(brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
+    }
+
+    // ******* Logging *******
+    
+    /**
+     * Logs the position, velocity, and targets of the swerve module.
+     */
+    private void logData() {
+        m_driveMotorPositionLog.append(m_driveEncoder.getPosition());
+        m_driveMotorVelocityLog.append(m_driveEncoder.getVelocity());
+        m_driveMotorSetpointLog.append(m_driveTarget);
+
+        m_turnMotorPositionLog.append(m_turnRelativeEncoder.getPosition());
+        m_turnMotorVelocityLog.append(m_turnRelativeEncoder.getVelocity());
+        m_turnMotorSetpointLog.append(m_turnTarget);
+
+        m_turnAbsoluteEncoderLog.append(m_turnAbsoluteEncoder.getDistance());
+    }
+
+    /**
+     * A function that should be called every loop.
+     */
+    public void update() {
+        logData();
+    }
+}
