@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Calibrations.SwerveCalibrations;
 import frc.robot.Constants.SwerveConstants;
 
@@ -48,15 +50,20 @@ public class SwerveModule {
     private String m_label;
     private final DataLog m_log;
 
+    private boolean m_pidTuning = false;
+    private double m_turnKP;
+    private double m_turnKI;
+    private double m_turnKD;
+
     /*
      * Logging:
-     *      SparkMax:
-     *          Motor Velocity  - Frame 1
-     *          Motor Temp      - Frame 1
-     *          Motor Voltage   - Frame 1
-     *          Motor Current   - Frame 1
-     *          Motor Position  - Frame 2
-     *          
+     * SparkMax:
+     * Motor Velocity - Frame 1
+     * Motor Temp - Frame 1
+     * Motor Voltage - Frame 1
+     * Motor Current - Frame 1
+     * Motor Position - Frame 2
+     * 
      */
 
     private final DoubleLogEntry m_driveMotorSetpointLog;
@@ -123,24 +130,37 @@ public class SwerveModule {
         m_driveEncoder = m_driveMotor.getEncoder();
         m_turnRelativeEncoder = m_turnMotor.getEncoder();
 
-        m_driveEncoder
-                .setVelocityConversionFactor(
-                        SwerveConstants.WHEEL_CIRCUMFERENCE_METERS / SwerveConstants.DRIVE_GEAR_RATIO / 60);
         m_driveEncoder.setPositionConversionFactor(
                 SwerveConstants.WHEEL_CIRCUMFERENCE_METERS / SwerveConstants.DRIVE_GEAR_RATIO);
+        m_driveEncoder.setVelocityConversionFactor(
+                SwerveConstants.WHEEL_CIRCUMFERENCE_METERS / SwerveConstants.DRIVE_GEAR_RATIO / 60);
 
         m_driveMotor.setInverted(driverReversed);
 
         m_turnRelativeEncoder.setPositionConversionFactor(2 * Math.PI / SwerveConstants.TURN_GEAR_RATIO);
+        m_turnRelativeEncoder.setVelocityConversionFactor(2 * Math.PI / SwerveConstants.TURN_GEAR_RATIO / 60);
 
         m_turnPIDController.setP(SwerveCalibrations.TURN_KP);
         m_turnPIDController.setI(SwerveCalibrations.TURN_KI);
         m_turnPIDController.setD(SwerveCalibrations.TURN_KD);
+        m_turnPIDController.setSmartMotionMaxVelocity(SwerveCalibrations.TURN_MAX_VELOCITY, 0);
+        m_turnPIDController.setSmartMotionMaxAccel(SwerveCalibrations.TURN_MAX_ACCELERATION, 0);
+        m_turnPIDController.setSmartMotionMinOutputVelocity(SwerveCalibrations.TURN_MIN_VELOCITY, 0);
 
         m_drivePIDController.setP(SwerveCalibrations.DRIVE_KP);
         m_drivePIDController.setI(SwerveCalibrations.DRIVE_KI);
         m_drivePIDController.setD(SwerveCalibrations.DRIVE_KD);
         m_drivePIDController.setFF(SwerveCalibrations.DRIVE_KF);
+
+        if (m_pidTuning) {
+            m_turnKP = SwerveCalibrations.TURN_KP;
+            m_turnKD = SwerveCalibrations.TURN_KD;
+
+            // PID Tunning
+            SmartDashboard.putNumber(label + " Turn kP", m_turnKP);
+            SmartDashboard.putNumber(label + " Turn kI", SwerveCalibrations.TURN_KI);
+            SmartDashboard.putNumber(label + " Turn kD", m_turnKD);
+        }
 
         if (debug) {
 
@@ -275,14 +295,14 @@ public class SwerveModule {
         // adds the closest int number of rotations to the target
         target += Math.round((relativeEncoderValue - target) / (2 * Math.PI)) * 2 * Math.PI;
 
-        // TODO: Implement trapezoidal profile
+        // TODO: Implement trapezoidal profile and Feed Forward
         m_turnTarget = target;
         m_turnPIDController.setReference(target, ControlType.kPosition);
 
+        // TODO: Implement Feed Forward
         m_driveTarget = m_state.speedMetersPerSecond;
-        m_drivePIDController.setReference(m_state.speedMetersPerSecond, ControlType.kVelocity);
-
-        logData();
+        m_drivePIDController.setReference(m_state.speedMetersPerSecond, ControlType.kVelocity, 0, 0.0,
+                ArbFFUnits.kVoltage);
     }
 
     /**
@@ -296,7 +316,7 @@ public class SwerveModule {
     }
 
     // ******* Logging *******
-    
+
     /**
      * Logs the position, velocity, and targets of the swerve module.
      */
@@ -323,5 +343,27 @@ public class SwerveModule {
      */
     public void update() {
         logData();
+
+        if (m_pidTuning) {
+            double turnKP = SmartDashboard.getNumber(m_label + " Turn kP",
+                    SwerveCalibrations.TURN_KP);
+            double turnKI = SmartDashboard.getNumber(m_label + " Turn kI",
+                    SwerveCalibrations.TURN_KI);
+            double turnKD = SmartDashboard.getNumber(m_label + " Turn kD",
+                    SwerveCalibrations.TURN_KD);
+
+            if (turnKP != m_turnKP) {
+                m_turnPIDController.setP(turnKP);
+                m_turnKP = turnKP;
+            }
+            if (turnKI != m_turnKI) {
+                m_turnPIDController.setI(turnKI);
+                m_turnKI = turnKI;
+            }
+            if (turnKD != m_turnKD) {
+                m_turnPIDController.setD(turnKD);
+                m_turnKD = turnKD;
+            }
+        }
     }
 }

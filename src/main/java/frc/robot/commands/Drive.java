@@ -36,11 +36,11 @@ public class Drive extends CommandBase {
 
     @Override
     public void execute() {
-        double strafeX = MathUtil.applyDeadband(m_strafeX.calculate(-m_driver.getLeftY()),
-                DriverConstants.CONTROLLER_DEADBAND)
+        double strafeX = m_strafeX.calculate(MathUtil.applyDeadband(-m_driver.getLeftY(),
+                DriverConstants.CONTROLLER_DEADBAND))
                 * DriverConstants.MAX_STRAFE_SPEED;
-        double strafeY = MathUtil.applyDeadband(m_strafeY.calculate(-m_driver.getLeftX()),
-                DriverConstants.CONTROLLER_DEADBAND)
+        double strafeY = m_strafeY.calculate(MathUtil.applyDeadband(-m_driver.getLeftX(),
+                DriverConstants.CONTROLLER_DEADBAND))
                 * DriverConstants.MAX_STRAFE_SPEED;
         double rotate = MathUtil.applyDeadband(-m_driver.getRightX(), DriverConstants.CONTROLLER_DEADBAND)
                 * DriverConstants.MAX_TURN_SPEED;

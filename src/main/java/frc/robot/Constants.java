@@ -15,16 +15,14 @@ public class Constants {
 
         public static final boolean DEBUG = true;
 
-        public static final double TURN_GEAR_RATIO = 12.8;
-        public static final double DRIVE_GEAR_RATIO = 8.16;
+        public static final double TURN_GEAR_RATIO = 12.8;  // MK3
+        public static final double DRIVE_GEAR_RATIO = 8.16; // MK3 Standard
 
         // These thing could be tested and experimental measured, but currently they are
         // theoretical.
         public static final double WHEEL_DIAMETER_INCHES = 4;
         public static final double WHEEL_CIRCUMFERENCE_METERS = Units
                 .inchesToMeters(Math.PI * SwerveConstants.WHEEL_DIAMETER_INCHES);
-        public static final double MAX_SPEED_METER_PER_SECOND = 4.0;
-
         public static final double TRACK_WIDTH_METER = Units.inchesToMeters(19.5);
         public static final double WHEEL_BASE_METER = Units.inchesToMeters(19.5);
 
@@ -56,8 +54,8 @@ public class Constants {
      */
     public static class DriverConstants {
 
-        public static final double MAX_STRAFE_SPEED = 3;
-        public static final double MAX_TURN_SPEED = 1 * Math.PI;
+        public static final double MAX_STRAFE_SPEED = 5;
+        public static final double MAX_TURN_SPEED = 3 * Math.PI;
 
         public static final int DRIVER_CONTROLLER_PORT = 0;
         public static final double CONTROLLER_DEADBAND = 0.1;

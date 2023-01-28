@@ -12,6 +12,7 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Calibrations.SwerveCalibrations;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.lib.ADIS16470;
 import frc.robot.lib.SwerveModule;
@@ -21,9 +22,9 @@ import java.util.ArrayList;
  * Declares the swerve drivetrain as a subsystem.
  */
 public class DrivetrainSubsystem extends SubsystemBase {
-    
+
     private SwerveModule[] m_swerveModules;
-    
+
     private ADIS16470 m_gyro;
     private SwerveDriveKinematics m_kinematics;
     private SwerveDriveOdometry m_odometry;
@@ -78,7 +79,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("Gyro Yaw (Deg)", getGyroRotation().getDegrees());
     }
-    
+
     /**
      * The Modules positions in an array.
      *
@@ -101,7 +102,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      */
     public void setModuleStates(SwerveModuleState[] swerveModuleStates) {
 
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED_METER_PER_SECOND);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveCalibrations.MAX_SPEED_METER_PER_SECOND);
 
         for (int i = 0; i < swerveModuleStates.length; i++) {
             m_swerveModules[i].setModuleState(swerveModuleStates[i]);
@@ -114,7 +115,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * @return The {@link Rotation2d} of the gyro
      */
     public Rotation2d getGyroRotation() {
-        
+
         return Rotation2d.fromDegrees(m_gyro.getAngle());
 
     }
@@ -138,7 +139,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      */
     public void drive(double strafeX, double strafeY, double rotate, boolean fieldOrientated) {
         ChassisSpeeds chassisSpeed;
-        
+
         if (fieldOrientated) {
             chassisSpeed = ChassisSpeeds.fromFieldRelativeSpeeds(strafeX, strafeY, rotate,
                     m_odometry.getPoseMeters().getRotation());
@@ -147,12 +148,20 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
         SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(chassisSpeed);
 
+        if (strafeX == 0.0 && strafeY == 0.0 && rotate == 0.0) {
+            moduleStates[0].angle = Rotation2d.fromDegrees(45);
+            moduleStates[1].angle = Rotation2d.fromDegrees(135);
+            moduleStates[2].angle = Rotation2d.fromDegrees(135);
+            moduleStates[3].angle = Rotation2d.fromDegrees(45);
+        }
+
         setModuleStates(moduleStates);
 
     }
 
     /**
-     * Sets the module stated based off of the kinematics and chassis speeds inputted.
+     * Sets the module stated based off of the kinematics and chassis speeds
+     * inputted.
      *
      * @param chassisSpeeds The Target speeds of the Drivetrain
      */
@@ -181,7 +190,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     /**
-     * Resets the robot's position on the field so that the current facing direction is forward.
+     * Resets the robot's position on the field so that the current facing direction
+     * is forward.
      */
     public void resetHeading() {
         Pose2d currentPose = getPose();

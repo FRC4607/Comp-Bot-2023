@@ -8,7 +8,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.ControlSwerveModule;
 import frc.robot.commands.Drive;
+import frc.robot.commands.SwerveSetHomes;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 /**
@@ -28,10 +30,15 @@ public class RobotContainer {
      */
     public RobotContainer() {
 
+        m_driver = new XboxController(0);
+
         m_drivetrainSubsystem.setDefaultCommand(new Drive(m_driver, m_drivetrainSubsystem));
 
         configureBindings();
 
+        SmartDashboard.putData(new SwerveSetHomes(m_drivetrainSubsystem));
+        // SmartDashboard.putData(new ControlSwerveModule(0, m_drivetrainSubsystem));
+        
         
         m_chooser = new SendableChooser<>();
 

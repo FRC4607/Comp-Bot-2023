@@ -283,7 +283,7 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
     }
 
     public ADIS16470() {
-        this(IMUAxis.kZ, SPI.Port.kOnboardCS0, CalibrationTime._64s);
+        this(IMUAxis.kZ, SPI.Port.kOnboardCS0, CalibrationTime._32s);
     }
 
     /**
@@ -363,7 +363,7 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
             writeRegister(MSC_CTRL, 0b11000001);
 
             /*
-             * All accelerometers' and gyroscopes' bias correction enabled.
+             * No accelerometer bias correction enabled and gyroscopes bias correction enabled.
              * Calibration time
              */
             writeRegister(NULL_CNFG, (m_calibration_time | 0b0000011100000000));
@@ -409,8 +409,8 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
             // time)
             try {
                 double calTime =  (Math.pow(2.0, m_calibration_time) / 2000 * 64 * 1.1 * 1000);
-                System.out.print("Calibration Time:");
-                System.out.println(calTime);
+                // System.out.print("Calibration Time:");
+                // System.out.println(calTime);
 
                 Thread.sleep((long) calTime);
             } catch (InterruptedException e) {
