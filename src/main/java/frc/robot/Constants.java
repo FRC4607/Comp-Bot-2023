@@ -63,4 +63,14 @@ public class Constants {
         public static final double CONTROLLER_DEADBAND = 0.1;
 
     }
+
+    /**
+     * The Constants of the Elevator.
+     */
+    public static class ElevatorConstants {
+
+        public static final int LEFT_MOTOR_CANID = 0;
+        public static final int RIGHT_MOTOR_CANID = 0;
+
+    }
 }
