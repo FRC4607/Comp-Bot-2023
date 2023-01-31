@@ -4,14 +4,21 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.ControlSwerveModule;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.Drive;
+import frc.robot.commands.ResetHeading;
 import frc.robot.commands.SwerveSetHomes;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import java.util.HashMap;
 
 /**
  * The Class that contains all the subsystems, driver/operator control
@@ -21,7 +28,7 @@ public class RobotContainer {
 
     private XboxController m_driver;
 
-    private DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
+    public DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
 
     SendableChooser<Command> m_chooser;
 
@@ -31,23 +38,33 @@ public class RobotContainer {
     public RobotContainer() {
 
         m_driver = new XboxController(0);
-
         m_drivetrainSubsystem.setDefaultCommand(new Drive(m_driver, m_drivetrainSubsystem));
 
         configureBindings();
 
         SmartDashboard.putData(new SwerveSetHomes(m_drivetrainSubsystem));
         // SmartDashboard.putData(new ControlSwerveModule(0, m_drivetrainSubsystem));
-        
-        
+
         m_chooser = new SendableChooser<>();
 
-        // Put Auto commands here.
+        PathPlannerServer.startServer(5811);
+
+        m_chooser.setDefaultOption("Test Auto", new SwerveAutoBuilder(
+                m_drivetrainSubsystem::getPose,
+                m_drivetrainSubsystem::setPose,
+                new PIDConstants(15.0, 0, 0),
+                new PIDConstants(15.0, 0, 0),
+                m_drivetrainSubsystem::setChassisSpeeds,
+                new HashMap<>(),
+                m_drivetrainSubsystem).fullAuto(PathPlanner.loadPath("Test-Auto", new PathConstraints(1.0, 1.0))));
 
         SmartDashboard.putData("Autonomous Command", m_chooser);
     }
 
     private void configureBindings() {
+        JoystickButton driverStart = new JoystickButton(m_driver, XboxController.Button.kStart.value);
+
+        driverStart.onTrue(new ResetHeading(m_drivetrainSubsystem));
     }
 
     /**

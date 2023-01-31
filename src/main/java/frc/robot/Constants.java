@@ -9,13 +9,13 @@ import edu.wpi.first.math.util.Units;
 public class Constants {
 
     /**
-     * Constants for the Swerve Modules.
+     * Constants for the Swerve Drivetrain.
      */
     public static class SwerveConstants {
 
-        public static final boolean DEBUG = true;
+        public static final boolean DEBUG = false;
 
-        public static final double TURN_GEAR_RATIO = 12.8;  // MK3
+        public static final double TURN_GEAR_RATIO = 12.8; // MK3
         public static final double DRIVE_GEAR_RATIO = 8.16; // MK3 Standard
 
         // These thing could be tested and experimental measured, but currently they are
@@ -36,6 +36,10 @@ public class Constants {
             new Translation2d(WHEEL_BASE_METER / 2, -TRACK_WIDTH_METER / 2),
             new Translation2d(-WHEEL_BASE_METER / 2, TRACK_WIDTH_METER / 2),
             new Translation2d(-WHEEL_BASE_METER / 2, -TRACK_WIDTH_METER / 2) };
+
+        public static final int PIGEON2_CAN_ID = 6;
+
+        public static final double GYRO_RECALIBRATION_TIME = 120.0;
 
     }
 

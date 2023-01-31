@@ -170,6 +170,7 @@ public class SwerveModule {
             layout.addNumber("Turn Encoder", this::getTurnPos);
             layout.addNumber("Turn Target", this::getTurnTarget);
             layout.addNumber("Wheel Velocity", this::getWheelVelocity);
+            layout.addNumber("Wheel Position", m_driveEncoder::getPosition);
             layout.addNumber("Turn Error", () -> {
                 return m_turnTarget - getTurnPos();
             });
@@ -249,7 +250,7 @@ public class SwerveModule {
      * @return Drive wheel position and Swerve module rotation.
      */
     public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(m_driveEncoder.getPosition(), Rotation2d.fromDegrees(getTurnPos()));
+        return new SwerveModulePosition(m_driveEncoder.getPosition(), Rotation2d.fromRadians(getTurnPos()));
     }
 
     // ******* Setters *******
@@ -280,7 +281,6 @@ public class SwerveModule {
     public void holdZero() {
         m_turnTarget = 0.0;
         m_turnPIDController.setReference(0, ControlType.kPosition);
-        logData();
     }
 
     /**
