@@ -73,4 +73,14 @@ public class Constants {
         public static final int RIGHT_MOTOR_CANID = 0;
 
     }
+
+    /**
+     * The constants of th manipulator (wrist included).
+     */
+    public static class ManipulatorConstants {
+
+        public static final int WRIST_MOTOR_CANID = 0;
+        public static final double WRIST_MOTOR_SPEED = 1;
+        
+    }
 }
