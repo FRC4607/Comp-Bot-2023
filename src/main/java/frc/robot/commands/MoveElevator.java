@@ -11,7 +11,13 @@ public class MoveElevator extends CommandBase {
     ElevatorSubsystem m_elevatorSubsystem;
     XboxController m_xboxController;
 
-    MoveElevator(XboxController xboxController, ElevatorSubsystem elevatorSubsystem) {
+    /**
+     * The command setup.
+     *
+     * @param xboxController    The device used for robot control.
+     * @param elevatorSubsystem The subsystem that is the elevator.
+     */
+    public MoveElevator(XboxController xboxController, ElevatorSubsystem elevatorSubsystem) {
         m_xboxController = xboxController;
 
         m_elevatorSubsystem = elevatorSubsystem;

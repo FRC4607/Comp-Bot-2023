@@ -9,7 +9,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.Drive;
+import frc.robot.commands.MoveElevator;
+import frc.robot.commands.MoveWrist;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.WristSubsystem;
 
 /**
  * The Class that contains all the subsystems, driver/operator control
@@ -21,6 +25,10 @@ public class RobotContainer {
 
     private DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
 
+    private ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
+
+    private WristSubsystem m_wristSubsystem = new WristSubsystem();
+
     SendableChooser<Command> m_chooser;
 
     /**
@@ -29,6 +37,10 @@ public class RobotContainer {
     public RobotContainer() {
 
         m_drivetrainSubsystem.setDefaultCommand(new Drive(m_driver, m_drivetrainSubsystem));
+
+        m_elevatorSubsystem.setDefaultCommand(new MoveElevator(m_driver, m_elevatorSubsystem));
+
+        m_wristSubsystem.setDefaultCommand(new MoveWrist(() -> {return m_driver.getRawButton(0); }, () -> {return m_driver.getRawButton(1); }, m_wristSubsystem));
 
         configureBindings();
 
