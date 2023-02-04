@@ -14,9 +14,11 @@ public class Calibrations {
         public static final double TURN_KI = 0.0;
         public static final double TURN_KD = 0.0;
 
-        // Smart motion is very jittery and slow
-        public static final double TURN_MAX_VELOCITY = 46.1 * 0.8;
-        public static final double TURN_MAX_ACCELERATION = 0.180 * 0.8;
+        /** Max turning speed in RPM. */
+        public static final double TURN_MAX_VELOCITY = 4497.14;
+        /** Max turning acceleration in Rad / s^2. */
+        public static final double TURN_MAX_ACCELERATION = 1851.23;
+        /** Min turning speed in Rad / s. */
         public static final double TURN_MIN_VELOCITY = 0.001;
 
 
@@ -25,6 +27,11 @@ public class Calibrations {
         public static final double DRIVE_KI = 0.0;
         public static final double DRIVE_KD = 0.0;
         public static final double DRIVE_KF = 0.0;
+
+        public static final double DRIVE_FF_KS = (0.125 + 0.108) / 2;
+        public static final double DRIVE_FF_KV = (3.23 + 3.25) / 2;
+        // Too few data points to calculate. Will revisit if time allows.
+        public static final double DRIVE_FF_KA = 0.0;
 
         public static final double MAX_SPEED_METER_PER_SECOND = 10.0; // Estimate
 
