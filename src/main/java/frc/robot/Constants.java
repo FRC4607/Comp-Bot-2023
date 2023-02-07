@@ -58,8 +58,8 @@ public class Constants {
      */
     public static class DriverConstants {
 
-        public static final double MAX_STRAFE_SPEED = 2;
-        public static final double MAX_TURN_SPEED = 3 * Math.PI;
+        public static final double MAX_STRAFE_SPEED = 3;
+        public static final double MAX_TURN_SPEED = 2 * Math.PI;
 
         public static final int DRIVER_CONTROLLER_PORT = 0;
         public static final double CONTROLLER_DEADBAND = 0.1;

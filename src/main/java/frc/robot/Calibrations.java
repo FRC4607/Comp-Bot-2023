@@ -33,7 +33,7 @@ public class Calibrations {
         // Too few data points to calculate. Will revisit if time allows.
         public static final double DRIVE_FF_KA = 0.0;
 
-        public static final double MAX_SPEED_METER_PER_SECOND = 10.0; // Estimate
+        public static final double MAX_SPEED_METER_PER_SECOND = 3.0; // Estimate
 
     }
 

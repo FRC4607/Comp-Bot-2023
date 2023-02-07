@@ -57,9 +57,9 @@ public class SwerveModule {
     private final DataLog m_log;
 
     private boolean m_pidTuning = false;
-    private double m_kP;
-    private double m_kI;
-    private double m_kD;
+    private double m_kp;
+    private double m_ki;
+    private double m_kd;
 
     /*
      * Logging:
@@ -109,6 +109,8 @@ public class SwerveModule {
         m_home = Preferences.getDouble(m_label + ":home", 0.0);
 
         m_turnAbsoluteEncoder = new DutyCycleEncoder(absEncoder);
+        m_turnAbsoluteEncoder.setDistancePerRotation(2 * Math.PI);
+        
         m_driveMotor = new CANSparkMax(driveMotorID, MotorType.kBrushless);
         m_turnMotor = new CANSparkMax(turnMotorID, MotorType.kBrushless);
 
@@ -168,13 +170,13 @@ public class SwerveModule {
                 SwerveCalibrations.DRIVE_FF_KA);
 
         if (m_pidTuning) {
-            m_kP = SwerveCalibrations.DRIVE_KP;
-            m_kD = SwerveCalibrations.DRIVE_KD;
+            m_kp = SwerveCalibrations.DRIVE_KP;
+            m_kd = SwerveCalibrations.DRIVE_KD;
 
             // PID Tunning
-            SmartDashboard.putNumber("kP", m_kP);
+            SmartDashboard.putNumber("kP", m_kp);
             // SmartDashboard.putNumber("kI", SwerveCalibrations.TURN_KI);
-            SmartDashboard.putNumber("kD", m_kD);
+            SmartDashboard.putNumber("kD", m_kd);
         }
 
         if (debug) {
@@ -409,16 +411,16 @@ public class SwerveModule {
             double kd = SmartDashboard.getNumber("kD",
                     SwerveCalibrations.TURN_KD);
 
-            if (kp != m_kP) {
+            if (kp != m_kp) {
                 m_turnPIDController.setP(kp);
-                m_kP = kp;
+                m_kp = kp;
             }
-            if (ki != m_kI) {
+            if (ki != m_ki) {
                 m_turnPIDController.setI(ki);
             }
-            if (kd != m_kD) {
+            if (kd != m_kd) {
                 m_turnPIDController.setD(kd);
-                m_kD = kd;
+                m_kd = kd;
             }
         }
     }

@@ -57,11 +57,11 @@ public class RobotContainer {
         m_chooser.setDefaultOption("Test Auto", new SwerveAutoBuilder(
                 m_drivetrainSubsystem::getPose,
                 m_drivetrainSubsystem::setPose,
-                new PIDConstants(15.0, 0, 0),
-                new PIDConstants(15.0, 0, 0),
+                new PIDConstants(3.0, 0, 0),
+                new PIDConstants(1.0, 0, 0),
                 m_drivetrainSubsystem::setChassisSpeeds,
                 new HashMap<>(),
-                m_drivetrainSubsystem).fullAuto(PathPlanner.loadPath("Test-Auto", new PathConstraints(1.0, 1.0))));
+                m_drivetrainSubsystem).fullAuto(PathPlanner.loadPath("Test-Auto", new PathConstraints(2.0, 1.5))));
 
         SmartDashboard.putData("Autonomous Command", m_chooser);
     }
