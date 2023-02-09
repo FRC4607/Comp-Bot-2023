@@ -10,9 +10,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.Drive;
 import frc.robot.commands.MoveElevator;
+import frc.robot.commands.MoveManipulator;
 import frc.robot.commands.MoveWrist;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.MotorizedManipulator;
 import frc.robot.subsystems.WristSubsystem;
 
 /**
@@ -29,6 +31,8 @@ public class RobotContainer {
 
     private WristSubsystem m_wristSubsystem = new WristSubsystem();
 
+    private MotorizedManipulator m_motorizedManipulator;
+
     SendableChooser<Command> m_chooser;
 
     /**
@@ -41,6 +45,8 @@ public class RobotContainer {
         m_elevatorSubsystem.setDefaultCommand(new MoveElevator(m_driver, m_elevatorSubsystem));
 
         m_wristSubsystem.setDefaultCommand(new MoveWrist(() -> {return m_driver.getRawButton(0); }, () -> {return m_driver.getRawButton(1); }, m_wristSubsystem));
+
+        m_motorizedManipulator.setDefaultCommand(new MoveManipulator(() -> {return m_driver.getRawButton(2); }, () -> {return m_driver.getRawButton(3); }, m_motorizedManipulator));
 
         configureBindings();
 
