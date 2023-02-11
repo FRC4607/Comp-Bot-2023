@@ -170,8 +170,8 @@ public class SwerveModule {
                 SwerveCalibrations.DRIVE_FF_KA);
 
         if (m_pidTuning) {
-            m_kp = SwerveCalibrations.DRIVE_KP;
-            m_kd = SwerveCalibrations.DRIVE_KD;
+            m_kp = SwerveCalibrations.TURN_KP;
+            m_kd = SwerveCalibrations.TURN_KD;
 
             // PID Tunning
             SmartDashboard.putNumber("kP", m_kp);

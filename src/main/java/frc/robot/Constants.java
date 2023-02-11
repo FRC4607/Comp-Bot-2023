@@ -13,10 +13,10 @@ public class Constants {
      */
     public static class SwerveConstants {
 
-        public static final boolean DEBUG = false;
+        public static final boolean DEBUG = true;
 
-        public static final double TURN_GEAR_RATIO = 12.8; // MK3
-        public static final double DRIVE_GEAR_RATIO = 8.16; // MK3 Standard
+        public static final double TURN_GEAR_RATIO = (32.0 / 15.0) *  (6.0); // MK4
+        public static final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0); // MK4 L2
 
         // These thing could be tested and experimental measured, but currently they are
         // theoretical.
@@ -27,9 +27,9 @@ public class Constants {
         public static final double WHEEL_BASE_METER = Units.inchesToMeters(19.5);
 
         public static final String[] LABELS = new String[] { "Front Left", "Front Right", "Rear Left", "Rear Right" };
-        public static final int[] TURN_CAN_IDS = new int[] { 13, 2, 14, 1 };
-        public static final int[] DRIVE_CAN_IDS = new int[] { 12, 3, 15, 20 };
-        public static final int[] ABS_ENCODER_DIO_PORT = new int[] { 24, 8, 5, 2 };
+        public static final int[] TURN_CAN_IDS = new int[] { 11, 18, 9, 30 };
+        public static final int[] DRIVE_CAN_IDS = new int[] { 10, 19, 8, 41 };
+        public static final int[] ABS_ENCODER_DIO_PORT = new int[] { 3, 0, 6, 9 };
         public static final boolean[] DRIVE_ENCODER_REVERSED = new boolean[] { false, true, false, true };
         public static final Translation2d[] POSITIONS = new Translation2d[] {
             new Translation2d(WHEEL_BASE_METER / 2, TRACK_WIDTH_METER / 2),

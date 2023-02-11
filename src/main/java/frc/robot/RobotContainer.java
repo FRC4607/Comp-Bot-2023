@@ -18,6 +18,7 @@ import frc.robot.commands.CalibrateDriveFF;
 import frc.robot.commands.CalibrateTurnFF;
 import frc.robot.commands.ControlSwerveModule;
 import frc.robot.commands.Drive;
+import frc.robot.commands.DriveWithSmartDashboard;
 import frc.robot.commands.ResetHeading;
 import frc.robot.commands.SwerveSetHomes;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -46,9 +47,10 @@ public class RobotContainer {
         configureBindings();
 
         SmartDashboard.putData(new SwerveSetHomes(m_drivetrainSubsystem));
-        SmartDashboard.putData(new CalibrateTurnFF(m_drivetrainSubsystem));
-        SmartDashboard.putData(new CalibrateDriveFF(m_drivetrainSubsystem));
-        // SmartDashboard.putData(new ControlSwerveModule(0, m_drivetrainSubsystem));
+        // SmartDashboard.putData(new CalibrateTurnFF(m_drivetrainSubsystem));
+        // SmartDashboard.putData(new CalibrateDriveFF(m_drivetrainSubsystem));
+        SmartDashboard.putData(new ControlSwerveModule(m_drivetrainSubsystem));
+        SmartDashboard.putData(new DriveWithSmartDashboard(m_drivetrainSubsystem));
 
         m_chooser = new SendableChooser<>();
 

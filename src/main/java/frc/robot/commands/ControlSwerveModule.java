@@ -6,14 +6,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
+/**
+ * A command that Allows control of individual modules via SmartDashboard.
+ */
 public class ControlSwerveModule extends CommandBase {
 
-    private int m_module;
     private DrivetrainSubsystem m_drivetrainSubsystem;
 
-    public ControlSwerveModule(int module, DrivetrainSubsystem drivetrainSubsystem) {
+    /**
+     * A command that Allows control of individual modules via SmartDashboard.
+     *
+     * @param drivetrainSubsystem the Swerve Drivetrain Subsystem
+     */
+    public ControlSwerveModule(DrivetrainSubsystem drivetrainSubsystem) {
 
-        m_module = module;
         m_drivetrainSubsystem = drivetrainSubsystem;
 
         addRequirements(m_drivetrainSubsystem);
@@ -24,6 +30,7 @@ public class ControlSwerveModule extends CommandBase {
     public void initialize() {
         SmartDashboard.putNumber("Drive Target", 0.0);
         SmartDashboard.putNumber("Turn Target (deg)", 0.0);
+        SmartDashboard.putNumber("Module Number", 0);
     }
 
     @Override
@@ -35,10 +42,11 @@ public class ControlSwerveModule extends CommandBase {
             new SwerveModuleState()
         };
 
-        states[m_module] = new SwerveModuleState(
-            SmartDashboard.getNumber("Drive Target", 0),
-            Rotation2d.fromDegrees(SmartDashboard.getNumber("Turn Target (deg)", 0))
-        );
+        int module = (int) SmartDashboard.getNumber("Module Number", 0);
+
+        states[module % 4] = new SwerveModuleState(
+                SmartDashboard.getNumber("Drive Target", 0),
+                Rotation2d.fromDegrees(SmartDashboard.getNumber("Turn Target (deg)", 0)));
 
         m_drivetrainSubsystem.setModuleStates(states);
     }

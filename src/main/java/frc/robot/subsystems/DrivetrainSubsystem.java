@@ -11,6 +11,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,6 +19,7 @@ import frc.robot.Calibrations.SwerveCalibrations;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.lib.ADIS16470;
 import frc.robot.lib.ADIS16470.CalibrationTime;
+import frc.robot.lib.ADIS16470.IMUAxis;
 import frc.robot.lib.SwerveModule;
 import java.util.ArrayList;
 
@@ -29,7 +31,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private SwerveModule[] m_swerveModules;
 
     private ADIS16470 m_adis16470;
-    private Pigeon2 m_pigeon;
+    // private Pigeon2 m_pigeon;
 
     private SwerveDriveKinematics m_kinematics;
     private SwerveDriveOdometry m_odometry;
@@ -38,7 +40,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     private final DoubleLogEntry m_gyroTempLog;
     private final DoubleLogEntry m_gyroYawLog;
-    private final DoubleLogEntry m_pigeonYawLog;
+    // private final DoubleLogEntry m_pigeonYawLog;
 
     private boolean m_gyroRecalibrated;
     private boolean m_matchStarted;
@@ -60,8 +62,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
                     SwerveConstants.DEBUG);
         }
 
-        m_adis16470 = new ADIS16470();
-        m_pigeon = new Pigeon2(SwerveConstants.PIGEON2_CAN_ID);
+        m_adis16470 = new ADIS16470(IMUAxis.kZ, SPI.Port.kOnboardCS0, CalibrationTime._4s);
+        // m_pigeon = new Pigeon2(SwerveConstants.PIGEON2_CAN_ID);
 
         for (int i = 0; i < m_swerveModules.length; i++) {
             m_swerveModules[i].homeEncoder();
@@ -74,7 +76,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         m_gyroTempLog = new DoubleLogEntry(m_log, "swerve/gyro/temp");
         m_gyroYawLog = new DoubleLogEntry(m_log, "swerve/gyro/yaw");
-        m_pigeonYawLog = new DoubleLogEntry(m_log, "swerve/pigeon/yaw");
+        // m_pigeonYawLog = new DoubleLogEntry(m_log, "swerve/pigeon/yaw");
 
         logData();
     }
@@ -96,7 +98,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
 
         SmartDashboard.putNumber("Gyro Yaw (Deg)", getGyroRotation().getDegrees());
-        SmartDashboard.putNumber("Pigeon Yaw (Deg)", m_pigeon.getYaw());
+        // SmartDashboard.putNumber("Pigeon Yaw (Deg)", m_pigeon.getYaw());
     }
 
     /**
@@ -121,7 +123,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      */
     public void setModuleStates(SwerveModuleState[] swerveModuleStates) {
 
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveCalibrations.MAX_SPEED_METER_PER_SECOND);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveCalibrations.MAX_SPEED_METER);
 
         for (int i = 0; i < swerveModuleStates.length; i++) {
             m_swerveModules[i].setModuleState(swerveModuleStates[i], true);
@@ -135,7 +137,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      */
     public void setModuleStates(SwerveModuleState[] swerveModuleStates, boolean optimize) {
 
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveCalibrations.MAX_SPEED_METER_PER_SECOND);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveCalibrations.MAX_SPEED_METER);
 
         for (int i = 0; i < swerveModuleStates.length; i++) {
             m_swerveModules[i].setModuleState(swerveModuleStates[i], optimize);
@@ -269,7 +271,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private void logData() {
         m_gyroTempLog.append(m_adis16470.getTemp());
         m_gyroYawLog.append(m_adis16470.getAngle());
-        m_pigeonYawLog.append(m_pigeon.getYaw());
+        // m_pigeonYawLog.append(m_pigeon.getYaw());
     }
 
     /**
