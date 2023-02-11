@@ -65,4 +65,26 @@ public class Constants {
         public static final double CONTROLLER_DEADBAND = 0.1;
 
     }
+
+    /**
+     * The Constants of the Elevator.
+     */
+    public static class ElevatorConstants {
+
+        public static final int LEFT_MOTOR_CANID = 0;
+        public static final int RIGHT_MOTOR_CANID = 0;
+
+    }
+
+    /**
+     * The constants of th manipulator (wrist included).
+     */
+    public static class ManipulatorConstants {
+
+        public static final int WRIST_MOTOR_CANID = 0;
+        public static final double WRIST_MOTOR_SPEED = 1;
+        public static final int MANIPULATOR_MOTOR_CANID = 0;
+        public static final double MANIPULATOR_MOTOR_SPEED = 1;
+        
+    }
 }

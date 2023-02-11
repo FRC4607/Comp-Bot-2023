@@ -18,11 +18,17 @@ import frc.robot.commands.CalibrateDriveFF;
 import frc.robot.commands.CalibrateTurnFF;
 import frc.robot.commands.ControlSwerveModule;
 import frc.robot.commands.Drive;
+import frc.robot.commands.MoveElevator;
+import frc.robot.commands.MoveManipulator;
+import frc.robot.commands.MoveWrist;
 import frc.robot.commands.DriveWithSmartDashboard;
 import frc.robot.commands.ResetHeading;
 import frc.robot.commands.SwerveSetHomes;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import java.util.HashMap;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.MotorizedManipulator;
+import frc.robot.subsystems.WristSubsystem;
 
 /**
  * The Class that contains all the subsystems, driver/operator control
@@ -33,6 +39,9 @@ public class RobotContainer {
     private XboxController m_driver;
 
     public DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
+    public ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
+    public WristSubsystem m_wristSubsystem = new WristSubsystem();
+    public MotorizedManipulator m_motorizedManipulator;
 
     SendableChooser<Command> m_chooser;
 
@@ -43,6 +52,12 @@ public class RobotContainer {
 
         m_driver = new XboxController(0);
         m_drivetrainSubsystem.setDefaultCommand(new Drive(m_driver, m_drivetrainSubsystem));
+
+        m_elevatorSubsystem.setDefaultCommand(new MoveElevator(m_driver, m_elevatorSubsystem));
+
+        m_wristSubsystem.setDefaultCommand(new MoveWrist(() -> {return m_driver.getRawButton(0); }, () -> {return m_driver.getRawButton(1); }, m_wristSubsystem));
+
+        m_motorizedManipulator.setDefaultCommand(new MoveManipulator(() -> {return m_driver.getRawButton(2); }, () -> {return m_driver.getRawButton(3); }, m_motorizedManipulator));
 
         configureBindings();
 
