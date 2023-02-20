@@ -27,7 +27,7 @@ public class MoveElevator extends CommandBase {
 
     @Override
     public void execute() {
-        double speed = m_xboxController.getLeftTriggerAxis() - m_xboxController.getRightTriggerAxis();
-        m_elevatorSubsystem.moveElevator(speed);
+        double speed = -m_xboxController.getLeftTriggerAxis() + m_xboxController.getRightTriggerAxis();
+        m_elevatorSubsystem.setSpeed(speed * 0.75);
     }
 }

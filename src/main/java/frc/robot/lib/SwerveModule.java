@@ -18,7 +18,6 @@ import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -45,7 +44,6 @@ public class SwerveModule {
     private SimpleMotorFeedforward m_driveFeedForward;
 
     private SwerveModuleState m_state;
-    private double m_stateTimestamp;
 
     private double m_home;
     private double m_turnTarget = 0.0;
@@ -227,7 +225,6 @@ public class SwerveModule {
         m_homeLog.append(m_home);
 
         m_state = new SwerveModuleState(0.0, Rotation2d.fromRadians(getTurnPos()));
-        m_stateTimestamp = Timer.getFPGATimestamp();
     }
 
     // ******* Getters *******
@@ -237,7 +234,6 @@ public class SwerveModule {
      */
     public double getTurnPos() {
         return m_turnRelativeEncoder.getPosition();
-        // m_turnRelativeEncoder.set
     }
 
     /**
@@ -322,7 +318,6 @@ public class SwerveModule {
         } else {
             m_state = state;
         }
-        m_stateTimestamp = Timer.getFPGATimestamp();
 
         double relativeEncoderValue = m_turnRelativeEncoder.getPosition();
         double target = m_state.angle.getRadians();

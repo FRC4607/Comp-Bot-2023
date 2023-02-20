@@ -43,4 +43,64 @@ public class Calibrations {
 
     }
 
+    /**
+     * Calibrations for the arm subsystems.
+     */
+    public static final class ArmCalibrations {
+        
+        public static final double POSITION_PIECE_COLLECTION = 125.0;
+        public static final double POSITION_LEVEL = 80.0;
+        public static final double POSITION_TOP_NODE = 90.0;
+        public static final double POSITION_RETRACTED = 40.0;
+
+        public static final double[] ARM_PLACEMENT_POSITIONS = {72, 70, 68, 70};
+        
+        
+        public static final double ELEVATOR_CLEARANCE = 40.0;
+
+        public static final double KG = 0.5;
+
+        public static final double KP = 0.15;
+        public static final double KI = 0.0;
+        public static final double KD = 0.0;
+
+
+        public static final double MAX_VELOCITY = 90.0;
+        public static final double MAX_ACCELERATION = 60.0;
+
+        public static final double TOLERANCE = 4.0;
+    }
+
+    /**
+     * Calibrations for the Elevator Subsystem.
+     */
+    public static final class ElevatorCalibrations {
+        
+        public static final double[] ELEVATOR_PLACEMENT_POSITIONS = {92.3, 60, 53, 40};
+        
+        public static final double KP = 1.0;
+        public static final double KI = 0.0;
+        public static final double KD = 0.0;
+        public static final double KFF = 0.0;
+
+        public static final double KG = 0.2;
+        public static final double MIDDLE_ROW_HEIGHT = 75;
+        public static final double MAX_ACCELERATION = 100;
+        public static final double MAX_VELOCITY = 100;
+
+        public static final double TOLERANCE = 1.5;
+
+        public static final double POSITION_PIECE_COLLECTION = 45.0;
+    }
+
+    /**
+     * The Calibrations for the Manipulator Subsystem.
+     */
+    public static final class ManipulatorCalibrations {
+        public static final double INTAKE_SPEED = -0.8;
+        public static final double OUTTAKE_SPEED = 0.5;
+        public static final double HOLD_SPEED = -0.2;
+        
+    }
+
 }

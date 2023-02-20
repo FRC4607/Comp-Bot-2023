@@ -42,7 +42,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private final DoubleLogEntry m_gyroYawLog;
     // private final DoubleLogEntry m_pigeonYawLog;
 
-    private boolean m_gyroRecalibrated;
+    private boolean m_gyroRecelebrated;
     private boolean m_matchStarted;
 
     /**
@@ -90,11 +90,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         m_odometry.update(getGyroRotation(), getModulePositions());
 
-        if (!m_gyroRecalibrated && Timer.getFPGATimestamp() > SwerveConstants.GYRO_RECALIBRATION_TIME
+        if (!m_gyroRecelebrated && Timer.getFPGATimestamp() > SwerveConstants.GYRO_RECALIBRATION_TIME
                 && !m_matchStarted) {
             m_adis16470.configCalTime(CalibrationTime._32s);
             m_adis16470.calibrate();
-            m_gyroRecalibrated = true;
+            m_gyroRecelebrated = true;
         }
 
         SmartDashboard.putNumber("Gyro Yaw (Deg)", getGyroRotation().getDegrees());

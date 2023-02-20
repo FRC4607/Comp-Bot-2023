@@ -29,7 +29,7 @@ public class Constants {
         public static final String[] LABELS = new String[] { "Front Left", "Front Right", "Rear Left", "Rear Right" };
         public static final int[] TURN_CAN_IDS = new int[] { 11, 18, 9, 30 };
         public static final int[] DRIVE_CAN_IDS = new int[] { 10, 19, 8, 41 };
-        public static final int[] ABS_ENCODER_DIO_PORT = new int[] { 3, 0, 6, 9 };
+        public static final int[] ABS_ENCODER_DIO_PORT = new int[] {0, 1, 2, 3};
         public static final boolean[] DRIVE_ENCODER_REVERSED = new boolean[] { false, true, false, true };
         public static final Translation2d[] POSITIONS = new Translation2d[] {
             new Translation2d(WHEEL_BASE_METER / 2, TRACK_WIDTH_METER / 2),
@@ -71,20 +71,34 @@ public class Constants {
      */
     public static class ElevatorConstants {
 
-        public static final int LEFT_MOTOR_CANID = 0;
-        public static final int RIGHT_MOTOR_CANID = 0;
+        public static final int ELEVATOR_MOTOR_CAN_ID = 16;
+
+        public static final int ABSOLUTE_ENCODER_PORT = 4;
+        public static final int ENCODER_A_PORT = 5;
+        public static final int ENCODER_B_PORT = 6;
+        public static final int ENCODER_I_PORT = 7;
+
+        public static final double GEAR_RATIO = 3.0;
 
     }
 
     /**
-     * The constants of th manipulator (wrist included).
+     * The constants of the manipulator.
      */
     public static class ManipulatorConstants {
 
-        public static final int WRIST_MOTOR_CANID = 0;
-        public static final double WRIST_MOTOR_SPEED = 1;
-        public static final int MANIPULATOR_MOTOR_CANID = 0;
-        public static final double MANIPULATOR_MOTOR_SPEED = 1;
+        public static final int MANIPULATOR_MOTOR_CAN_ID = 15;
+        public static final double MANIPULATOR_MOTOR_SPEED = 0.75;
         
+    }
+
+    /**
+     * Constants of the Arm.
+     */
+    public static class ArmConstants {
+
+        public static final int ARM_MOTOR_CAN_ID = 14;
+        public static final double ARM_MOTOR_SPEED = 1.0;
+
     }
 }
