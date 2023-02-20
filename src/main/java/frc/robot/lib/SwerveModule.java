@@ -8,14 +8,17 @@ import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,7 +42,10 @@ public class SwerveModule {
     private SparkMaxPIDController m_turnPIDController;
     private SparkMaxPIDController m_drivePIDController;
 
+    private SimpleMotorFeedforward m_driveFeedForward;
+
     private SwerveModuleState m_state;
+    private double m_stateTimestamp;
 
     private double m_home;
     private double m_turnTarget = 0.0;
@@ -51,9 +57,9 @@ public class SwerveModule {
     private final DataLog m_log;
 
     private boolean m_pidTuning = false;
-    private double m_turnKP;
-    private double m_turnKI;
-    private double m_turnKD;
+    private double m_kp;
+    private double m_ki;
+    private double m_kd;
 
     /*
      * Logging:
@@ -66,6 +72,8 @@ public class SwerveModule {
      * 
      */
 
+    private final DoubleLogEntry m_driveMotorOutputLog;
+    private final IntegerLogEntry m_driveMotorFaultsLog;
     private final DoubleLogEntry m_driveMotorSetpointLog;
     private final DoubleLogEntry m_driveMotorPositionLog;
     private final DoubleLogEntry m_driveMotorVelocityLog;
@@ -73,6 +81,8 @@ public class SwerveModule {
     private final DoubleLogEntry m_driveMotorVoltageLog;
     private final DoubleLogEntry m_driveMotorTempLog;
 
+    private final DoubleLogEntry m_turnMotorOutputLog;
+    private final IntegerLogEntry m_turnMotorFaultsLog;
     private final DoubleLogEntry m_turnMotorSetpointLog;
     private final DoubleLogEntry m_turnMotorPositionLog;
     private final DoubleLogEntry m_turnMotorVelocityLog;
@@ -99,6 +109,8 @@ public class SwerveModule {
         m_home = Preferences.getDouble(m_label + ":home", 0.0);
 
         m_turnAbsoluteEncoder = new DutyCycleEncoder(absEncoder);
+        m_turnAbsoluteEncoder.setDistancePerRotation(2 * Math.PI);
+        
         m_driveMotor = new CANSparkMax(driveMotorID, MotorType.kBrushless);
         m_turnMotor = new CANSparkMax(turnMotorID, MotorType.kBrushless);
 
@@ -145,21 +157,26 @@ public class SwerveModule {
         m_turnPIDController.setD(SwerveCalibrations.TURN_KD);
         m_turnPIDController.setSmartMotionMaxVelocity(SwerveCalibrations.TURN_MAX_VELOCITY, 0);
         m_turnPIDController.setSmartMotionMaxAccel(SwerveCalibrations.TURN_MAX_ACCELERATION, 0);
-        m_turnPIDController.setSmartMotionMinOutputVelocity(SwerveCalibrations.TURN_MIN_VELOCITY, 0);
+        m_turnPIDController.setSmartMotionMinOutputVelocity(
+                SwerveCalibrations.TURN_MIN_VELOCITY * SwerveConstants.TURN_GEAR_RATIO / (2 * Math.PI), 0);
 
         m_drivePIDController.setP(SwerveCalibrations.DRIVE_KP);
         m_drivePIDController.setI(SwerveCalibrations.DRIVE_KI);
         m_drivePIDController.setD(SwerveCalibrations.DRIVE_KD);
         m_drivePIDController.setFF(SwerveCalibrations.DRIVE_KF);
 
+        m_driveFeedForward = new SimpleMotorFeedforward(SwerveCalibrations.DRIVE_FF_KS,
+                SwerveCalibrations.DRIVE_FF_KV,
+                SwerveCalibrations.DRIVE_FF_KA);
+
         if (m_pidTuning) {
-            m_turnKP = SwerveCalibrations.TURN_KP;
-            m_turnKD = SwerveCalibrations.TURN_KD;
+            m_kp = SwerveCalibrations.DRIVE_KP;
+            m_kd = SwerveCalibrations.DRIVE_KD;
 
             // PID Tunning
-            SmartDashboard.putNumber(label + " Turn kP", m_turnKP);
-            SmartDashboard.putNumber(label + " Turn kI", SwerveCalibrations.TURN_KI);
-            SmartDashboard.putNumber(label + " Turn kD", m_turnKD);
+            SmartDashboard.putNumber("kP", m_kp);
+            // SmartDashboard.putNumber("kI", SwerveCalibrations.TURN_KI);
+            SmartDashboard.putNumber("kD", m_kd);
         }
 
         if (debug) {
@@ -170,6 +187,12 @@ public class SwerveModule {
             layout.addNumber("Turn Encoder", this::getTurnPos);
             layout.addNumber("Turn Target", this::getTurnTarget);
             layout.addNumber("Wheel Velocity", this::getWheelVelocity);
+            layout.addNumber("Wheel Velocity Target", () -> {
+                return m_driveTarget;
+            });
+            layout.addNumber("Wheel Velocity Error", () -> {
+                return m_driveTarget - getWheelVelocity();
+            });
             layout.addNumber("Wheel Position", m_driveEncoder::getPosition);
             layout.addNumber("Turn Error", () -> {
                 return m_turnTarget - getTurnPos();
@@ -179,6 +202,8 @@ public class SwerveModule {
 
         m_log = DataLogManager.getLog();
 
+        m_driveMotorOutputLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/output", m_label));
+        m_driveMotorFaultsLog = new IntegerLogEntry(m_log, String.format("/swerve/%s/drive/faults", m_label));
         m_driveMotorSetpointLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/setpoint", m_label));
         m_driveMotorPositionLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/position", m_label));
         m_driveMotorVelocityLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/velocity", m_label));
@@ -186,6 +211,8 @@ public class SwerveModule {
         m_driveMotorVoltageLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/voltage", m_label));
         m_driveMotorTempLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/temp", m_label));
 
+        m_turnMotorOutputLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/output", m_label));
+        m_turnMotorFaultsLog = new IntegerLogEntry(m_log, String.format("/swerve/%s/turn/faults", m_label));
         m_turnMotorSetpointLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/setpoint", m_label));
         m_turnMotorPositionLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/position", m_label));
         m_turnMotorVelocityLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/velocity", m_label));
@@ -198,6 +225,9 @@ public class SwerveModule {
 
         logData();
         m_homeLog.append(m_home);
+
+        m_state = new SwerveModuleState(0.0, Rotation2d.fromRadians(getTurnPos()));
+        m_stateTimestamp = Timer.getFPGATimestamp();
     }
 
     // ******* Getters *******
@@ -286,8 +316,13 @@ public class SwerveModule {
     /**
      * Sets the target module state.
      */
-    public void setModuleState(SwerveModuleState state) {
-        m_state = SwerveModuleState.optimize(state, new Rotation2d(getTurnPos()));
+    public void setModuleState(SwerveModuleState state, boolean optimize) {
+        if (optimize) {
+            m_state = SwerveModuleState.optimize(state, new Rotation2d(getTurnPos()));
+        } else {
+            m_state = state;
+        }
+        m_stateTimestamp = Timer.getFPGATimestamp();
 
         double relativeEncoderValue = m_turnRelativeEncoder.getPosition();
         double target = m_state.angle.getRadians();
@@ -295,13 +330,13 @@ public class SwerveModule {
         // adds the closest int number of rotations to the target
         target += Math.round((relativeEncoderValue - target) / (2 * Math.PI)) * 2 * Math.PI;
 
-        // TODO: Implement trapezoidal profile and Feed Forward
         m_turnTarget = target;
         m_turnPIDController.setReference(target, ControlType.kPosition);
 
-        // TODO: Implement Feed Forward
         m_driveTarget = m_state.speedMetersPerSecond;
-        m_drivePIDController.setReference(m_state.speedMetersPerSecond, ControlType.kVelocity, 0, 0.0,
+        double ffVoltage = m_driveFeedForward.calculate(m_state.speedMetersPerSecond);
+
+        m_drivePIDController.setReference(m_state.speedMetersPerSecond, ControlType.kVelocity, 0, ffVoltage,
                 ArbFFUnits.kVoltage);
     }
 
@@ -315,12 +350,32 @@ public class SwerveModule {
         m_turnMotor.setIdleMode(brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
     }
 
+    /**
+     * Sets the voltage of the drive motor.
+     *
+     * @param voltage voltage the motor is set to
+     */
+    public void setDriveVoltage(double voltage) {
+        m_driveMotor.setVoltage(voltage);
+    }
+
+    /**
+     * Sets the voltage of the turn motor.
+     *
+     * @param voltage voltage the motor is set to
+     */
+    public void setTurnVoltage(double voltage) {
+        m_turnMotor.setVoltage(voltage);
+    }
+
     // ******* Logging *******
 
     /**
      * Logs the position, velocity, and targets of the swerve module.
      */
     private void logData() {
+        m_driveMotorOutputLog.append(m_driveMotor.getAppliedOutput());
+        m_driveMotorFaultsLog.append(m_driveMotor.getFaults());
         m_driveMotorSetpointLog.append(m_driveTarget);
         m_driveMotorPositionLog.append(m_driveEncoder.getPosition());
         m_driveMotorVelocityLog.append(m_driveEncoder.getVelocity());
@@ -328,6 +383,8 @@ public class SwerveModule {
         m_driveMotorVoltageLog.append(m_driveMotor.getBusVoltage());
         m_driveMotorTempLog.append(m_driveMotor.getMotorTemperature());
 
+        m_turnMotorOutputLog.append(m_turnMotor.getAppliedOutput());
+        m_turnMotorFaultsLog.append(m_turnMotor.getFaults());
         m_turnMotorSetpointLog.append(m_turnTarget);
         m_turnMotorPositionLog.append(m_turnRelativeEncoder.getPosition());
         m_turnMotorVelocityLog.append(m_turnRelativeEncoder.getVelocity());
@@ -336,6 +393,8 @@ public class SwerveModule {
         m_turnMotorTempLog.append(m_turnMotor.getMotorTemperature());
 
         m_turnAbsoluteEncoderLog.append(m_turnAbsoluteEncoder.getDistance());
+
+        m_driveMotor.getFaults();
     }
 
     /**
@@ -345,24 +404,23 @@ public class SwerveModule {
         logData();
 
         if (m_pidTuning) {
-            double turnKP = SmartDashboard.getNumber(m_label + " Turn kP",
+            double kp = SmartDashboard.getNumber("kP",
                     SwerveCalibrations.TURN_KP);
-            double turnKI = SmartDashboard.getNumber(m_label + " Turn kI",
+            double ki = SmartDashboard.getNumber("kI",
                     SwerveCalibrations.TURN_KI);
-            double turnKD = SmartDashboard.getNumber(m_label + " Turn kD",
+            double kd = SmartDashboard.getNumber("kD",
                     SwerveCalibrations.TURN_KD);
 
-            if (turnKP != m_turnKP) {
-                m_turnPIDController.setP(turnKP);
-                m_turnKP = turnKP;
+            if (kp != m_kp) {
+                m_turnPIDController.setP(kp);
+                m_kp = kp;
             }
-            if (turnKI != m_turnKI) {
-                m_turnPIDController.setI(turnKI);
-                m_turnKI = turnKI;
+            if (ki != m_ki) {
+                m_turnPIDController.setI(ki);
             }
-            if (turnKD != m_turnKD) {
-                m_turnPIDController.setD(turnKD);
-                m_turnKD = turnKD;
+            if (kd != m_kd) {
+                m_turnPIDController.setD(kd);
+                m_kd = kd;
             }
         }
     }

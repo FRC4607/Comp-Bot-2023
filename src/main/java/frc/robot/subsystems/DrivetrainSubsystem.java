@@ -90,7 +90,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         if (!m_gyroRecalibrated && Timer.getFPGATimestamp() > SwerveConstants.GYRO_RECALIBRATION_TIME
                 && !m_matchStarted) {
-            m_adis16470.configCalTime(CalibrationTime._4s);
+            m_adis16470.configCalTime(CalibrationTime._32s);
             m_adis16470.calibrate();
             m_gyroRecalibrated = true;
         }
@@ -124,7 +124,21 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveCalibrations.MAX_SPEED_METER_PER_SECOND);
 
         for (int i = 0; i < swerveModuleStates.length; i++) {
-            m_swerveModules[i].setModuleState(swerveModuleStates[i]);
+            m_swerveModules[i].setModuleState(swerveModuleStates[i], true);
+        }
+    }
+
+    /**
+     * sends an error if an incorrect number of swerve modules are set up.
+     *
+     * @param swerveModuleStates to see if the correct # of modules are set up.
+     */
+    public void setModuleStates(SwerveModuleState[] swerveModuleStates, boolean optimize) {
+
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveCalibrations.MAX_SPEED_METER_PER_SECOND);
+
+        for (int i = 0; i < swerveModuleStates.length; i++) {
+            m_swerveModules[i].setModuleState(swerveModuleStates[i], optimize);
         }
     }
 
@@ -205,6 +219,28 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void setBrakeMode(boolean brakeMode) {
         for (int i = 0; i < m_swerveModules.length; i++) {
             m_swerveModules[i].setBrakeMode(brakeMode);
+        }
+    }
+
+    /**
+     * Sets the voltage of the drive motors.
+     *
+     * @param voltage the voltage the motors are set to
+     */
+    public void setModuleDriveVoltage(double voltage) {
+        for (int i = 0; i < m_swerveModules.length; i++) {
+            m_swerveModules[i].setDriveVoltage(voltage);
+        }
+    }
+
+    /**
+     * Sets the voltage of the drive motors.
+     *
+     * @param voltage the voltage the motors are set to
+     */
+    public void setModuleTurnVoltage(double voltage) {
+        for (int i = 0; i < m_swerveModules.length; i++) {
+            m_swerveModules[i].setTurnVoltage(voltage);
         }
     }
 

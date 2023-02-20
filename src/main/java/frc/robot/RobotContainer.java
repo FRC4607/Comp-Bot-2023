@@ -14,6 +14,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.CalibrateDriveFF;
+import frc.robot.commands.CalibrateTurnFF;
+import frc.robot.commands.ControlSwerveModule;
 import frc.robot.commands.Drive;
 import frc.robot.commands.ResetHeading;
 import frc.robot.commands.SwerveSetHomes;
@@ -43,6 +46,8 @@ public class RobotContainer {
         configureBindings();
 
         SmartDashboard.putData(new SwerveSetHomes(m_drivetrainSubsystem));
+        SmartDashboard.putData(new CalibrateTurnFF(m_drivetrainSubsystem));
+        SmartDashboard.putData(new CalibrateDriveFF(m_drivetrainSubsystem));
         // SmartDashboard.putData(new ControlSwerveModule(0, m_drivetrainSubsystem));
 
         m_chooser = new SendableChooser<>();
@@ -52,11 +57,11 @@ public class RobotContainer {
         m_chooser.setDefaultOption("Test Auto", new SwerveAutoBuilder(
                 m_drivetrainSubsystem::getPose,
                 m_drivetrainSubsystem::setPose,
-                new PIDConstants(15.0, 0, 0),
-                new PIDConstants(15.0, 0, 0),
+                new PIDConstants(3.0, 0, 0),
+                new PIDConstants(1.0, 0, 0),
                 m_drivetrainSubsystem::setChassisSpeeds,
                 new HashMap<>(),
-                m_drivetrainSubsystem).fullAuto(PathPlanner.loadPath("Test-Auto", new PathConstraints(1.0, 1.0))));
+                m_drivetrainSubsystem).fullAuto(PathPlanner.loadPath("Test-Auto", new PathConstraints(2.0, 1.5))));
 
         SmartDashboard.putData("Autonomous Command", m_chooser);
     }
