@@ -93,12 +93,9 @@ public class Constants {
     }
 
     /**
-     * Constants of the Arm.
+     * The constants of the Arm.
      */
     public static class ArmConstants {
-
         public static final int ARM_MOTOR_CAN_ID = 14;
-        public static final double ARM_MOTOR_SPEED = 1.0;
-
     }
 }

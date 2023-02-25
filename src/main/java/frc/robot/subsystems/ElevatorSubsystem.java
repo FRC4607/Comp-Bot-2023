@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
+import frc.robot.Calibrations.ArmCalibrations;
 import frc.robot.Calibrations.ElevatorCalibrations;
 import frc.robot.Constants.ElevatorConstants;
 
@@ -69,7 +71,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_pidController = new ProfiledPIDController(ElevatorCalibrations.KP, ElevatorCalibrations.KI,
                 ElevatorCalibrations.KD,
                 new Constraints(ElevatorCalibrations.MAX_VELOCITY, ElevatorCalibrations.MAX_ACCELERATION));
-        
+
         // SmartDashboard.putData(m_pidController);
 
         m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535); // Max Period - Analog Sensor
@@ -116,9 +118,23 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_motor.setVoltage(voltage);
     }
 
+    /**
+     * Sets the position of the elevator with arm constraints accounted for.
+     *
+     * @param position The position the elevator is set to.
+     */
     public void setElevatorPosition(double position) {
         m_closedLoop = true;
-        m_pidController.setGoal(position);
+        if (position < ElevatorCalibrations.ARM_CLEARANCE && RobotContainer.getInstance().m_armSubsystem
+                .getAbsoluteEncoderPosition() > ArmCalibrations.ELEVATOR_CLEARANCE) {
+            m_pidController.setGoal(ElevatorCalibrations.ARM_CLEARANCE);
+        } else {
+            m_pidController.setGoal(position);
+        }
+    }
+
+    public void resetController() {
+        m_pidController.reset(getEncoderPosition());
     }
 
     public double getEncoderPosition() {

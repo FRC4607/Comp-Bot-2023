@@ -26,6 +26,7 @@ public class MoveArmToPosition extends CommandBase {
 
     @Override
     public void initialize() {
+        m_armSubsystem.resetController();
         m_armSubsystem.setArmTargetPosition(m_position);
     }
 }

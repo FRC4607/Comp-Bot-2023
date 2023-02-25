@@ -3,8 +3,9 @@ package frc.robot.commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ArmConstants;
+import frc.robot.Calibrations.ArmCalibrations;
 import frc.robot.Constants.DriverConstants;
 import frc.robot.subsystems.ArmSubsystem;
 
@@ -34,16 +35,17 @@ public class MoveArm extends CommandBase {
     @Override
     public void initialize() {
         m_armPosition = m_armSubsystem.getAbsoluteEncoderPosition();
-        m_limiter = new SlewRateLimiter(30, -30, 0);
+        m_armSubsystem.resetController();
     }
 
     @Override
     public void execute() {
 
-        m_armPosition -= m_limiter
-                .calculate(MathUtil.applyDeadband(m_operator.getLeftY(), DriverConstants.CONTROLLER_DEADBAND)
-                        * ArmConstants.ARM_MOTOR_SPEED);
+        m_armPosition += MathUtil.applyDeadband(-m_operator.getLeftY(), DriverConstants.CONTROLLER_DEADBAND)
+                * ArmCalibrations.ARM_SPEED;
 
+        m_armPosition = MathUtil.clamp(m_armPosition, ArmCalibrations.MIN_POSITION, ArmCalibrations.MAX_POSITION);
         m_armSubsystem.setArmTargetPosition(m_armPosition);
+        SmartDashboard.putNumber("Arm Target Position", m_armPosition);
     }
 }

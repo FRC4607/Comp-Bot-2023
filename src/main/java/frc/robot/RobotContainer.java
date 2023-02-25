@@ -43,8 +43,24 @@ import java.util.HashMap;
  */
 public class RobotContainer {
 
+    private static RobotContainer m_instance;
+
+    /**
+     * Gets the instance of the robot container.
+     *
+     * @return The robot Container
+     */
+    public static RobotContainer getInstance() {
+        if (m_instance == null) {
+            m_instance = new RobotContainer();
+        }
+        return m_instance;
+    }
+
     private XboxController m_driver;
     private XboxController m_operator;
+
+
 
     public DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
     public ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
@@ -57,7 +73,7 @@ public class RobotContainer {
     /**
      * The constructor for the robot container.
      */
-    public RobotContainer() {
+    private RobotContainer() {
 
         m_driver = new XboxController(0);
         m_operator = new XboxController(1);
@@ -78,7 +94,7 @@ public class RobotContainer {
         SmartDashboard.putData(new MoveArmSmartDashboard(m_armSubsystem));
         SmartDashboard.putData(new MoveElevatorSmartDashboard(m_elevatorSubsystem));
         SmartDashboard.putData(
-                new PlaceGamePiece(PieceLevel.TopCone, m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
+                new PlaceGamePiece(PieceLevel.MiddleCone, m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
         SmartDashboard.putData(new AutoCollectGamePiece(m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
 
         SmartDashboard.putData(new DriveWithSmartDashboard(m_drivetrainSubsystem));
@@ -90,7 +106,7 @@ public class RobotContainer {
         HashMap<String, Command> autoCommands = new HashMap<String, Command>();
 
         autoCommands.put("Place Top Cone",
-                new PlaceGamePiece(PieceLevel.MiddleCone, m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
+                new PlaceGamePiece(PieceLevel.MiddleCube, m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
         autoCommands.put("Collect Cone",
                 new AutoCollectGamePiece(m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
 

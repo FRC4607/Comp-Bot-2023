@@ -24,7 +24,8 @@ public class MoveElevatorSmartDashboard extends CommandBase {
 
     @Override
     public void initialize() {
-        SmartDashboard.putNumber("Elevator Target Position", 0);
+        SmartDashboard.putNumber("Elevator Target Position", m_elevatorSubsystem.getEncoderPosition());
+        m_elevatorSubsystem.resetController();
     }
 
     @Override

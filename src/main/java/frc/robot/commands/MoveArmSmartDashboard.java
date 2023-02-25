@@ -25,6 +25,7 @@ public class MoveArmSmartDashboard extends CommandBase {
     @Override
     public void initialize() {
         SmartDashboard.putNumber("Arm Setpoint", m_armSubsystem.getAbsoluteEncoderPosition());
+        m_armSubsystem.resetController();
     }
 
     @Override

@@ -35,11 +35,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
      */
     public ManipulatorSubsystem() {
 
-        m_motorManipulator = new CANSparkMax(ManipulatorConstants.MANIPULATOR_MOTOR_CAN_ID, MotorType.kBrushed);
+        m_motorManipulator = new CANSparkMax(ManipulatorConstants.MANIPULATOR_MOTOR_CAN_ID, MotorType.kBrushless);
 
         m_motorManipulator.restoreFactoryDefaults();
         m_motorManipulator.setIdleMode(IdleMode.kBrake);
-        m_motorManipulator.setInverted(false);
+        m_motorManipulator.setInverted(true);
         m_motorManipulator.setSmartCurrentLimit(40, 40);
         // m_manipulatorEncoder = m_motorManipulator.getEncoder();
         // m_manipulatorEncoder.setPositionConversionFactor(1.0);
