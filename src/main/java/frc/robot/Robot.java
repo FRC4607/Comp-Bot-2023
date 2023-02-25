@@ -32,6 +32,7 @@ public class Robot extends TimedRobot {
 
     private final NetworkTable m_piTable = NetworkTableInstance.getDefault().getTable("PiTable");
     private final NetworkTableEntry m_recording = m_piTable.getEntry("RecordingEnabled");
+    private boolean m_startSet = false;
 
     private Command m_autonomousCommand;
     private RobotContainer m_robotContainer = new RobotContainer();
@@ -52,6 +53,10 @@ public class Robot extends TimedRobot {
         }
         else if(m_AutorecordState == AutorecordState.STOP && !m_stopValueSent) {
             m_recording.setBoolean(false);
+        }
+        if (m_piTable.containsKey("Start") && !m_startSet) {
+            m_piTable.getEntry("Start").setBoolean(true);
+            m_startSet = true;
         }
         CommandScheduler.getInstance().run();
     }

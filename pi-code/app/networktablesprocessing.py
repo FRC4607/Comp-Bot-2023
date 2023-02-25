@@ -17,6 +17,8 @@ ntinst: ntcore.NetworkTableInstance = None
 
 csOutput: CvSource = None
 
+started: bool = False
+
 def parseError(str):
     """Report parse error."""
     print("config error in '" + configFile + "': " + str, file=sys.stderr)
@@ -73,10 +75,12 @@ def configureNetworkTables():
     entry.setDefaultBoolean(False)
     entry = ntinst.getTable("PiTable").getEntry("RecordingEnabled")
     entry.setDefaultBoolean(False)
+    entry = ntinst.getTable("PiTable").getEntry("Start")
+    entry.setDefaultBoolean(False)
 
     global csOutput
     CameraServer.startAutomaticCapture()
-    csOutput = CameraServer.putVideo("Camera Feed", 300, 300)
+    csOutput = CameraServer.putVideo("Camera Feed", 416, 416)
 
 def getRobotEnabled() -> bool:
     return ntinst.getTable("PiTable").getBoolean("RecordingEnabled", False)
@@ -88,3 +92,10 @@ def setFSOpen(open: bool):
 def pushCameraServer(frame):
     global csOutput
     csOutput.putFrame(frame)
+
+def getStarted() -> bool:
+    global started
+    if ntinst.getTable("PiTable").getEntry("Start").getBoolean(False):
+        ntinst.getTable("PiTable").getEntry("Start").setBoolean(False)
+        started = True
+    return started

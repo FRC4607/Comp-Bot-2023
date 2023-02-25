@@ -9,6 +9,9 @@ import numpy as np
 if __name__ == "__main__":
     print("Configuring NT...")
     ntprocessing.configureNetworkTables()
+    print("Waiting for start command...")
+    while not ntprocessing.getStarted():
+        pass
     print("Opening DepthAI device...")
     pipeline = daiprocessing.configurePipeline()
     with dai.Device(pipeline) as device:
