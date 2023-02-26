@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -44,7 +43,7 @@ public class MoveElevator extends CommandBase {
                     * ElevatorCalibrations.ELEVATOR_DRIVER_SPEED;
 
             m_elevatorPosition = m_elevatorPosition < 0 ? 0 : m_elevatorPosition;
-            
+
             m_elevatorSubsystem.setElevatorPosition(m_elevatorPosition);
             SmartDashboard.putNumber("Elevator Target Position", m_elevatorPosition);
         }

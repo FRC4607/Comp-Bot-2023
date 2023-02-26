@@ -48,9 +48,9 @@ public class PlaceGamePiece extends CommandBase {
     /**
      * An Autonomous Command to place a Game Piece.
      *
-     * @param pieceLevel The level and type of the game piece
-     * @param elevatorSubsystem The Elevator Subsystem
-     * @param armSubsystem the Arm Subsystem
+     * @param pieceLevel           The level and type of the game piece
+     * @param elevatorSubsystem    The Elevator Subsystem
+     * @param armSubsystem         the Arm Subsystem
      * @param manipulatorSubsystem the Manipulator Subsystem
      */
     public PlaceGamePiece(PieceLevel pieceLevel, ElevatorSubsystem elevatorSubsystem, ArmSubsystem armSubsystem,
@@ -68,7 +68,8 @@ public class PlaceGamePiece extends CommandBase {
         m_state = State.extendingElevator;
         m_counter = 0;
         m_elevatorSubsystem
-                .setElevatorPosition(ElevatorCalibrations.elevatorPlacementPositions()[m_pieceLevel.m_value]);
+                .setElevatorPosition(ElevatorCalibrations.elevatorPlacementPositions()[m_pieceLevel.m_value]
+                        + ElevatorCalibrations.TOLERANCE);
         m_elevatorSubsystem.resetController();
         m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_RETRACTED);
         m_armSubsystem.resetController();
@@ -80,9 +81,10 @@ public class PlaceGamePiece extends CommandBase {
         switch (m_state) {
             case extendingElevator:
                 if (Math.abs(m_elevatorSubsystem.getEncoderPosition()
-                        - ElevatorCalibrations.elevatorPlacementPositions()[m_pieceLevel.m_value])
-                        < ElevatorCalibrations.TOLERANCE) {
-                    m_armSubsystem.setArmTargetPosition(ArmCalibrations.armPlacementPositions()[m_pieceLevel.m_value]);
+                        - ElevatorCalibrations
+                                .elevatorPlacementPositions()[m_pieceLevel.m_value]) < ElevatorCalibrations.TOLERANCE) {
+                    m_armSubsystem.setArmTargetPosition(
+                            ArmCalibrations.armPlacementPositions()[m_pieceLevel.m_value]);
                     m_state = State.extendingArm;
                 }
                 break;
@@ -99,7 +101,7 @@ public class PlaceGamePiece extends CommandBase {
 
             case placingPiece:
                 if (m_counter > 25) {
-                    m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_RETRACTED);
+                    m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_RETRACTED + ArmCalibrations.TOLERANCE);
                     m_state = State.retractingArm;
                 }
                 m_counter++;
@@ -109,7 +111,7 @@ public class PlaceGamePiece extends CommandBase {
                 if (Math.abs(m_armSubsystem.getAbsoluteEncoderPosition()
                         - ArmCalibrations.POSITION_RETRACTED) < ArmCalibrations.TOLERANCE) {
                     m_elevatorSubsystem.setElevatorPosition(0);
-                    m_manipulatorSubsystem.setSpeed(0);
+                    m_manipulatorSubsystem.setSpeed(ManipulatorCalibrations.HOLD_SPEED);
                     m_state = State.retractingElevator;
                 }
                 break;

@@ -49,10 +49,13 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         if (m_AutorecordState == AutorecordState.AUTO && !m_startValueSent) {
+            System.out.println("Starting automatic recording.");
             m_recording.setBoolean(true);
-        }
-        else if(m_AutorecordState == AutorecordState.STOP && !m_stopValueSent) {
+            m_startValueSent = true;
+        } else if (m_AutorecordState == AutorecordState.STOP && !m_stopValueSent) {
+            System.out.println("Stopping automatic recording.");
             m_recording.setBoolean(false);
+            m_stopValueSent = true;
         }
         if (m_piTable.containsKey("Start") && !m_startSet) {
             m_piTable.getEntry("Start").setBoolean(true);

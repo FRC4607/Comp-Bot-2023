@@ -26,16 +26,16 @@
     },
     {
       "anchorPoint": {
-        "x": 6.692817965242371,
-        "y": 4.560231517600782
+        "x": 6.678477614558091,
+        "y": 4.345126257336594
       },
       "prevControl": {
-        "x": 5.244442546130173,
-        "y": 4.818357829917807
+        "x": 5.230102195445893,
+        "y": 4.60325256965362
       },
       "nextControl": {
-        "x": 5.244442546130173,
-        "y": 4.818357829917807
+        "x": 5.230102195445893,
+        "y": 4.60325256965362
       },
       "holonomicAngle": 0.0,
       "isReversal": true,
@@ -66,7 +66,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "Place Cone"
+          "Place Top Cone"
         ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
@@ -79,7 +79,7 @@
   "isReversed": null,
   "markers": [
     {
-      "position": 0.48181818181818203,
+      "position": 0.20000000000000007,
       "names": [
         "event",
         "Collect Cone"

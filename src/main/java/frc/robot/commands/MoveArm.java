@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -16,7 +15,6 @@ public class MoveArm extends CommandBase {
     ArmSubsystem m_armSubsystem;
     private XboxController m_operator;
     private double m_armPosition;
-    private SlewRateLimiter m_limiter;
 
     /**
      * Defines what is necessary for this command.

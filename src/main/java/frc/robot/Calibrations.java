@@ -110,7 +110,7 @@ public class Calibrations {
         public static final double MAX_VELOCITY = 180.0;
         public static final double MAX_ACCELERATION = 120.0;
 
-        public static final double TOLERANCE = 4.0;
+        public static final double TOLERANCE = 6.0;
 
         public static final double MIN_POSITION = 10.0;
         public static final double MAX_POSITION = 180.0;
@@ -171,18 +171,19 @@ public class Calibrations {
         public static final double MAX_ACCELERATION = 100;
         public static final double MAX_VELOCITY = 100;
 
-        public static final double TOLERANCE = 1.5;
+        public static final double TOLERANCE = 2.0;
 
         public static final double POSITION_PIECE_COLLECTION = 45.0;
         public static final double ARM_CLEARANCE = 35.0;
         public static final double ELEVATOR_DRIVER_SPEED = 1.0;
+        public static final double COLLECTION_POSITION = 40;
     }
 
     /**
      * The Calibrations for the Manipulator Subsystem.
      */
     public static final class ManipulatorCalibrations {
-        public static final double INTAKE_SPEED = -0.75;
+        public static final double INTAKE_SPEED = -0.80;
         public static final double OUTTAKE_SPEED = 0.2;
         public static final double HOLD_SPEED = -0.1;
 

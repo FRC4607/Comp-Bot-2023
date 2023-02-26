@@ -48,7 +48,7 @@ public class AutoCollectGamePiece extends CommandBase {
     public void initialize() {
         m_state = State.extendingElevator;
         m_counter = 0;
-        m_elevatorSubsystem.setElevatorPosition(ElevatorCalibrations.ARM_CLEARANCE);
+        m_elevatorSubsystem.setElevatorPosition(ElevatorCalibrations.COLLECTION_POSITION + ElevatorCalibrations.TOLERANCE);
         m_elevatorSubsystem.resetController();
         m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_RETRACTED);
         m_armSubsystem.resetController();
@@ -59,7 +59,7 @@ public class AutoCollectGamePiece extends CommandBase {
         switch (m_state) {
             case extendingElevator:
                 if (Math.abs(m_elevatorSubsystem.getEncoderPosition()
-                        - ElevatorCalibrations.ARM_CLEARANCE) < ElevatorCalibrations.TOLERANCE) {
+                        - ElevatorCalibrations.COLLECTION_POSITION) < ElevatorCalibrations.TOLERANCE) {
 
                     m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_PIECE_COLLECTION);
                     m_state = State.extendingArm;
@@ -76,7 +76,7 @@ public class AutoCollectGamePiece extends CommandBase {
                 break;
 
             case collectingPiece:
-                if (m_counter > 50) {
+                if (m_counter > 150) {
                     m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_RETRACTED);
                     m_state = State.retractingArm;
                     m_manipulatorSubsystem.setSpeed(ManipulatorCalibrations.HOLD_SPEED);
