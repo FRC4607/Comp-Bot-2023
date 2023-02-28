@@ -14,12 +14,11 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
 import frc.robot.Calibrations.ArmCalibrations;
 import frc.robot.Calibrations.ElevatorCalibrations;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.RobotContainer;
 
 /**
  * The subsystem responsible for the manipulator of the robot.
@@ -149,10 +148,6 @@ public class ArmSubsystem extends SubsystemBase {
         m_motorTempLog.append(m_motor.getMotorTemperature());
         m_absolutePositionLog.append(m_absoluteEncoder.getPosition());
         m_absoluteVelocityLog.append(m_absoluteEncoder.getPosition());
-
-        SmartDashboard.putNumber("Arm Position", m_motorEncoder.getPosition());
-        SmartDashboard.putNumber("Arm Absolute Position", m_absoluteEncoder.getPosition());
-        SmartDashboard.putNumber("Arm Absolute Position 2", getAbsoluteEncoderPosition());
 
         m_motor.getFaults();
 

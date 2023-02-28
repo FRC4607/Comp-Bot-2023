@@ -13,6 +13,7 @@ public class MoveElevator extends CommandBase {
     ElevatorSubsystem m_elevatorSubsystem;
     XboxController m_xboxController;
     private double m_elevatorPosition;
+    private boolean m_manual;
 
     /**
      * The command setup.
@@ -30,22 +31,30 @@ public class MoveElevator extends CommandBase {
     @Override
     public void initialize() {
         SmartDashboard.putBoolean("Open Elevator Control", false);
+        m_manual = false;
+        m_elevatorPosition = m_elevatorSubsystem.getEncoderPosition();
     }
 
     @Override
     public void execute() {
         double input = m_xboxController.getRightTriggerAxis() - m_xboxController.getLeftTriggerAxis();
-        
+
         if (SmartDashboard.getBoolean("Open Elevator Control", true)) {
+            if (!m_manual) {
+                m_manual = true;
+            }
             m_elevatorSubsystem.setSpeed(input * 0.75);
         } else {
+            if (m_manual) {
+                m_manual = false;
+                m_elevatorPosition = m_elevatorSubsystem.getEncoderPosition();
+            }
             m_elevatorPosition += (input)
                     * ElevatorCalibrations.ELEVATOR_DRIVER_SPEED;
 
             m_elevatorPosition = m_elevatorPosition < 0 ? 0 : m_elevatorPosition;
 
             m_elevatorSubsystem.setElevatorPosition(m_elevatorPosition);
-            SmartDashboard.putNumber("Elevator Target Position", m_elevatorPosition);
         }
 
     }

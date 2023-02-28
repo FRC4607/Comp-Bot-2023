@@ -14,12 +14,11 @@ import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
 import frc.robot.Calibrations.ArmCalibrations;
 import frc.robot.Calibrations.ElevatorCalibrations;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.RobotContainer;
 
 /**
  * The subsystem used for the elevator lift.
@@ -161,9 +160,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_motorTempLog.append(m_motor.getMotorTemperature());
         m_encoderPositionLog.append(m_motorEncoder.getPosition());
         m_absoluteEncoderPositionLog.append(m_absoluteEncoder.getDistance());
-
-        SmartDashboard.putNumber("Elevator Motor Position", m_motorEncoder.getPosition());
-        SmartDashboard.putNumber("Elevator Encoder Position", getEncoderPosition());
 
         m_motor.getFaults();
     }

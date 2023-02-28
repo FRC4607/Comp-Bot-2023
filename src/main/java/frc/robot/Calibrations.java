@@ -56,6 +56,16 @@ public class Calibrations {
     public static final class ArmCalibrations {
 
         public static final double POSITION_PIECE_COLLECTION = 170.0;
+
+        public static double pieceCollection() {
+            if (!Preferences.containsKey("Arm Piece Collection")) {
+                Preferences.setDouble("Arm Piece Collection", POSITION_PIECE_COLLECTION);
+            }
+
+            return Preferences.getDouble("Arm Piece Collection", POSITION_PIECE_COLLECTION);
+        }
+        
+
         public static final double POSITION_LEVEL = 80.0;
         public static final double POSITION_TOP_NODE = 90.0;
         public static final double POSITION_RETRACTED = 10.0;
@@ -96,6 +106,16 @@ public class Calibrations {
             }
 
             return preferences;
+        }
+
+        public static final double SHELF_PICKUP = 40.0;
+
+        public static double shelfPickup() {
+            if (!Preferences.containsKey("Arm Shelf Pickup")) {
+                Preferences.setDouble("Arm Shelf Pickup", SHELF_PICKUP);
+            }
+
+            return Preferences.getDouble("Arm Shelf Pickup", SHELF_PICKUP);
         }
 
         public static final double KG = 0.5;
@@ -161,6 +181,16 @@ public class Calibrations {
             return preferences;
         }
 
+        public static double shelfPickup() {
+            double elevatorShelfPickup = Preferences.getDouble("Elevator Shelf Pickup", 0.0);
+
+            if (elevatorShelfPickup == 0.0) {
+                Preferences.setDouble("Elevator Shelf Pickup", 90.0);
+                elevatorShelfPickup = 90.0;
+            }
+            return elevatorShelfPickup;
+        }
+
         public static final double KP = 1.0;
         public static final double KI = 0.0;
         public static final double KD = 0.0;
@@ -173,10 +203,18 @@ public class Calibrations {
 
         public static final double TOLERANCE = 2.0;
 
-        public static final double POSITION_PIECE_COLLECTION = 45.0;
+        private static final double PIECE_COLLECTION_STATIC = 45.0;
+
+        public static double pieceCollection() {
+            if (!Preferences.containsKey("Elevator Piece Collection")) {
+                Preferences.setDouble("Elevator Piece Collection", PIECE_COLLECTION_STATIC);
+            }
+
+            return Preferences.getDouble("Elevator Piece Collection", PIECE_COLLECTION_STATIC);
+        }
+
         public static final double ARM_CLEARANCE = 35.0;
         public static final double ELEVATOR_DRIVER_SPEED = 1.0;
-        public static final double COLLECTION_POSITION = 40;
     }
 
     /**
