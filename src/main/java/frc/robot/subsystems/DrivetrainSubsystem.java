@@ -62,7 +62,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         m_adis16470 = new ADIS16470();
         m_pigeon = new Pigeon2(SwerveConstants.PIGEON2_CAN_ID);
-
         for (int i = 0; i < m_swerveModules.length; i++) {
             m_swerveModules[i].homeEncoder();
         }
@@ -97,6 +96,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("Gyro Yaw (Deg)", getGyroRotation().getDegrees());
         SmartDashboard.putNumber("Pigeon Yaw (Deg)", m_pigeon.getYaw());
+        SmartDashboard.putNumber("Pigeon Pitch (Deg)", m_pigeon.getPitch());
+        SmartDashboard.putNumber("ADIS Pitch (Deg)", m_adis16470.getYFilteredAccelAngle());
     }
 
     /**
@@ -148,9 +149,19 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * @return The {@link Rotation2d} of the gyro
      */
     public Rotation2d getGyroRotation() {
-
         return Rotation2d.fromDegrees(m_adis16470.getAngle());
+    }
 
+    public Rotation2d getPigeonYawRotation() {
+        return Rotation2d.fromDegrees(m_pigeon.getYaw());
+    }
+
+    public Rotation2d getPigeonPitchRotation() {
+        return Rotation2d.fromDegrees(m_pigeon.getPitch());
+    }
+
+    public Rotation2d getPigeonRollRotation() {
+        return Rotation2d.fromDegrees(m_pigeon.getRoll());
     }
 
     /**
