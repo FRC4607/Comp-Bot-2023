@@ -11,15 +11,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations.SwerveCalibrations;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.lib.ADIS16470;
-import frc.robot.lib.ADIS16470.CalibrationTime;
-import frc.robot.lib.ADIS16470.IMUAxis;
 import frc.robot.lib.SwerveModule;
 import java.util.ArrayList;
 
@@ -30,20 +24,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     private SwerveModule[] m_swerveModules;
 
-    private ADIS16470 m_adis16470;
-    // private Pigeon2 m_pigeon;
+    private Pigeon2 m_pigeon;
 
     private SwerveDriveKinematics m_kinematics;
     private SwerveDriveOdometry m_odometry;
 
     private final DataLog m_log;
 
-    private final DoubleLogEntry m_gyroTempLog;
-    private final DoubleLogEntry m_gyroYawLog;
-    // private final DoubleLogEntry m_pigeonYawLog;
-
-    private boolean m_gyroRecelebrated;
-    private boolean m_matchStarted;
+    private final DoubleLogEntry m_pigeonYawLog;
 
     /**
      * Sets up the hardware used in the drivetrain.
@@ -57,13 +45,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
                     SwerveConstants.LABELS[i],
                     SwerveConstants.DRIVE_CAN_IDS[i],
                     SwerveConstants.TURN_CAN_IDS[i],
-                    SwerveConstants.ABS_ENCODER_DIO_PORT[i],
                     SwerveConstants.DRIVE_ENCODER_REVERSED[i],
                     SwerveConstants.DEBUG);
         }
 
-        m_adis16470 = new ADIS16470(IMUAxis.kZ, SPI.Port.kOnboardCS0, CalibrationTime._4s);
-        // m_pigeon = new Pigeon2(SwerveConstants.PIGEON2_CAN_ID);
+        m_pigeon = new Pigeon2(SwerveConstants.PIGEON2_CAN_ID);
+        m_pigeon.setYaw(0);
 
         for (int i = 0; i < m_swerveModules.length; i++) {
             m_swerveModules[i].homeEncoder();
@@ -74,9 +61,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         m_log = DataLogManager.getLog();
 
-        m_gyroTempLog = new DoubleLogEntry(m_log, "swerve/gyro/temp");
-        m_gyroYawLog = new DoubleLogEntry(m_log, "swerve/gyro/yaw");
-        // m_pigeonYawLog = new DoubleLogEntry(m_log, "swerve/pigeon/yaw");
+        m_pigeonYawLog = new DoubleLogEntry(m_log, "swerve/pigeon/yaw");
 
         logData();
     }
@@ -89,13 +74,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
         logData();
 
         m_odometry.update(getGyroRotation(), getModulePositions());
-
-        if (!m_gyroRecelebrated && Timer.getFPGATimestamp() > SwerveConstants.GYRO_RECALIBRATION_TIME
-                && !m_matchStarted) {
-            m_adis16470.configCalTime(CalibrationTime._32s);
-            m_adis16470.calibrate();
-            m_gyroRecelebrated = true;
-        }
 
         // SmartDashboard.putNumber("Gyro Yaw (Deg)", getGyroRotation().getDegrees());
         // SmartDashboard.putNumber("Pigeon Yaw (Deg)", m_pigeon.getYaw());
@@ -151,7 +129,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      */
     public Rotation2d getGyroRotation() {
 
-        return Rotation2d.fromDegrees(m_adis16470.getAngle());
+        return Rotation2d.fromDegrees(m_pigeon.getYaw());
 
     }
 
@@ -269,17 +247,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * A function that logs the data in the Drivetrain subsystem.
      */
     private void logData() {
-        m_gyroTempLog.append(m_adis16470.getTemp());
-        m_gyroYawLog.append(m_adis16470.getAngle());
-        // m_pigeonYawLog.append(m_pigeon.getYaw());
-    }
-
-    /**
-     * This function should be called when auto or teleop is started. It prevents
-     * the ADIS16470 from recalibrating if it has not already done so.
-     */
-    public void matchBegin() {
-        m_matchStarted = true;
+        m_pigeonYawLog.append(m_pigeon.getYaw());
     }
 
 }

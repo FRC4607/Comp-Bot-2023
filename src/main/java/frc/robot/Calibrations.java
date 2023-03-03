@@ -23,30 +23,26 @@ public class Calibrations {
         /** Min turning speed in Rad / s. */
         public static final double TURN_MIN_VELOCITY = 0.001;
 
-        // Yet to be tuned
-        public static final double DRIVE_KP = 0.0;
+        // Kind of tuned - So little error because of feed forward that it is hard to tune.
+        public static final double DRIVE_KP = 0.1;
         public static final double DRIVE_KI = 0.0;
         public static final double DRIVE_KD = 0.0;
         public static final double DRIVE_KF = 0.0;
 
-        /*
-         * Rear Left motor data was not included because of noise in the data.
-         */
-        public static final double DRIVE_FF_KS = (0.21 + 0.142 + 0.221 + 0.153 + 0.236 + 0.153) / 6;
-        public static final double DRIVE_FF_KV = (2.61 + 2.66 + 2.56 + 2.59 + 2.56 + 2.61) / 6;
-        // Too few data points to calculate. Will revisit if time allows.
-        public static final double DRIVE_FF_KA = 0.0;
+        public static final double DRIVE_FF_KS = 0.16;
+        public static final double DRIVE_FF_KV = 2.6825;
+        public static final double DRIVE_FF_KA = 0.808625;
 
         /**
          * Max acceleration in Meters / s. Experimentally determined at voltage of 9
          * volts.
          */
-        public static final double MAX_SPEED_METER = 3.39;
+        public static final double MAX_SPEED_METER = 3.27;
         /**
          * Max acceleration in Meters / s^2. Experimentally determined with a step
          * voltage of 9 volts.
          */
-        public static final double MAX_ACCELERATION = 4.39;
+        public static final double MAX_ACCELERATION = 3.27;
 
     }
 
@@ -58,11 +54,11 @@ public class Calibrations {
         public static final double POSITION_PIECE_COLLECTION = 170.0;
 
         public static double pieceCollection() {
-            if (!Preferences.containsKey("Arm Piece Collection")) {
-                Preferences.setDouble("Arm Piece Collection", POSITION_PIECE_COLLECTION);
+            if (!Preferences.containsKey("ArmPieceCollection")) {
+                Preferences.setDouble("ArmPieceCollection", POSITION_PIECE_COLLECTION);
             }
 
-            return Preferences.getDouble("Arm Piece Collection", POSITION_PIECE_COLLECTION);
+            return Preferences.getDouble("ArmPieceCollection", POSITION_PIECE_COLLECTION);
         }
         
 
@@ -111,11 +107,11 @@ public class Calibrations {
         public static final double SHELF_PICKUP = 40.0;
 
         public static double shelfPickup() {
-            if (!Preferences.containsKey("Arm Shelf Pickup")) {
-                Preferences.setDouble("Arm Shelf Pickup", SHELF_PICKUP);
+            if (!Preferences.containsKey("ArmShelfPickup")) {
+                Preferences.setDouble("ArmShelfPickup", SHELF_PICKUP);
             }
 
-            return Preferences.getDouble("Arm Shelf Pickup", SHELF_PICKUP);
+            return Preferences.getDouble("ArmShelfPickup", SHELF_PICKUP);
         }
 
         public static final double KG = 0.5;
@@ -182,10 +178,10 @@ public class Calibrations {
         }
 
         public static double shelfPickup() {
-            double elevatorShelfPickup = Preferences.getDouble("Elevator Shelf Pickup", 0.0);
+            double elevatorShelfPickup = Preferences.getDouble("ElevatorShelfPickup", 0.0);
 
             if (elevatorShelfPickup == 0.0) {
-                Preferences.setDouble("Elevator Shelf Pickup", 90.0);
+                Preferences.setDouble("ElevatorShelfPickup", 90.0);
                 elevatorShelfPickup = 90.0;
             }
             return elevatorShelfPickup;
@@ -206,15 +202,17 @@ public class Calibrations {
         private static final double PIECE_COLLECTION_STATIC = 45.0;
 
         public static double pieceCollection() {
-            if (!Preferences.containsKey("Elevator Piece Collection")) {
-                Preferences.setDouble("Elevator Piece Collection", PIECE_COLLECTION_STATIC);
+            if (!Preferences.containsKey("ElevatorPieceCollection")) {
+                Preferences.setDouble("ElevatorPieceCollection", PIECE_COLLECTION_STATIC);
             }
 
-            return Preferences.getDouble("Elevator Piece Collection", PIECE_COLLECTION_STATIC);
+            return Preferences.getDouble("ElevatorPieceCollection", PIECE_COLLECTION_STATIC);
         }
 
         public static final double ARM_CLEARANCE = 35.0;
         public static final double ELEVATOR_DRIVER_SPEED = 1.0;
+
+        public static final double MAX_POSITION = 100;
     }
 
     /**

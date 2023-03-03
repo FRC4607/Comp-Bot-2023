@@ -99,6 +99,10 @@ public class ArmSubsystem extends SubsystemBase {
         m_motor.set(speed);
     }
 
+    public void setVoltage(double voltage) {
+        m_motor.setVoltage(voltage);
+    }
+
     /**
      * Gets the position of the absolute encoder in Degrees with Vertical being 0
      * and forward being positive.
@@ -118,8 +122,8 @@ public class ArmSubsystem extends SubsystemBase {
     public void setArmTargetPosition(double position) {
         m_setpoint = MathUtil.clamp(position, ArmCalibrations.MIN_POSITION, ArmCalibrations.MAX_POSITION);
 
-        if (m_setpoint > ArmCalibrations.ELEVATOR_CLEARANCE && RobotContainer.getInstance().m_elevatorSubsystem
-                .getEncoderPosition() < ElevatorCalibrations.ARM_CLEARANCE) {
+        if (m_setpoint > ArmCalibrations.ELEVATOR_CLEARANCE && /*RobotContainer.getInstance().m_elevatorSubsystem
+                .getEncoderPosition()*/0 < ElevatorCalibrations.ARM_CLEARANCE) {
             m_pidController.setGoal(ArmCalibrations.ELEVATOR_CLEARANCE);
         } else {
             m_pidController.setGoal(m_setpoint);

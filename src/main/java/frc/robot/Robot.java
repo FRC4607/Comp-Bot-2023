@@ -8,6 +8,8 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -26,6 +28,7 @@ public class Robot extends TimedRobot {
         TELEOP,
         STOP
     }
+
     private AutorecordState m_AutorecordState = AutorecordState.BEFORE_START;
     private boolean m_startValueSent = false;
     private boolean m_stopValueSent = false;
@@ -37,12 +40,26 @@ public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
     private RobotContainer m_robotContainer = RobotContainer.getInstance();
 
+    private AddressableLED m_LEDs;
+    private AddressableLEDBuffer m_LEDBuffer;
+    private NetworkTableEntry alienceColorEntry;
+
     @Override
     public void robotInit() {
         m_recording.setBoolean(false);
         DataLogManager.start();
         DataLog log = DataLogManager.getLog();
         DriverStation.startDataLog(log);
+
+        m_LEDs = new AddressableLED(0);
+        m_LEDs.setLength(38);
+        m_LEDBuffer = new AddressableLEDBuffer(38);
+        m_LEDs.setData(m_LEDBuffer);
+        m_LEDs.start();
+
+        NetworkTableInstance inst = NetworkTableInstance.getDefault();
+        NetworkTable fmsInfo = inst.getTable("FMSInfo");
+        alienceColorEntry = fmsInfo.getEntry("IsRedAlliance");
 
     }
 
@@ -62,14 +79,21 @@ public class Robot extends TimedRobot {
             m_startSet = true;
         }
         CommandScheduler.getInstance().run();
+
+        // boolean isRed = alienceColorEntry.getBoolean(false);
+
+        // for (int i = 0; i < 38; i++) {
+        //     m_LEDBuffer.setHSV(i, isRed ? 0 : 100, 255, 255);
+        // }
+
+        // m_LEDs.setData(m_LEDBuffer);
     }
 
     @Override
     public void disabledInit() {
         if (m_AutorecordState == AutorecordState.AUTO) {
             m_AutorecordState = AutorecordState.AUTO_DISABLED;
-        }
-        else if (m_AutorecordState == AutorecordState.TELEOP) {
+        } else if (m_AutorecordState == AutorecordState.TELEOP) {
             m_AutorecordState = AutorecordState.STOP;
         }
     }
@@ -88,7 +112,6 @@ public class Robot extends TimedRobot {
             m_AutorecordState = AutorecordState.AUTO;
         }
 
-        m_robotContainer.m_drivetrainSubsystem.matchBegin();
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         if (m_autonomousCommand != null) {
@@ -110,7 +133,6 @@ public class Robot extends TimedRobot {
             m_AutorecordState = AutorecordState.TELEOP;
         }
 
-        m_robotContainer.m_drivetrainSubsystem.matchBegin();
 
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
@@ -127,7 +149,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
-        m_robotContainer.m_drivetrainSubsystem.matchBegin();
 
         CommandScheduler.getInstance().cancelAll();
     }

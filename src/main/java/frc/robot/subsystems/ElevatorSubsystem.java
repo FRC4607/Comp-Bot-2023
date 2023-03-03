@@ -124,8 +124,8 @@ public class ElevatorSubsystem extends SubsystemBase {
      */
     public void setElevatorPosition(double position) {
         m_closedLoop = true;
-        if (position < ElevatorCalibrations.ARM_CLEARANCE && RobotContainer.getInstance().m_armSubsystem
-                .getAbsoluteEncoderPosition() > ArmCalibrations.ELEVATOR_CLEARANCE) {
+        if (position < 0.0 /*ElevatorCalibrations.ARM_CLEARANCE && RobotContainer.getInstance().m_armSubsystem
+                .getAbsoluteEncoderPosition()*/&& 0.0 > ArmCalibrations.ELEVATOR_CLEARANCE) {
             m_pidController.setGoal(ElevatorCalibrations.ARM_CLEARANCE);
         } else {
             m_pidController.setGoal(position);

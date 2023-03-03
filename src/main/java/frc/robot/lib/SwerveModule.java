@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -16,7 +17,6 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
@@ -34,7 +34,7 @@ public class SwerveModule {
     private CANSparkMax m_driveMotor;
     private CANSparkMax m_turnMotor;
 
-    private DutyCycleEncoder m_turnAbsoluteEncoder;
+    private SparkMaxAbsoluteEncoder m_turnAbsoluteEncoder;
     private RelativeEncoder m_turnRelativeEncoder;
     private RelativeEncoder m_driveEncoder;
 
@@ -54,7 +54,7 @@ public class SwerveModule {
     private String m_label;
     private final DataLog m_log;
 
-    private boolean m_pidTuning = false;
+    private boolean m_pidTuning = true;
     private double m_kp;
     private double m_ki;
     private double m_kd;
@@ -87,28 +87,24 @@ public class SwerveModule {
     private final DoubleLogEntry m_turnMotorCurrentLog;
     private final DoubleLogEntry m_turnMotorVoltageLog;
     private final DoubleLogEntry m_turnMotorTempLog;
+    private final DoubleLogEntry m_turnMotorAbsoluteEncoderLog;
 
     private final DoubleLogEntry m_homeLog;
-    private final DoubleLogEntry m_turnAbsoluteEncoderLog;
 
     /**
      * An encapsulates of a swerve module.
      *
      * @param driveMotorID The CAN ID of the drive motor
      * @param turnMotorID  The CAN ID of the turn motor
-     * @param absEncoder   The roborio DIO port the absolute encoder is on
      * @param debug        Whether a value is sent to Shuffleboard
      */
-    public SwerveModule(String label, int driveMotorID, int turnMotorID, int absEncoder,
+    public SwerveModule(String label, int driveMotorID, int turnMotorID,
             boolean driverReversed, boolean debug) {
 
         m_label = label;
 
         m_home = Preferences.getDouble(m_label + ":home", 0.0);
 
-        m_turnAbsoluteEncoder = new DutyCycleEncoder(absEncoder);
-        m_turnAbsoluteEncoder.setDistancePerRotation(2 * Math.PI);
-        
         m_driveMotor = new CANSparkMax(driveMotorID, MotorType.kBrushless);
         m_turnMotor = new CANSparkMax(turnMotorID, MotorType.kBrushless);
 
@@ -128,8 +124,8 @@ public class SwerveModule {
 
         m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535); // Max Period - Analog Sensor
         m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 65535); // Max Period - Alternate Encoder
-        m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535); // Max Period - Duty Cycle Encoder Position
-        m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 65535); // Max Period - Duty Cycle Encoder Velocity
+        m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20); // Duty Cycle Encoder Position
+        m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20); // Duty Cycle Encoder Velocity
 
         m_turnMotor.clearFaults();
         m_driveMotor.clearFaults();
@@ -163,13 +159,16 @@ public class SwerveModule {
         m_drivePIDController.setD(SwerveCalibrations.DRIVE_KD);
         m_drivePIDController.setFF(SwerveCalibrations.DRIVE_KF);
 
+        m_turnAbsoluteEncoder = m_turnMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
+        m_turnAbsoluteEncoder.setPositionConversionFactor(2 * Math.PI);
+
         m_driveFeedForward = new SimpleMotorFeedforward(SwerveCalibrations.DRIVE_FF_KS,
                 SwerveCalibrations.DRIVE_FF_KV,
                 SwerveCalibrations.DRIVE_FF_KA);
 
         if (m_pidTuning) {
-            m_kp = SwerveCalibrations.TURN_KP;
-            m_kd = SwerveCalibrations.TURN_KD;
+            m_kp = SwerveCalibrations.DRIVE_KP;
+            m_kd = SwerveCalibrations.DRIVE_KD;
 
             // PID Tunning
             SmartDashboard.putNumber("kP", m_kp);
@@ -217,9 +216,9 @@ public class SwerveModule {
         m_turnMotorCurrentLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/current", m_label));
         m_turnMotorVoltageLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/voltage", m_label));
         m_turnMotorTempLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/temp", m_label));
+        m_turnMotorAbsoluteEncoderLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/absolute", m_label));
 
         m_homeLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/home", m_label));
-        m_turnAbsoluteEncoderLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn_enc/absolute", m_label));
 
         logData();
         m_homeLog.append(m_home);
@@ -240,7 +239,7 @@ public class SwerveModule {
      * Returns the absolute position of the turn encoder in radian.
      */
     public double getAbsoluteEncoder() {
-        return m_turnAbsoluteEncoder.getAbsolutePosition() * 2 * Math.PI;
+        return m_turnAbsoluteEncoder.getPosition();
     }
 
     /**
@@ -387,7 +386,7 @@ public class SwerveModule {
         m_turnMotorVoltageLog.append(m_turnMotor.getBusVoltage());
         m_turnMotorTempLog.append(m_turnMotor.getMotorTemperature());
 
-        m_turnAbsoluteEncoderLog.append(m_turnAbsoluteEncoder.getDistance());
+        m_turnMotorAbsoluteEncoderLog.append(m_turnAbsoluteEncoder.getPosition());
 
         m_driveMotor.getFaults();
     }
@@ -407,14 +406,14 @@ public class SwerveModule {
                     SwerveCalibrations.TURN_KD);
 
             if (kp != m_kp) {
-                m_turnPIDController.setP(kp);
+                m_drivePIDController.setP(kp);
                 m_kp = kp;
             }
             if (ki != m_ki) {
-                m_turnPIDController.setI(ki);
+                m_drivePIDController.setI(ki);
             }
             if (kd != m_kd) {
-                m_turnPIDController.setD(kd);
+                m_drivePIDController.setD(kd);
                 m_kd = kd;
             }
         }
