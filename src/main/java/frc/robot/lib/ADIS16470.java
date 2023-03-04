@@ -283,7 +283,7 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
     }
 
     public ADIS16470() {
-        this(IMUAxis.kZ, SPI.Port.kOnboardCS0, CalibrationTime._32s);
+        this(IMUAxis.kZ, SPI.Port.kOnboardCS0, CalibrationTime._4s);
     }
 
     /**

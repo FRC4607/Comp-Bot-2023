@@ -67,10 +67,10 @@ public class Constants {
     }
 
     public static class AutoLevelConstants {
-        public static final double kP = 0.05;
+        public static final double kP = 0.04;
         public static final double kI = 0.0;
-        public static final double kD = 0.005;
-        public static final double tolerance = 1;
+        public static final double kD = 0.0001;
+        public static final double tolerance = 1.5;
         public static final double waitTime = 3;
     }
 }

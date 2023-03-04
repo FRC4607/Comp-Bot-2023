@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.Pigeon2.AxisDirection;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -62,6 +64,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         m_adis16470 = new ADIS16470();
         m_pigeon = new Pigeon2(SwerveConstants.PIGEON2_CAN_ID);
+        m_pigeon.configFactoryDefault();
+        m_pigeon.configMountPose(AxisDirection.NegativeY, AxisDirection.PositiveZ);
+        m_pigeon.setYaw(0);
         for (int i = 0; i < m_swerveModules.length; i++) {
             m_swerveModules[i].homeEncoder();
         }
@@ -89,7 +94,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         if (!m_gyroRecalibrated && Timer.getFPGATimestamp() > SwerveConstants.GYRO_RECALIBRATION_TIME
                 && !m_matchStarted) {
-            m_adis16470.configCalTime(CalibrationTime._32s);
+            m_adis16470.configCalTime(CalibrationTime._4s);
             m_adis16470.calibrate();
             m_gyroRecalibrated = true;
         }
