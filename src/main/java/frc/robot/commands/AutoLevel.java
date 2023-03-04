@@ -1,57 +1,72 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.AutoLevelConstants;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 public class AutoLevel extends CommandBase {
     private final DrivetrainSubsystem m_drive;
-    private final PIDController m_pid;
-    private final Timer m_timer;
     private double m_deg;
+
+    private double m_xSpeed;
+
+    private long m_lastTime;
+    private double m_lastPitch;
+
+    private boolean m_end = false;
+
+    private enum SignChange {
+        POSITIVE,
+        NEGATIVE
+    };
+
+    private SignChange m_sign = null;
+
     public AutoLevel(DrivetrainSubsystem drive) {
+        m_xSpeed = SmartDashboard.getNumber("Robot AutoLevel X Speed", 0);
         m_drive = drive;
         addRequirements(m_drive);
-        m_timer = new Timer();
-        m_pid = new PIDController(AutoLevelConstants.kP, AutoLevelConstants.kI, AutoLevelConstants.kD);
-        m_pid.setTolerance(AutoLevelConstants.tolerance);
-        SmartDashboard.putNumber("Robot AutoLevel P", AutoLevelConstants.kP);
-        SmartDashboard.putNumber("Robot AutoLevel D", AutoLevelConstants.kD);
-        // SmartDashboard.putNumber("Robot AutoLevel X Speed", 1);
     }
 
     @Override
     public void initialize() {
-        m_pid.setSetpoint(0);
+        m_xSpeed = SmartDashboard.getNumber("Robot AutoLevel X Speed", 0);
         m_deg = getRobotPitch().getDegrees();
+        m_lastTime = RobotController.getFPGATime();
+        m_lastPitch = getRobotPitch().getDegrees();
     }
 
     @Override
     public void execute() {
-        double newP = SmartDashboard.getNumber("Robot AutoLevel P", AutoLevelConstants.kP);
-        double newD = SmartDashboard.getNumber("Robot AutoLevel D", AutoLevelConstants.kD);
-        // double newX = SmartDashboard.getNumber("Robot AutoLevel X Speed", 1);
-        m_deg = getRobotPitch().getDegrees();
-        m_pid.setP(newP);
-        m_pid.setD(newD);
-        if (m_pid.atSetpoint()) {
-            m_pid.setSetpoint(m_deg);
-            m_drive.drive(0, 0, 0, true);
-        } else {
-            double value = m_pid.calculate(m_deg, 0);
-            m_drive.drive(value, 0, 0, true);
+        double p = getRobotPitch().getDegrees();
+        long t = RobotController.getFPGATime();
+        double v = (p - m_lastPitch) / (t - m_lastTime);
+        if (Math.abs(v) > SmartDashboard.getNumber("Robot AutoLevel Angular Velocity Cutoff", 10)) {
+            if (m_sign == null) {
+                if (Math.signum(v) == 1.0) {
+                    m_sign = SignChange.POSITIVE;
+                }
+                else {
+                    m_sign = SignChange.NEGATIVE;
+                }
+            }
+            else {
+                if (Math.signum(v) == -1.0 && m_sign == SignChange.POSITIVE) {
+                    end(false);
+                    return;
+                } else if (Math.signum(v) == 1.0 && m_sign == SignChange.NEGATIVE) {
+                    end(false);
+                    return;
+                }
+            }
         }
-        // if (Math.abs(m_deg) > AutoLevelConstants.tolerance) {
-        //     m_drive.drive(-Math.signum(m_deg) * newX, 0, 0, true);
-        // }
-        // else {
-        //     m_drive.drive(0, 0, 0, true);
-        // }
+        m_drive.drive(m_xSpeed, 0, 0, true);
+        m_lastTime = t;
+        m_lastPitch = p;
         SmartDashboard.putNumber("Calculated Robot Angle", m_deg);
+        SmartDashboard.putNumber("Calculated Robot Anglular Velocity", v);
     }
 
     public Rotation2d getRobotPitch() {
@@ -66,18 +81,11 @@ public class AutoLevel extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         m_drive.drive(0, 0, 0, true);
+        m_end = true;
     }
 
     @Override
     public boolean isFinished() {
-        if (Math.abs(m_deg) < AutoLevelConstants.tolerance) {
-            m_timer.start();
-            return m_timer.get() > AutoLevelConstants.waitTime;
-        }
-        else {
-            m_timer.stop();
-            m_timer.reset();
-            return false;
-        }
+        return m_end;
     }
 }

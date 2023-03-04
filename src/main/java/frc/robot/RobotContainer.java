@@ -45,6 +45,9 @@ public class RobotContainer {
 
         configureBindings();
 
+        SmartDashboard.putNumber("Robot AutoLevel X Speed", 0.3);
+        SmartDashboard.putNumber("Robot AutoLevel Angular Velocity Cutoff", 10);
+
         SmartDashboard.putData(new SwerveSetHomes(m_drivetrainSubsystem));
         SmartDashboard.putData(new CalibrateTurnFF(m_drivetrainSubsystem));
         SmartDashboard.putData(new CalibrateDriveFF(m_drivetrainSubsystem));
