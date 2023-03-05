@@ -39,7 +39,7 @@ public class MoveArm extends CommandBase {
     public void execute() {
 
         m_armPosition += MathUtil.applyDeadband(-m_operator.getLeftY(), DriverConstants.CONTROLLER_DEADBAND)
-                * ArmCalibrations.ARM_SPEED;
+                * ArmCalibrations.ARM_OPERATOR_SPEED;
 
         m_armPosition = MathUtil.clamp(m_armPosition, ArmCalibrations.MIN_POSITION, ArmCalibrations.MAX_POSITION);
         m_armSubsystem.setArmTargetPosition(m_armPosition);

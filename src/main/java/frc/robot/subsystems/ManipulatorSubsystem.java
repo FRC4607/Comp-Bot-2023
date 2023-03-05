@@ -39,7 +39,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
         m_motor.restoreFactoryDefaults();
         m_motor.setIdleMode(IdleMode.kBrake);
         m_motor.setInverted(true);
-        m_motor.setSmartCurrentLimit(40, 40);
+        m_motor.setSmartCurrentLimit(20, 20);
         m_manipulatorEncoder = m_motor.getEncoder();
         m_manipulatorEncoder.setPositionConversionFactor(1.0);
 

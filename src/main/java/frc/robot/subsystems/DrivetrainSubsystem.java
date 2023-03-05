@@ -11,6 +11,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations.SwerveCalibrations;
 import frc.robot.Constants.SwerveConstants;
@@ -247,7 +248,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * A function that logs the data in the Drivetrain subsystem.
      */
     private void logData() {
-        m_pigeonYawLog.append(m_pigeon.getYaw());
+        long timeStamp = (long) Timer.getFPGATimestamp();
+        m_pigeonYawLog.append(m_pigeon.getYaw(), timeStamp);
     }
 
 }

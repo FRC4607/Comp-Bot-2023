@@ -16,6 +16,7 @@ public class FloorPickup extends CommandBase {
     private State m_state;
 
     private enum State {
+        homingArm,
         extendingElevator,
         extendingArm,
         done
@@ -36,9 +37,7 @@ public class FloorPickup extends CommandBase {
 
     @Override
     public void initialize() {
-        m_state = State.extendingElevator;
-        m_elevatorSubsystem
-                .setElevatorPosition(ElevatorCalibrations.pieceCollection() + ElevatorCalibrations.TOLERANCE);
+        m_state = State.homingArm;
         m_elevatorSubsystem.resetController();
         m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_RETRACTED);
         m_armSubsystem.resetController();
@@ -47,6 +46,16 @@ public class FloorPickup extends CommandBase {
     @Override
     public void execute() {
         switch (m_state) {
+            case homingArm:
+                if (Math.abs(m_armSubsystem.getAbsoluteEncoderPosition()
+                        - ArmCalibrations.POSITION_RETRACTED) < ArmCalibrations.TOLERANCE) {
+
+                    m_elevatorSubsystem
+                            .setElevatorPosition(
+                                    ElevatorCalibrations.pieceCollection() + ElevatorCalibrations.TOLERANCE);
+                    m_state = State.extendingElevator;
+                }
+                break;
             case extendingElevator:
                 if (Math.abs(m_elevatorSubsystem.getEncoderPosition()
                         - ElevatorCalibrations.pieceCollection()) < ElevatorCalibrations.TOLERANCE) {

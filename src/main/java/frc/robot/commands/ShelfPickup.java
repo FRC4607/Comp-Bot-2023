@@ -16,6 +16,7 @@ public class ShelfPickup extends CommandBase {
     private State m_state;
 
     private enum State {
+        homingArm,
         extendingElevator,
         extendingArm,
         done
@@ -25,7 +26,7 @@ public class ShelfPickup extends CommandBase {
      * A command to collect game piece in auto.
      *
      * @param elevatorSubsystem The Elevator Subsystem
-     * @param armSubsystem The Arm Subsystem
+     * @param armSubsystem      The Arm Subsystem
      */
     public ShelfPickup(ElevatorSubsystem elevatorSubsystem, ArmSubsystem armSubsystem) {
         m_elevatorSubsystem = elevatorSubsystem;
@@ -36,8 +37,9 @@ public class ShelfPickup extends CommandBase {
 
     @Override
     public void initialize() {
-        m_state = State.extendingElevator;
-        m_elevatorSubsystem.setElevatorPosition(ElevatorCalibrations.shelfPickup() + ElevatorCalibrations.TOLERANCE);
+        m_state = State.homingArm;
+        // m_elevatorSubsystem.setElevatorPosition(ElevatorCalibrations.shelfPickup() +
+        // ElevatorCalibrations.TOLERANCE);
         m_elevatorSubsystem.resetController();
         m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_RETRACTED);
         m_armSubsystem.resetController();
@@ -46,6 +48,15 @@ public class ShelfPickup extends CommandBase {
     @Override
     public void execute() {
         switch (m_state) {
+            case homingArm:
+                if (Math.abs(m_armSubsystem.getAbsoluteEncoderPosition()
+                        - ArmCalibrations.POSITION_RETRACTED) < ArmCalibrations.TOLERANCE) {
+
+                    m_elevatorSubsystem
+                            .setElevatorPosition(ElevatorCalibrations.shelfPickup() + ElevatorCalibrations.TOLERANCE);
+                    m_state = State.extendingElevator;
+                }
+                break;
             case extendingElevator:
                 if (Math.abs(m_elevatorSubsystem.getEncoderPosition()
                         - ElevatorCalibrations.shelfPickup()) < ElevatorCalibrations.TOLERANCE) {

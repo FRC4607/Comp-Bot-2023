@@ -44,6 +44,8 @@ public class Robot extends TimedRobot {
     private AddressableLEDBuffer m_LEDBuffer;
     private NetworkTableEntry alienceColorEntry;
 
+    private boolean m_previousIsRed;
+
     @Override
     public void robotInit() {
         m_recording.setBoolean(false);
@@ -61,6 +63,16 @@ public class Robot extends TimedRobot {
         NetworkTable fmsInfo = inst.getTable("FMSInfo");
         alienceColorEntry = fmsInfo.getEntry("IsRedAlliance");
 
+        boolean isRed = alienceColorEntry.getBoolean(false);
+
+        m_previousIsRed = isRed;
+        for (int i = 0; i < 38; i++) {
+            m_LEDBuffer.setHSV(i, isRed ? 0 : 100, 255, 255);
+        }
+        m_LEDs.setData(m_LEDBuffer);
+
+        Calibrations.ArmCalibrations.initPreferences();
+        Calibrations.ElevatorCalibrations.initPreferences();
     }
 
     @Override
@@ -80,13 +92,16 @@ public class Robot extends TimedRobot {
         }
         CommandScheduler.getInstance().run();
 
-        // boolean isRed = alienceColorEntry.getBoolean(false);
+        boolean isRed = alienceColorEntry.getBoolean(false);
 
-        // for (int i = 0; i < 38; i++) {
-        //     m_LEDBuffer.setHSV(i, isRed ? 0 : 100, 255, 255);
-        // }
+        if (isRed != m_previousIsRed) {
 
-        // m_LEDs.setData(m_LEDBuffer);
+            for (int i = 0; i < 38; i++) {
+                m_LEDBuffer.setHSV(i, isRed ? 0 : 100, 255, 255);
+            }
+            m_LEDs.setData(m_LEDBuffer);
+        }
+    
     }
 
     @Override

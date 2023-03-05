@@ -15,7 +15,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AutoCollectGamePiece;
+import frc.robot.commands.CalibrateArmFF;
 import frc.robot.commands.CalibrateDriveFF;
+import frc.robot.commands.CalibrateElevatorFF;
 import frc.robot.commands.Drive;
 import frc.robot.commands.DriveWithSmartDashboard;
 import frc.robot.commands.FloorPickup;
@@ -61,9 +63,9 @@ public class RobotContainer {
     private XboxController m_operator;
 
     public DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
-    // public ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
-    // public ArmSubsystem m_armSubsystem = new ArmSubsystem();
-    // public ManipulatorSubsystem m_motorizedManipulator = new ManipulatorSubsystem();
+    public ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
+    public ArmSubsystem m_armSubsystem = new ArmSubsystem();
+    public ManipulatorSubsystem m_motorizedManipulator = new ManipulatorSubsystem();
     public PDHSubsystem m_pdhSubsystem = new PDHSubsystem();
 
     private SendableChooser<Command> m_chooser;
@@ -77,25 +79,27 @@ public class RobotContainer {
         m_operator = new XboxController(1);
 
         m_drivetrainSubsystem.setDefaultCommand(new Drive(m_driver, m_drivetrainSubsystem));
-        // m_elevatorSubsystem.setDefaultCommand(new MoveElevator(m_driver, m_elevatorSubsystem));
+        m_elevatorSubsystem.setDefaultCommand(new MoveElevator(m_driver, m_elevatorSubsystem));
 
-        // m_motorizedManipulator.setDefaultCommand(
-        //         new MoveManipulator(m_operator::getLeftBumper, m_operator::getRightBumper, m_motorizedManipulator));
+        m_motorizedManipulator.setDefaultCommand(
+                new MoveManipulator(m_operator::getLeftBumper, m_operator::getRightBumper, m_motorizedManipulator));
         // m_armSubsystem.setDefaultCommand(new MoveArm(m_operator, m_armSubsystem));
 
         configureBindings();
 
         SmartDashboard.putData(new SwerveSetHomes(m_drivetrainSubsystem));
         // SmartDashboard.putData(new CalibrateTurnFF(m_drivetrainSubsystem));
-        SmartDashboard.putData(new CalibrateDriveFF(m_drivetrainSubsystem));
+        // SmartDashboard.putData(new CalibrateDriveFF(m_drivetrainSubsystem));
+        // SmartDashboard.putData(new CalibrateElevatorFF(m_elevatorSubsystem));
+        // SmartDashboard.putData(new CalibrateArmFF(m_armSubsystem));
         // SmartDashboard.putData(new ControlSwerveModule(m_drivetrainSubsystem));
-        // SmartDashboard.putData(new MoveArmSmartDashboard(m_armSubsystem));
-        // SmartDashboard.putData(new MoveElevatorSmartDashboard(m_elevatorSubsystem));
+        SmartDashboard.putData(new MoveElevatorSmartDashboard(m_elevatorSubsystem));
+        SmartDashboard.putData(new MoveArmSmartDashboard(m_armSubsystem));
         // SmartDashboard.putData(
         // new PlaceGamePiece(PieceLevel.MiddleCone, m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
         // SmartDashboard.putData(new AutoCollectGamePiece(m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
 
-        SmartDashboard.putData(new DriveWithSmartDashboard(m_drivetrainSubsystem));
+        // SmartDashboard.putData(new DriveWithSmartDashboard(m_drivetrainSubsystem));
 
         m_chooser = new SendableChooser<>();
 
@@ -133,26 +137,26 @@ public class RobotContainer {
         driverStart.onTrue(new ResetHeading(m_drivetrainSubsystem));
 
         JoystickButton driverLeftBumper = new JoystickButton(m_driver, XboxController.Button.kLeftBumper.value);
-        // driverLeftBumper.onTrue(new FloorPickup(m_elevatorSubsystem, m_armSubsystem));
+        driverLeftBumper.onTrue(new FloorPickup(m_elevatorSubsystem, m_armSubsystem));
 
         JoystickButton driverRightBumper = new JoystickButton(m_driver, XboxController.Button.kRightBumper.value);
-        // driverRightBumper.onTrue(new ShelfPickup(m_elevatorSubsystem, m_armSubsystem));
+        driverRightBumper.onTrue(new ShelfPickup(m_elevatorSubsystem, m_armSubsystem));
 
         JoystickButton driverA = new JoystickButton(m_driver, XboxController.Button.kA.value);
         JoystickButton driverB = new JoystickButton(m_driver, XboxController.Button.kB.value);
-        // driverB.onTrue(new Retract(m_elevatorSubsystem, m_armSubsystem));
+        driverB.onTrue(new Retract(m_elevatorSubsystem, m_armSubsystem));
 
         JoystickButton driverY = new JoystickButton(m_driver, XboxController.Button.kY.value);
         JoystickButton driverX = new JoystickButton(m_driver, XboxController.Button.kX.value);
 
         JoystickButton operatorA = new JoystickButton(m_operator, XboxController.Button.kA.value);
         JoystickButton operatorB = new JoystickButton(m_operator, XboxController.Button.kB.value);
-        // operatorB.onTrue(
-                // new PlaceGamePiece(PieceLevel.MiddleCone, m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
+        operatorB.onTrue(
+                new PlaceGamePiece(PieceLevel.MiddleCone, m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
 
         JoystickButton operatorY = new JoystickButton(m_operator, XboxController.Button.kY.value);
-        // operatorY.onTrue(
-                // new PlaceGamePiece(PieceLevel.TopCone, m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
+        operatorY.onTrue(
+                new PlaceGamePiece(PieceLevel.TopCone, m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
                 
         JoystickButton operatorX = new JoystickButton(m_operator, XboxController.Button.kX.value);
 

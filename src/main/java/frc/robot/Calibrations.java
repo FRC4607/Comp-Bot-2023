@@ -48,179 +48,142 @@ public class Calibrations {
 
     /**
      * Calibrations for the arm subsystems.
+     *
+     * <p> Units of Position is Deg
      */
     public static final class ArmCalibrations {
 
-        public static final double POSITION_PIECE_COLLECTION = 170.0;
+        public static final double KS = 0.321;
+        public static final double KV = 0.046;
+        public static final double KA = 0.0;
+        public static final double KG = 1.5;
+
+        public static final double KP = 0.1;
+        public static final double KI = 0.0;
+        public static final double KD = 0.0;
+
+        public static final double MIN_POSITION = 20.0;
+        public static final double MAX_POSITION = 170.0;
+        public static final double MAX_VELOCITY = 295.0;
+        public static final double MAX_ACCELERATION = 1920.0 / 5.0 / 2;
+
+        public static final double ELEVATOR_CLEARANCE = 30.0;
+
+        public static final double TOLERANCE = 5.0;
+
+        public static final double ARM_OPERATOR_SPEED = 2.0;
+
+        public static final double POSITION_RETRACTED = 20.0;
+        public static final double SHELF_PICKUP_STATIC = 40.0;
+        public static final double PIECE_COLLECTION_STATIC = 170.0;
+        public static final double[] NODE_POSITIONS_STATIC = { 40, 70, 45, 70 };
+
+        public static void initPreferences() {
+            Preferences.initDouble("ArmPieceCollection", PIECE_COLLECTION_STATIC);
+            Preferences.initDouble("ArmShelfPickup", SHELF_PICKUP_STATIC);
+
+            Preferences.initDouble("ArmTopCone", NODE_POSITIONS_STATIC[0]);
+            Preferences.initDouble("ArmTopCube", NODE_POSITIONS_STATIC[1]);
+            Preferences.initDouble("ArmMiddleCone", NODE_POSITIONS_STATIC[2]);
+            Preferences.initDouble("ArmMiddleCube", NODE_POSITIONS_STATIC[3]);
+        }
 
         public static double pieceCollection() {
-            if (!Preferences.containsKey("ArmPieceCollection")) {
-                Preferences.setDouble("ArmPieceCollection", POSITION_PIECE_COLLECTION);
-            }
-
-            return Preferences.getDouble("ArmPieceCollection", POSITION_PIECE_COLLECTION);
+            return Preferences.getDouble("ArmPieceCollection", PIECE_COLLECTION_STATIC);
         }
-        
 
-        public static final double POSITION_LEVEL = 80.0;
-        public static final double POSITION_TOP_NODE = 90.0;
-        public static final double POSITION_RETRACTED = 10.0;
-
-        public static final double[] ARM_PLACEMENT_POSITIONS_STATIC = { 72, 70, 45, 70 };
+        public static double shelfPickup() {
+            return Preferences.getDouble("ArmShelfPickup", SHELF_PICKUP_STATIC);
+        }
 
         /**
          * Gets the setpoint from Preferences table.
          *
          * @return The setpoint form the preferences table.
          */
-        public static double[] armPlacementPositions() {
+        public static double[] nodePositions() {
             double[] preferences = {
-                Preferences.getDouble("TopConeArm", 0),
-                Preferences.getDouble("TopCubeArm", 0),
-                Preferences.getDouble("MiddleConeArm", 0),
-                Preferences.getDouble("MiddleCubeArm", 0)
+                Preferences.getDouble("TopConeArm", NODE_POSITIONS_STATIC[0]),
+                Preferences.getDouble("TopCubeArm", NODE_POSITIONS_STATIC[1]),
+                Preferences.getDouble("MiddleConeArm", NODE_POSITIONS_STATIC[2]),
+                Preferences.getDouble("MiddleCubeArm", NODE_POSITIONS_STATIC[3])
             };
-
-            if (preferences[0] == 0) {
-                Preferences.setDouble("TopConeArm", ARM_PLACEMENT_POSITIONS_STATIC[0]);
-                preferences[0] = ARM_PLACEMENT_POSITIONS_STATIC[0];
-            }
-
-            if (preferences[1] == 0) {
-                Preferences.setDouble("TopCubeArm", ARM_PLACEMENT_POSITIONS_STATIC[1]);
-                preferences[1] = ARM_PLACEMENT_POSITIONS_STATIC[1];
-            }
-
-            if (preferences[2] == 0) {
-                Preferences.setDouble("MiddleConeArm", ARM_PLACEMENT_POSITIONS_STATIC[2]);
-                preferences[2] = ARM_PLACEMENT_POSITIONS_STATIC[2];
-            }
-
-            if (preferences[3] == 0) {
-                Preferences.setDouble("MiddleCubeArm", ARM_PLACEMENT_POSITIONS_STATIC[3]);
-                preferences[3] = ARM_PLACEMENT_POSITIONS_STATIC[3];
-            }
-
+    
             return preferences;
-        }
-
-        public static final double SHELF_PICKUP = 40.0;
-
-        public static double shelfPickup() {
-            if (!Preferences.containsKey("ArmShelfPickup")) {
-                Preferences.setDouble("ArmShelfPickup", SHELF_PICKUP);
-            }
-
-            return Preferences.getDouble("ArmShelfPickup", SHELF_PICKUP);
-        }
-
-        public static final double KG = 0.5;
-
-        public static final double ELEVATOR_CLEARANCE = 30.0;
-
-
-        public static final double KP = 0.15;
-        public static final double KI = 0.0;
-        public static final double KD = 0.0;
-
-        public static final double MAX_VELOCITY = 180.0;
-        public static final double MAX_ACCELERATION = 120.0;
-
-        public static final double TOLERANCE = 6.0;
-
-        public static final double MIN_POSITION = 10.0;
-        public static final double MAX_POSITION = 180.0;
-
-        public static final double ARM_SPEED = 2.0;
+        }    
     }
 
     /**
      * Calibrations for the Elevator Subsystem.
+     * 
+     * <p> Units of Position is Rot of the drum
      */
     public static final class ElevatorCalibrations {
 
-        public static final double[] ELEVATOR_PLACEMENT_POSITIONS_STATIC = { 92.3, 60, 55, 40 };
+        public static final double KS = 0.3375;
+        public static final double KV = 1.95;
+        public static final double KA = 0.0;
+        public static final double KG = 0.25;
+
+        public static final double KP = 10.0;
+        public static final double KI = 1;
+        public static final double KD = 0.0;
+
+        public static final double MAX_POSITION = 5.5;
+        public static final double MAX_VELOCITY = 4.0;
+        public static final double MAX_ACCELERATION = 34.0;
+        
+        public static final double ARM_CLEARANCE = 35.0;
+        
+        public static final double TOLERANCE = 0.05;
+
+        public static final double ELEVATOR_DRIVER_SPEED = 4.0 / 50.0;
+
+        private static final double PIECE_COLLECTION_STATIC = 2.475;
+        private static final double SHELF_PICKUP_STATIC = 3.3;
+        public static final double[] NODE_POSITIONS_STATIC = { 5.08, 5.08, 3.0, 3.25 };
+
+        public static void initPreferences() {
+            Preferences.initDouble("ElevatorPieceCollection", PIECE_COLLECTION_STATIC);
+            Preferences.initDouble("ElevatorShelfPickup", SHELF_PICKUP_STATIC);
+
+            Preferences.initDouble("ElevatorTopCone", NODE_POSITIONS_STATIC[0]);
+            Preferences.initDouble("ElevatorTopCube", NODE_POSITIONS_STATIC[1]);
+            Preferences.initDouble("ElevatorMiddleCone", NODE_POSITIONS_STATIC[2]);
+            Preferences.initDouble("ElevatorMiddleCube", NODE_POSITIONS_STATIC[3]);
+        }
+
+        public static double pieceCollection() {
+            return Preferences.getDouble("ElevatorPieceCollection", PIECE_COLLECTION_STATIC);
+        }
+
+        public static double shelfPickup() {
+            return Preferences.getDouble("ElevatorShelfPickup", SHELF_PICKUP_STATIC);
+        }
 
         /**
          * Gets the setpoint from Preferences table.
          *
          * @return The setpoint form the preferences table.
          */
-        public static double[] elevatorPlacementPositions() {
+        public static double[] nodePositions() {
             double[] preferences = {
-                Preferences.getDouble("TopConeElevator", 0),
-                Preferences.getDouble("TopCubeElevator", 0),
-                Preferences.getDouble("MiddleConeElevator", 0),
-                Preferences.getDouble("MiddleCubeElevator", 0)
+                Preferences.getDouble("TopConeElevator", NODE_POSITIONS_STATIC[0]),
+                Preferences.getDouble("TopCubeElevator", NODE_POSITIONS_STATIC[1]),
+                Preferences.getDouble("MiddleConeElevator", NODE_POSITIONS_STATIC[2]),
+                Preferences.getDouble("MiddleCubeElevator", NODE_POSITIONS_STATIC[3])
             };
-
-            if (preferences[0] == 0) {
-                Preferences.setDouble("TopConeElevator", ELEVATOR_PLACEMENT_POSITIONS_STATIC[0]);
-                preferences[0] = ELEVATOR_PLACEMENT_POSITIONS_STATIC[0];
-            }
-
-            if (preferences[1] == 0) {
-                Preferences.setDouble("TopCubeElevator", ELEVATOR_PLACEMENT_POSITIONS_STATIC[1]);
-                preferences[1] = ELEVATOR_PLACEMENT_POSITIONS_STATIC[1];
-            }
-
-            if (preferences[2] == 0) {
-                Preferences.setDouble("MiddleConeElevator", ELEVATOR_PLACEMENT_POSITIONS_STATIC[2]);
-                preferences[2] = ELEVATOR_PLACEMENT_POSITIONS_STATIC[2];
-            }
-
-            if (preferences[3] == 0) {
-                Preferences.setDouble("MiddleCubeElevator", ELEVATOR_PLACEMENT_POSITIONS_STATIC[3]);
-                preferences[3] = ELEVATOR_PLACEMENT_POSITIONS_STATIC[3];
-            }
-
+    
             return preferences;
         }
-
-        public static double shelfPickup() {
-            double elevatorShelfPickup = Preferences.getDouble("ElevatorShelfPickup", 0.0);
-
-            if (elevatorShelfPickup == 0.0) {
-                Preferences.setDouble("ElevatorShelfPickup", 90.0);
-                elevatorShelfPickup = 90.0;
-            }
-            return elevatorShelfPickup;
-        }
-
-        public static final double KP = 1.0;
-        public static final double KI = 0.0;
-        public static final double KD = 0.0;
-        public static final double KFF = 0.0;
-
-        public static final double KG = 0.2;
-        public static final double MIDDLE_ROW_HEIGHT = 75;
-        public static final double MAX_ACCELERATION = 100;
-        public static final double MAX_VELOCITY = 100;
-
-        public static final double TOLERANCE = 2.0;
-
-        private static final double PIECE_COLLECTION_STATIC = 45.0;
-
-        public static double pieceCollection() {
-            if (!Preferences.containsKey("ElevatorPieceCollection")) {
-                Preferences.setDouble("ElevatorPieceCollection", PIECE_COLLECTION_STATIC);
-            }
-
-            return Preferences.getDouble("ElevatorPieceCollection", PIECE_COLLECTION_STATIC);
-        }
-
-        public static final double ARM_CLEARANCE = 35.0;
-        public static final double ELEVATOR_DRIVER_SPEED = 1.0;
-
-        public static final double MAX_POSITION = 100;
     }
 
     /**
      * The Calibrations for the Manipulator Subsystem.
      */
     public static final class ManipulatorCalibrations {
-        public static final double INTAKE_SPEED = -0.80;
-        public static final double OUTTAKE_SPEED = 0.2;
+        public static final double INTAKE_SPEED = -0.8;
+        public static final double OUTTAKE_SPEED = 0.5;
         public static final double HOLD_SPEED = -0.1;
 
     }

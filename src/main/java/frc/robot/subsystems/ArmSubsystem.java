@@ -8,12 +8,15 @@ import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations.ArmCalibrations;
 import frc.robot.Calibrations.ElevatorCalibrations;
@@ -39,11 +42,19 @@ public class ArmSubsystem extends SubsystemBase {
     private final DoubleLogEntry m_motorTempLog;
     private final DoubleLogEntry m_absolutePositionLog;
     private final DoubleLogEntry m_absoluteVelocityLog;
+    private final DoubleLogEntry m_motorCommandedVoltageLog;
+    private final DoubleLogEntry m_goalPositionLog;
+    private final DoubleLogEntry m_setpointPositionLog;
+    private final DoubleLogEntry m_setpointVelocityLog;
+    private final DoubleLogEntry m_feedforwardLog;
+    private final DoubleLogEntry m_pidLog;
 
     private final ProfiledPIDController m_pidController;
+    private final ArmFeedforward m_feedforward;
 
     private double m_setpoint;
     private boolean m_closedLoop;
+    private double m_commandedVoltage = 0.0;
 
     /**
      * Defines the wrist subsystem.
@@ -54,26 +65,34 @@ public class ArmSubsystem extends SubsystemBase {
 
         m_motor.restoreFactoryDefaults();
         m_motor.setIdleMode(IdleMode.kBrake);
-        m_motor.setInverted(true);
+        m_motor.setInverted(false);
         m_motor.setSmartCurrentLimit(40, 40);
 
         m_motorEncoder = m_motor.getEncoder();
         m_motorEncoder.setPositionConversionFactor(1.0);
 
         m_absoluteEncoder = m_motor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
-        m_absoluteEncoder.setPositionConversionFactor(360);
-        m_absoluteEncoder.setVelocityConversionFactor(360 / 60);
-        m_absoluteEncoder.setZeroOffset(MathUtil.inputModulus(-105.0 + 120, 0, 360));
+        m_absoluteEncoder.setPositionConversionFactor(360.0);
+        m_absoluteEncoder.setVelocityConversionFactor(360.0);
+        m_absoluteEncoder.setZeroOffset(MathUtil.inputModulus(-84 + 120, 0, 360));
         m_absoluteEncoder.setInverted(true);
 
+        m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10); // Faults and Applied Output
+        m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10); // Velocity, Bus Voltage, Temp, and Current
+        m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10); // Position
         m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535); // Max Period - Analog Sensor
         m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 65535); // Max Period - Alternate Encoder
-        m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20); // Duty Cycle Position
-        m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20); // Duty Cycle Velocity
+        m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 10); // Duty Cycle Position
+        m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 10); // Duty Cycle Velocity
 
         m_pidController = new ProfiledPIDController(ArmCalibrations.KP, ArmCalibrations.KI, ArmCalibrations.KD,
                 new Constraints(ArmCalibrations.MAX_VELOCITY, ArmCalibrations.MAX_ACCELERATION));
         m_pidController.reset(getAbsoluteEncoderPosition());
+
+        SmartDashboard.putData(m_pidController);
+
+        m_feedforward = new ArmFeedforward(ArmCalibrations.KS, ArmCalibrations.KG, ArmCalibrations.KV,
+                ArmCalibrations.KA);
 
         DataLog log = DataLogManager.getLog();
 
@@ -84,8 +103,16 @@ public class ArmSubsystem extends SubsystemBase {
         m_motorCurrentLog = new DoubleLogEntry(log, "/arm/motor/current");
         m_motorVoltageLog = new DoubleLogEntry(log, "/arm/motor/voltage");
         m_motorTempLog = new DoubleLogEntry(log, "/arm/motor/temp");
+        m_motorCommandedVoltageLog = new DoubleLogEntry(log, "/arm/commandedVoltage");
         m_absolutePositionLog = new DoubleLogEntry(log, "/arm/absolute/position");
         m_absoluteVelocityLog = new DoubleLogEntry(log, "/arm/absolute/velocity");
+
+        m_goalPositionLog = new DoubleLogEntry(log, "/arm/goal/position");
+        m_setpointPositionLog = new DoubleLogEntry(log, "/arm/setpoint/position");
+        m_setpointVelocityLog = new DoubleLogEntry(log, "/arm/setpoint/velocity");
+        m_feedforwardLog = new DoubleLogEntry(log, "/arm/feedforward");
+        m_pidLog = new DoubleLogEntry(log, "/arm/pid");
+
 
     }
 
@@ -100,6 +127,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void setVoltage(double voltage) {
+        m_commandedVoltage = voltage;
         m_motor.setVoltage(voltage);
     }
 
@@ -122,12 +150,15 @@ public class ArmSubsystem extends SubsystemBase {
     public void setArmTargetPosition(double position) {
         m_setpoint = MathUtil.clamp(position, ArmCalibrations.MIN_POSITION, ArmCalibrations.MAX_POSITION);
 
-        if (m_setpoint > ArmCalibrations.ELEVATOR_CLEARANCE && /*RobotContainer.getInstance().m_elevatorSubsystem
-                .getEncoderPosition()*/0 < ElevatorCalibrations.ARM_CLEARANCE) {
-            m_pidController.setGoal(ArmCalibrations.ELEVATOR_CLEARANCE);
-        } else {
-            m_pidController.setGoal(m_setpoint);
-        }
+        m_setpoint -= 3.75 + Math.sin(m_setpoint * Math.PI / 180.0) * 17.5;
+
+        // if (m_setpoint > ArmCalibrations.ELEVATOR_CLEARANCE &&
+        // /*RobotContainer.getInstance().m_elevatorSubsystem
+        // .getEncoderPosition()*/0 < ElevatorCalibrations.ARM_CLEARANCE) {
+        // m_pidController.setGoal(ArmCalibrations.ELEVATOR_CLEARANCE);
+        // } else {
+        m_pidController.setGoal(m_setpoint);
+        // }
         m_closedLoop = true;
     }
 
@@ -138,22 +169,37 @@ public class ArmSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
+        long timeStamp = (long) (Timer.getFPGATimestamp() * 1e6);
+        
+        double pid = m_pidController.calculate(getAbsoluteEncoderPosition());
+        double ff = m_feedforward.calculate((m_pidController.getSetpoint().position - 90.0) * Math.PI / 180.0,
+                m_pidController.getSetpoint().velocity);
+
         if (m_closedLoop) {
-            m_motor.setVoltage(m_pidController.calculate(getAbsoluteEncoderPosition())
-                + Math.sin(getAbsoluteEncoderPosition() * Math.PI / 180) * ArmCalibrations.KG);
+            m_commandedVoltage = pid + ff;
+            m_motor.setVoltage(m_commandedVoltage);
         }
 
-        m_motorOutputLog.append(m_motor.getAppliedOutput());
-        m_motorFaultsLog.append(m_motor.getFaults());
-        m_motorPositionLog.append(m_motorEncoder.getPosition());
-        m_motorVelocityLog.append(m_motorEncoder.getVelocity());
-        m_motorCurrentLog.append(m_motor.getOutputCurrent());
-        m_motorVoltageLog.append(m_motor.getBusVoltage());
-        m_motorTempLog.append(m_motor.getMotorTemperature());
-        m_absolutePositionLog.append(m_absoluteEncoder.getPosition());
-        m_absoluteVelocityLog.append(m_absoluteEncoder.getPosition());
 
-        m_motor.getFaults();
+        m_motorOutputLog.append(m_motor.getAppliedOutput(), timeStamp);
+        m_motorFaultsLog.append(m_motor.getFaults(), timeStamp);
+        m_motorPositionLog.append(m_motorEncoder.getPosition(), timeStamp);
+        m_motorVelocityLog.append(m_motorEncoder.getVelocity(), timeStamp);
+        m_motorCurrentLog.append(m_motor.getOutputCurrent(), timeStamp);
+        m_motorVoltageLog.append(m_motor.getBusVoltage(), timeStamp);
+        m_motorTempLog.append(m_motor.getMotorTemperature(), timeStamp);
+        m_motorCommandedVoltageLog.append(m_commandedVoltage, timeStamp);
+        m_absolutePositionLog.append(getAbsoluteEncoderPosition(), timeStamp);
+        m_absoluteVelocityLog.append(m_absoluteEncoder.getVelocity(), timeStamp);
+
+        m_goalPositionLog.append(m_pidController.getGoal().position, timeStamp);
+        m_setpointPositionLog.append(m_pidController.getSetpoint().position, timeStamp);
+        m_setpointVelocityLog.append(m_pidController.getSetpoint().velocity, timeStamp);
+        m_feedforwardLog.append(ff, timeStamp);
+        m_pidLog.append(pid, timeStamp);
+
+        SmartDashboard.putNumber("Arm Position", getAbsoluteEncoderPosition());
+        SmartDashboard.putNumber("Arm Setpoint", m_pidController.getSetpoint().position);
 
     }
 }

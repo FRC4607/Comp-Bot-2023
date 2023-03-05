@@ -61,14 +61,14 @@ public class AutoCollectGamePiece extends CommandBase {
                 if (Math.abs(m_elevatorSubsystem.getEncoderPosition()
                         - ElevatorCalibrations.pieceCollection()) < ElevatorCalibrations.TOLERANCE) {
 
-                    m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_PIECE_COLLECTION);
+                    m_armSubsystem.setArmTargetPosition(ArmCalibrations.PIECE_COLLECTION_STATIC);
                     m_state = State.extendingArm;
                 }
                 break;
 
             case extendingArm:
                 if (Math.abs(m_armSubsystem.getAbsoluteEncoderPosition()
-                        - ArmCalibrations.POSITION_PIECE_COLLECTION) < ArmCalibrations.TOLERANCE) {
+                        - ArmCalibrations.PIECE_COLLECTION_STATIC) < ArmCalibrations.TOLERANCE) {
 
                     m_manipulatorSubsystem.setSpeed(ManipulatorCalibrations.INTAKE_SPEED);
                     m_state = State.collectingPiece;

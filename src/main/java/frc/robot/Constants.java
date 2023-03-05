@@ -77,7 +77,8 @@ public class Constants {
         public static final int ENCODER_B_PORT = 2;
         public static final int ENCODER_I_PORT = 3;
 
-        public static final double GEAR_RATIO = 3.0;
+        public static final double GEAR_RATIO_MOTOR = 9.0 * 48.0 / 30.0;
+        public static final double GEAR_RATIO_ENCODER = 48.0 / 30.0;
 
     }
 
