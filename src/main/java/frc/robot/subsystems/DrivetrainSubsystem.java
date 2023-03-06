@@ -72,7 +72,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
 
         m_kinematics = new SwerveDriveKinematics(SwerveConstants.POSITIONS);
-        m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroRotation(), getModulePositions());
+        m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroYaw(), getModulePositions());
 
         m_log = DataLogManager.getLog();
 
@@ -90,7 +90,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
         logData();
 
-        m_odometry.update(getGyroRotation(), getModulePositions());
+        m_odometry.update(getGyroYaw(), getModulePositions());
 
         if (!m_gyroRecalibrated && Timer.getFPGATimestamp() > SwerveConstants.GYRO_RECALIBRATION_TIME
                 && !m_matchStarted) {
@@ -149,25 +149,45 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     /**
-     * The rotation of the gyro.
+     * The yaw of the gyro.
      *
-     * @return The {@link Rotation2d} of the gyro
+     * @return The {@link Rotation2d} of the gyro's yaw
      */
-    public Rotation2d getGyroRotation() {
-        return Rotation2d.fromDegrees(m_adis16470.getAngle());
-    }
-
-    public Rotation2d getPigeonYawRotation() {
+    public Rotation2d getGyroYaw() {
         return Rotation2d.fromDegrees(m_pigeon.getYaw());
     }
 
-    public Rotation2d getPigeonPitchRotation() {
+    /**
+     * The pitch of the gyro.
+     *
+     * @return The {@link Rotation2d} of the gyro's pitch
+     */
+    public Rotation2d getGyroPitch() {
         return Rotation2d.fromDegrees(m_pigeon.getPitch());
     }
 
-    public Rotation2d getPigeonRollRotation() {
+    /**
+     * The roll of the gyro.
+     *
+     * @return The {@link Rotation2d} of the gyro's roll
+     */
+    public Rotation2d getGyroRoll() {
         return Rotation2d.fromDegrees(m_pigeon.getRoll());
     }
+
+    /**
+     * Gets the pitch of the robot regardless of the robot's yaw. For the gyro's raw yaw value, use {@code getGyroPitch}.
+     * @return A {@link Rotation2d} of the robot's pitch relative to the field.
+     */
+    public Rotation2d getRobotPitch() {
+        // This is probably not the correct way to do this, but it's a close enough approximation
+        double roll = getGyroRoll().getRadians();
+        double pitch = getGyroPitch().getRadians();
+        double yaw = getGyroYaw().getRadians();
+        double theNumber = Math.cos(yaw) * pitch + Math.sin(yaw) * roll;
+        return Rotation2d.fromRadians(theNumber);
+    }
+    
 
     /**
      * The estimated Pose.
@@ -267,7 +287,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void resetHeading() {
         Pose2d currentPose = getPose();
         Pose2d newPose = new Pose2d(currentPose.getTranslation(), new Rotation2d());
-        m_odometry.resetPosition(getGyroRotation(), getModulePositions(), newPose);
+        m_odometry.resetPosition(getGyroYaw(), getModulePositions(), newPose);
     }
 
     /**
@@ -276,7 +296,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * @param pose The pose the odometry is set to.
      */
     public void setPose(Pose2d pose) {
-        m_odometry.resetPosition(getGyroRotation(), getModulePositions(), pose);
+        m_odometry.resetPosition(getGyroYaw(), getModulePositions(), pose);
     }
 
     /**
