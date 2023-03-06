@@ -78,6 +78,10 @@ public class Calibrations {
         public static final double PIECE_COLLECTION_STATIC = 170.0;
         public static final double[] NODE_POSITIONS_STATIC = { 40, 70, 45, 70 };
 
+
+        /**
+         * Initializes the preset arm positions into the preferences tables if the value is not initialized.
+         */
         public static void initPreferences() {
             Preferences.initDouble("ArmPieceCollection", PIECE_COLLECTION_STATIC);
             Preferences.initDouble("ArmShelfPickup", SHELF_PICKUP_STATIC);
@@ -103,10 +107,10 @@ public class Calibrations {
          */
         public static double[] nodePositions() {
             double[] preferences = {
-                Preferences.getDouble("TopConeArm", NODE_POSITIONS_STATIC[0]),
-                Preferences.getDouble("TopCubeArm", NODE_POSITIONS_STATIC[1]),
-                Preferences.getDouble("MiddleConeArm", NODE_POSITIONS_STATIC[2]),
-                Preferences.getDouble("MiddleCubeArm", NODE_POSITIONS_STATIC[3])
+                Preferences.getDouble("ArmTopCone", NODE_POSITIONS_STATIC[0]),
+                Preferences.getDouble("ArmTopCube", NODE_POSITIONS_STATIC[1]),
+                Preferences.getDouble("ArmMiddleCone", NODE_POSITIONS_STATIC[2]),
+                Preferences.getDouble("ArmMiddleCube", NODE_POSITIONS_STATIC[3])
             };
     
             return preferences;
@@ -126,7 +130,7 @@ public class Calibrations {
         public static final double KG = 0.25;
 
         public static final double KP = 10.0;
-        public static final double KI = 1;
+        public static final double KI = 0.0;
         public static final double KD = 0.0;
 
         public static final double MAX_POSITION = 5.5;
@@ -143,6 +147,9 @@ public class Calibrations {
         private static final double SHELF_PICKUP_STATIC = 3.3;
         public static final double[] NODE_POSITIONS_STATIC = { 5.08, 5.08, 3.0, 3.25 };
 
+        /**
+         * Initializes the preset arm positions into the preferences tables if the value is not initialized.
+         */
         public static void initPreferences() {
             Preferences.initDouble("ElevatorPieceCollection", PIECE_COLLECTION_STATIC);
             Preferences.initDouble("ElevatorShelfPickup", SHELF_PICKUP_STATIC);
@@ -168,10 +175,10 @@ public class Calibrations {
          */
         public static double[] nodePositions() {
             double[] preferences = {
-                Preferences.getDouble("TopConeElevator", NODE_POSITIONS_STATIC[0]),
-                Preferences.getDouble("TopCubeElevator", NODE_POSITIONS_STATIC[1]),
-                Preferences.getDouble("MiddleConeElevator", NODE_POSITIONS_STATIC[2]),
-                Preferences.getDouble("MiddleCubeElevator", NODE_POSITIONS_STATIC[3])
+                Preferences.getDouble("ElevatorTopCone", NODE_POSITIONS_STATIC[0]),
+                Preferences.getDouble("ElevatorTopCube", NODE_POSITIONS_STATIC[1]),
+                Preferences.getDouble("ElevatorMiddleCone", NODE_POSITIONS_STATIC[2]),
+                Preferences.getDouble("ElevatorMiddleCube", NODE_POSITIONS_STATIC[3])
             };
     
             return preferences;

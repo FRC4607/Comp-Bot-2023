@@ -5,9 +5,13 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.RobotBase;
- 
+
+/**
+ * The main class and entry point to the program.
+ */
 public final class Main {
-    private Main() {}
+    private Main() {
+    }
 
     public static void main(String... args) {
         RobotBase.startRobot(Robot::new);

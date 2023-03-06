@@ -2,10 +2,11 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Calibrations.ArmCalibrations;
-import frc.robot.Calibrations.ElevatorCalibrations;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
 
+/**
+ * A command to collect data for the arm FF data.
+ */
 public class CalibrateArmFF extends CommandBase {
 
     private enum State {
@@ -18,17 +19,21 @@ public class CalibrateArmFF extends CommandBase {
     }
 
     private final double m_quasiStaticRate = 0.25;
-    private final double m_quasiStaticMax = 2.0;
-    private final double m_stepVoltage = 3.0;
+    private final double m_stepVoltage = 9.0;
+    private final double m_downStartingVoltage = 0.5;
 
     private ArmSubsystem m_armSubsystem;
     private State m_state;
-    private double m_quasiStaticUpReached;
-    private double m_quasiStaticDownReached;
 
     private double m_voltage;
-    private int m_counter;
 
+    /**
+     * The constructor for a command to collect data for FF on the arm. The arm is
+     * expected to start all the way down and the elevator extended out such that
+     * it will not interfere.
+     *
+     * @param armSubsystem The arm subsystem
+     */
     public CalibrateArmFF(ArmSubsystem armSubsystem) {
         m_armSubsystem = armSubsystem;
 
@@ -38,8 +43,6 @@ public class CalibrateArmFF extends CommandBase {
     @Override
     public void initialize() {
         m_state = State.QuasiStaticUp;
-        m_quasiStaticUpReached = 0.0;
-        m_quasiStaticDownReached = 0.5;
         m_voltage = 0.0;
     }
 
@@ -51,8 +54,7 @@ public class CalibrateArmFF extends CommandBase {
 
                 if (m_armSubsystem.getAbsoluteEncoderPosition() <= ArmCalibrations.MIN_POSITION) {
                     m_state = State.QuasiStaticDown;
-                    m_quasiStaticUpReached = m_voltage;
-                    m_voltage = m_quasiStaticDownReached;
+                    m_voltage = m_downStartingVoltage;
                 }
                 break;
 
@@ -66,27 +68,28 @@ public class CalibrateArmFF extends CommandBase {
                     // m_elevatorSubsystem.setVoltage(m_stepVoltage);
                     // } else {
                     m_state = State.done;
-                    m_quasiStaticDownReached = m_voltage;
-                    m_voltage = -9;
+                    m_voltage = -m_stepVoltage;
                     // }
                 }
                 break;
 
             case StepUp:
 
-                if (m_armSubsystem.getAbsoluteEncoderPosition()
-                    <= (ArmCalibrations.MAX_POSITION - ArmCalibrations.MIN_POSITION) * 0.25 + ArmCalibrations.MIN_POSITION) {
+                if (m_armSubsystem
+                        .getAbsoluteEncoderPosition() <= (ArmCalibrations.MAX_POSITION - ArmCalibrations.MIN_POSITION)
+                                * 0.25 + ArmCalibrations.MIN_POSITION) {
                     m_state = State.StepDown;
-                    m_voltage = 9;
+                    m_voltage = m_stepVoltage;
                 }
 
                 break;
 
             case StepDown:
 
-                if (m_armSubsystem.getAbsoluteEncoderPosition() 
-                    <= (ArmCalibrations.MAX_POSITION - ArmCalibrations.MIN_POSITION) * 0.75 + ArmCalibrations.MIN_POSITION) {
-                    m_state = State.StepDown;
+                if (m_armSubsystem
+                        .getAbsoluteEncoderPosition() <= (ArmCalibrations.MAX_POSITION - ArmCalibrations.MIN_POSITION)
+                                * 0.75 + ArmCalibrations.MIN_POSITION) {
+                    m_state = State.done;
                     m_voltage = 0;
                 }
 

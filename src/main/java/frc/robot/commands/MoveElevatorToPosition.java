@@ -26,6 +26,6 @@ public class MoveElevatorToPosition extends CommandBase {
     @Override
     public void initialize() {
         m_elevatorSubsystem.resetController();
-        m_elevatorSubsystem.setElevatorPosition(m_position);
+        m_elevatorSubsystem.setElevatorTargetPosition(m_position);
     }
 }

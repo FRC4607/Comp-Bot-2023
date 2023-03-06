@@ -30,6 +30,6 @@ public class MoveElevatorSmartDashboard extends CommandBase {
 
     @Override
     public void execute() {
-        m_elevatorSubsystem.setElevatorPosition(SmartDashboard.getNumber("Elevator Target Position", 0));
+        m_elevatorSubsystem.setElevatorTargetPosition(SmartDashboard.getNumber("Elevator Target Position", 0));
     }
 }

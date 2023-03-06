@@ -53,7 +53,7 @@ public class ShelfPickup extends CommandBase {
                         - ArmCalibrations.POSITION_RETRACTED) < ArmCalibrations.TOLERANCE) {
 
                     m_elevatorSubsystem
-                            .setElevatorPosition(ElevatorCalibrations.shelfPickup() + ElevatorCalibrations.TOLERANCE);
+                            .setElevatorTargetPosition(ElevatorCalibrations.shelfPickup() + ElevatorCalibrations.TOLERANCE);
                     m_state = State.extendingElevator;
                 }
                 break;

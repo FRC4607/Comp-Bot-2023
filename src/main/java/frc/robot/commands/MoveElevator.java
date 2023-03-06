@@ -56,7 +56,7 @@ public class MoveElevator extends CommandBase {
             m_elevatorPosition = m_elevatorPosition < 0 ? 0 : m_elevatorPosition;
             m_elevatorPosition = MathUtil.clamp(m_elevatorPosition, 0, ElevatorCalibrations.MAX_POSITION);
 
-            m_elevatorSubsystem.setElevatorPosition(m_elevatorPosition);
+            m_elevatorSubsystem.setElevatorTargetPosition(m_elevatorPosition);
         }
 
     }

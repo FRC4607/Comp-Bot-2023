@@ -11,17 +11,17 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
+import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations.ArmCalibrations;
-import frc.robot.Calibrations.ElevatorCalibrations;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.RobotContainer;
 
 /**
  * The subsystem responsible for the manipulator of the robot.
@@ -43,11 +43,14 @@ public class ArmSubsystem extends SubsystemBase {
     private final DoubleLogEntry m_absolutePositionLog;
     private final DoubleLogEntry m_absoluteVelocityLog;
     private final DoubleLogEntry m_motorCommandedVoltageLog;
+    private final BooleanLogEntry m_closedLoopLog;
+    private final DoubleLogEntry m_trueGoalPositionLog;
     private final DoubleLogEntry m_goalPositionLog;
     private final DoubleLogEntry m_setpointPositionLog;
     private final DoubleLogEntry m_setpointVelocityLog;
     private final DoubleLogEntry m_feedforwardLog;
     private final DoubleLogEntry m_pidLog;
+    private final StringLogEntry m_currentCommandLog;
 
     private final ProfiledPIDController m_pidController;
     private final ArmFeedforward m_feedforward;
@@ -107,11 +110,15 @@ public class ArmSubsystem extends SubsystemBase {
         m_absolutePositionLog = new DoubleLogEntry(log, "/arm/absolute/position");
         m_absoluteVelocityLog = new DoubleLogEntry(log, "/arm/absolute/velocity");
 
+        m_closedLoopLog = new BooleanLogEntry(log, "arm/closedLoop");
+        m_trueGoalPositionLog = new DoubleLogEntry(log, "/arm/trueGoal");
         m_goalPositionLog = new DoubleLogEntry(log, "/arm/goal/position");
         m_setpointPositionLog = new DoubleLogEntry(log, "/arm/setpoint/position");
         m_setpointVelocityLog = new DoubleLogEntry(log, "/arm/setpoint/velocity");
         m_feedforwardLog = new DoubleLogEntry(log, "/arm/feedforward");
         m_pidLog = new DoubleLogEntry(log, "/arm/pid");
+
+        m_currentCommandLog = new StringLogEntry(log, "/arm/command");
 
 
     }
@@ -149,16 +156,8 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public void setArmTargetPosition(double position) {
         m_setpoint = MathUtil.clamp(position, ArmCalibrations.MIN_POSITION, ArmCalibrations.MAX_POSITION);
-
         m_setpoint -= 3.75 + Math.sin(m_setpoint * Math.PI / 180.0) * 17.5;
-
-        // if (m_setpoint > ArmCalibrations.ELEVATOR_CLEARANCE &&
-        // /*RobotContainer.getInstance().m_elevatorSubsystem
-        // .getEncoderPosition()*/0 < ElevatorCalibrations.ARM_CLEARANCE) {
-        // m_pidController.setGoal(ArmCalibrations.ELEVATOR_CLEARANCE);
-        // } else {
         m_pidController.setGoal(m_setpoint);
-        // }
         m_closedLoop = true;
     }
 
@@ -192,14 +191,14 @@ public class ArmSubsystem extends SubsystemBase {
         m_absolutePositionLog.append(getAbsoluteEncoderPosition(), timeStamp);
         m_absoluteVelocityLog.append(m_absoluteEncoder.getVelocity(), timeStamp);
 
+        m_closedLoopLog.append(m_closedLoop, timeStamp);
+        m_trueGoalPositionLog.append(m_setpoint, timeStamp);
         m_goalPositionLog.append(m_pidController.getGoal().position, timeStamp);
         m_setpointPositionLog.append(m_pidController.getSetpoint().position, timeStamp);
         m_setpointVelocityLog.append(m_pidController.getSetpoint().velocity, timeStamp);
         m_feedforwardLog.append(ff, timeStamp);
         m_pidLog.append(pid, timeStamp);
 
-        SmartDashboard.putNumber("Arm Position", getAbsoluteEncoderPosition());
-        SmartDashboard.putNumber("Arm Setpoint", m_pidController.getSetpoint().position);
-
+        m_currentCommandLog.append(getCurrentCommand().getName(), timeStamp);
     }
 }

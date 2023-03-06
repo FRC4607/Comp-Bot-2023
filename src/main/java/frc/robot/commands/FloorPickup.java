@@ -51,7 +51,7 @@ public class FloorPickup extends CommandBase {
                         - ArmCalibrations.POSITION_RETRACTED) < ArmCalibrations.TOLERANCE) {
 
                     m_elevatorSubsystem
-                            .setElevatorPosition(
+                            .setElevatorTargetPosition(
                                     ElevatorCalibrations.pieceCollection() + ElevatorCalibrations.TOLERANCE);
                     m_state = State.extendingElevator;
                 }

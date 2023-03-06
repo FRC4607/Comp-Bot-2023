@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
 
-    private enum AutorecordState {
+    private enum AutoRecordState {
         BEFORE_START,
         AUTO,
         AUTO_DISABLED,
@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
         STOP
     }
 
-    private AutorecordState m_AutorecordState = AutorecordState.BEFORE_START;
+    private AutoRecordState m_autoRecordState = AutoRecordState.BEFORE_START;
     private boolean m_startValueSent = false;
     private boolean m_stopValueSent = false;
 
@@ -40,9 +40,9 @@ public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
     private RobotContainer m_robotContainer = RobotContainer.getInstance();
 
-    private AddressableLED m_LEDs;
-    private AddressableLEDBuffer m_LEDBuffer;
-    private NetworkTableEntry alienceColorEntry;
+    private AddressableLED m_leds;
+    private AddressableLEDBuffer m_ledBuffer;
+    private NetworkTableEntry m_allianceColorEntry;
 
     private boolean m_previousIsRed;
 
@@ -53,23 +53,23 @@ public class Robot extends TimedRobot {
         DataLog log = DataLogManager.getLog();
         DriverStation.startDataLog(log);
 
-        m_LEDs = new AddressableLED(0);
-        m_LEDs.setLength(38);
-        m_LEDBuffer = new AddressableLEDBuffer(38);
-        m_LEDs.setData(m_LEDBuffer);
-        m_LEDs.start();
+        m_leds = new AddressableLED(0);
+        m_leds.setLength(38);
+        m_ledBuffer = new AddressableLEDBuffer(38);
+        m_leds.setData(m_ledBuffer);
+        m_leds.start();
 
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         NetworkTable fmsInfo = inst.getTable("FMSInfo");
-        alienceColorEntry = fmsInfo.getEntry("IsRedAlliance");
+        m_allianceColorEntry = fmsInfo.getEntry("IsRedAlliance");
 
-        boolean isRed = alienceColorEntry.getBoolean(false);
+        boolean isRed = m_allianceColorEntry.getBoolean(false);
 
         m_previousIsRed = isRed;
         for (int i = 0; i < 38; i++) {
-            m_LEDBuffer.setHSV(i, isRed ? 0 : 100, 255, 255);
+            m_ledBuffer.setHSV(i, isRed ? 0 : 100, 255, 255);
         }
-        m_LEDs.setData(m_LEDBuffer);
+        m_leds.setData(m_ledBuffer);
 
         Calibrations.ArmCalibrations.initPreferences();
         Calibrations.ElevatorCalibrations.initPreferences();
@@ -77,11 +77,11 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
-        if (m_AutorecordState == AutorecordState.AUTO && !m_startValueSent) {
+        if (m_autoRecordState == AutoRecordState.AUTO && !m_startValueSent) {
             System.out.println("Starting automatic recording.");
             m_recording.setBoolean(true);
             m_startValueSent = true;
-        } else if (m_AutorecordState == AutorecordState.STOP && !m_stopValueSent) {
+        } else if (m_autoRecordState == AutoRecordState.STOP && !m_stopValueSent) {
             System.out.println("Stopping automatic recording.");
             m_recording.setBoolean(false);
             m_stopValueSent = true;
@@ -92,24 +92,24 @@ public class Robot extends TimedRobot {
         }
         CommandScheduler.getInstance().run();
 
-        boolean isRed = alienceColorEntry.getBoolean(false);
+        boolean isRed = m_allianceColorEntry.getBoolean(false);
 
         if (isRed != m_previousIsRed) {
 
             for (int i = 0; i < 38; i++) {
-                m_LEDBuffer.setHSV(i, isRed ? 0 : 100, 255, 255);
+                m_ledBuffer.setHSV(i, isRed ? 0 : 100, 255, 255);
             }
-            m_LEDs.setData(m_LEDBuffer);
+            m_leds.setData(m_ledBuffer);
         }
     
     }
 
     @Override
     public void disabledInit() {
-        if (m_AutorecordState == AutorecordState.AUTO) {
-            m_AutorecordState = AutorecordState.AUTO_DISABLED;
-        } else if (m_AutorecordState == AutorecordState.TELEOP) {
-            m_AutorecordState = AutorecordState.STOP;
+        if (m_autoRecordState == AutoRecordState.AUTO) {
+            m_autoRecordState = AutoRecordState.AUTO_DISABLED;
+        } else if (m_autoRecordState == AutoRecordState.TELEOP) {
+            m_autoRecordState = AutoRecordState.STOP;
         }
     }
 
@@ -123,8 +123,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        if (m_AutorecordState == AutorecordState.BEFORE_START) {
-            m_AutorecordState = AutorecordState.AUTO;
+        if (m_autoRecordState == AutoRecordState.BEFORE_START) {
+            m_autoRecordState = AutoRecordState.AUTO;
         }
 
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
@@ -144,8 +144,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        if (m_AutorecordState == AutorecordState.AUTO_DISABLED) {
-            m_AutorecordState = AutorecordState.TELEOP;
+        if (m_autoRecordState == AutoRecordState.AUTO_DISABLED) {
+            m_autoRecordState = AutoRecordState.TELEOP;
         }
 
 

@@ -31,8 +31,8 @@ public class AutoCollectGamePiece extends CommandBase {
     /**
      * A command to collect game piece in auto.
      *
-     * @param elevatorSubsystem The Elevator Subsystem
-     * @param armSubsystem The Arm Subsystem
+     * @param elevatorSubsystem    The Elevator Subsystem
+     * @param armSubsystem         The Arm Subsystem
      * @param manipulatorSubsystem The Manipulator Subsystem
      */
     public AutoCollectGamePiece(ElevatorSubsystem elevatorSubsystem, ArmSubsystem armSubsystem,
@@ -48,7 +48,8 @@ public class AutoCollectGamePiece extends CommandBase {
     public void initialize() {
         m_state = State.extendingElevator;
         m_counter = 0;
-        m_elevatorSubsystem.setElevatorPosition(ElevatorCalibrations.pieceCollection() + ElevatorCalibrations.TOLERANCE);
+        m_elevatorSubsystem
+                .setElevatorTargetPosition(ElevatorCalibrations.pieceCollection() + ElevatorCalibrations.TOLERANCE);
         m_elevatorSubsystem.resetController();
         m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_RETRACTED);
         m_armSubsystem.resetController();
@@ -87,7 +88,7 @@ public class AutoCollectGamePiece extends CommandBase {
             case retractingArm:
                 if (Math.abs(m_armSubsystem.getAbsoluteEncoderPosition()
                         - ArmCalibrations.POSITION_RETRACTED) < ArmCalibrations.TOLERANCE) {
-                    m_elevatorSubsystem.setElevatorPosition(0);
+                    m_elevatorSubsystem.setElevatorTargetPosition(0);
                     m_state = State.retractingElevator;
                 }
                 break;

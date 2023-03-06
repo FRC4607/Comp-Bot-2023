@@ -2,6 +2,7 @@ package frc.robot.lib;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.WPIUtilJNI;
+
 /**
  * A class that limits the acceleration and deceleration of the input value.
  */
@@ -60,8 +61,8 @@ public class AccelerationLimiter {
         } else {
             m_prevVal += MathUtil.clamp(
                     input - m_prevVal,
-                    m_decelerationLimit * elapsedTime,
-                    -m_accelerationLimit * elapsedTime);
+                    -m_decelerationLimit * elapsedTime,
+                    m_accelerationLimit * elapsedTime);
         }
 
         m_prevTime = currentTime;

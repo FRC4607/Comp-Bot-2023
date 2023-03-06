@@ -48,7 +48,7 @@ public class Retract extends CommandBase {
             case retractingArm:
                 if (Math.abs(m_armSubsystem.getAbsoluteEncoderPosition()
                         - ArmCalibrations.POSITION_RETRACTED) < ArmCalibrations.TOLERANCE) {
-                    m_elevatorSubsystem.setElevatorPosition(0);
+                    m_elevatorSubsystem.setElevatorTargetPosition(0);
                     m_state = State.retractingElevator;
                 }
                 break;

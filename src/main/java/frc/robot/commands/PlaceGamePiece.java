@@ -68,7 +68,7 @@ public class PlaceGamePiece extends CommandBase {
         m_state = State.extendingElevator;
         m_counter = 0;
         m_elevatorSubsystem
-                .setElevatorPosition(ElevatorCalibrations.nodePositions()[m_pieceLevel.m_value]
+                .setElevatorTargetPosition(ElevatorCalibrations.nodePositions()[m_pieceLevel.m_value]
                         + ElevatorCalibrations.TOLERANCE);
         m_elevatorSubsystem.resetController();
         m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_RETRACTED);
@@ -110,7 +110,7 @@ public class PlaceGamePiece extends CommandBase {
             case retractingArm:
                 if (Math.abs(m_armSubsystem.getAbsoluteEncoderPosition()
                         - ArmCalibrations.POSITION_RETRACTED) < ArmCalibrations.TOLERANCE) {
-                    m_elevatorSubsystem.setElevatorPosition(0);
+                    m_elevatorSubsystem.setElevatorTargetPosition(0);
                     m_manipulatorSubsystem.setSpeed(ManipulatorCalibrations.HOLD_SPEED);
                     m_state = State.retractingElevator;
                 }

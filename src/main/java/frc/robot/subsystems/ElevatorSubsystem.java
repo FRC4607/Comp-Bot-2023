@@ -6,23 +6,21 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxLimitSwitch;
-
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
+import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Calibrations.ArmCalibrations;
 import frc.robot.Calibrations.ElevatorCalibrations;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.RobotContainer;
 
 /**
  * The subsystem used for the elevator lift.
@@ -49,10 +47,19 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final DoubleLogEntry m_motorCommandedVoltageLog;
     private final DoubleLogEntry m_encoderPositionLog;
     private final DoubleLogEntry m_absoluteEncoderPositionLog;
+    private final BooleanLogEntry m_closedLoopLog;
+    private final DoubleLogEntry m_trueGoalPositionLog;
+    private final DoubleLogEntry m_goalPositionLog;
+    private final DoubleLogEntry m_setpointPositionLog;
+    private final DoubleLogEntry m_setpointVelocityLog;
+    private final DoubleLogEntry m_feedforwardLog;
+    private final DoubleLogEntry m_pidLog;
+    private final StringLogEntry m_currentCommandLog;
 
     private boolean m_closedLoop;
 
     private double m_commandedVoltage = 0.0;
+    private double m_setpoint;
 
     /**
      * Declares and configures motors.
@@ -108,6 +115,15 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_encoderPositionLog = new DoubleLogEntry(log, "/elevator/encoder/position");
         m_absoluteEncoderPositionLog = new DoubleLogEntry(log, "/elevator/encoder/absolutePosition");
 
+        m_closedLoopLog = new BooleanLogEntry(log, "elevator/closedLoop");
+        m_trueGoalPositionLog = new DoubleLogEntry(log, "/elevator/trueGoal");
+        m_goalPositionLog = new DoubleLogEntry(log, "/elevator/goal/position");
+        m_setpointPositionLog = new DoubleLogEntry(log, "/elevator/setpoint/position");
+        m_setpointVelocityLog = new DoubleLogEntry(log, "/elevator/setpoint/velocity");
+        m_feedforwardLog = new DoubleLogEntry(log, "/elevator/feedforward");
+        m_pidLog = new DoubleLogEntry(log, "/elevator/pid");
+
+        m_currentCommandLog = new StringLogEntry(log, "/elevator/command");
     }
 
     /**
@@ -137,15 +153,12 @@ public class ElevatorSubsystem extends SubsystemBase {
      *
      * @param position The position the elevator is set to.
      */
-    public void setElevatorPosition(double position) {
+    public void setElevatorTargetPosition(double position) {
+
         m_closedLoop = true;
-        // if (position < ElevatorCalibrations.ARM_CLEARANCE &&
-        // RobotContainer.getInstance().m_armSubsystem
-        // .getAbsoluteEncoderPosition() > ArmCalibrations.ELEVATOR_CLEARANCE) {
-        // m_pidController.setGoal(ElevatorCalibrations.ARM_CLEARANCE);
-        // } else {
+        m_setpoint = position;
+
         m_pidController.setGoal(position);
-        // }
     }
 
     public void resetController() {
@@ -159,9 +172,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        double pid = m_pidController.calculate(getEncoderPosition());
+        double ff = m_ffController.calculate(m_pidController.getSetpoint().velocity, 0);
+
         if (m_closedLoop) {
-            double pid = m_pidController.calculate(getEncoderPosition());
-            double ff = m_ffController.calculate(m_pidController.getSetpoint().velocity, 0);
             m_commandedVoltage = -(pid + ff);
             m_motor.setVoltage(m_commandedVoltage);
         }
@@ -185,11 +199,17 @@ public class ElevatorSubsystem extends SubsystemBase {
         // m_absoluteEncoderPositionLog.append(m_absoluteEncoder.getDistance(),
         // timeStamp);
 
-        m_motor.getFaults();
+        m_closedLoopLog.append(m_closedLoop, timeStamp);
+        m_trueGoalPositionLog.append(m_setpoint, timeStamp);
+        m_goalPositionLog.append(m_pidController.getGoal().position, timeStamp);
+        m_setpointPositionLog.append(m_pidController.getSetpoint().position, timeStamp);
+        m_setpointVelocityLog.append(m_pidController.getSetpoint().velocity, timeStamp);
+        m_feedforwardLog.append(ff, timeStamp);
+        m_pidLog.append(pid, timeStamp);
 
-        SmartDashboard.putNumber("Elevator Position Internal", -m_motorEncoder.getPosition());
-        SmartDashboard.putNumber("Elevator Velocity Internal", -m_motorEncoder.getVelocity());
-        SmartDashboard.putNumber("Elevator Current", -m_motor.getOutputCurrent());
+        m_currentCommandLog.append(getCurrentCommand().getName(), timeStamp);
+
+        
     }
 
 }

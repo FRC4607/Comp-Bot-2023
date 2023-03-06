@@ -4,8 +4,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Calibrations.SwerveCalibrations;
 import frc.robot.Constants.DriverConstants;
+import frc.robot.lib.AccelerationLimiter;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 /**
@@ -16,8 +16,8 @@ public class Drive extends CommandBase {
     private XboxController m_driver;
     private DrivetrainSubsystem m_drivetrainSubsystem;
 
-    private SlewRateLimiter m_strafeX;
-    private SlewRateLimiter m_strafeY;
+    private AccelerationLimiter m_strafeX;
+    private AccelerationLimiter m_strafeY;
 
     /**
      * Input from the driver.
@@ -29,17 +29,20 @@ public class Drive extends CommandBase {
         m_driver = driver;
         m_drivetrainSubsystem = drivetrainSubsystem;
 
-        m_strafeX = new SlewRateLimiter(5.0);
-        m_strafeY = new SlewRateLimiter(5.0);
+        m_strafeX = new AccelerationLimiter(5.0, 10.0);
+        m_strafeY = new AccelerationLimiter(5.0, 10.0);
 
         addRequirements(m_drivetrainSubsystem);
     }
 
     @Override
+    public void initialize() {
+        m_strafeX.reset(0);
+        m_strafeY.reset(0);
+    }
+
+    @Override
     public void execute() {
-        double leftY = MathUtil.applyDeadband(-m_driver.getLeftY(), DriverConstants.CONTROLLER_DEADBAND);
-        double leftX = MathUtil.applyDeadband(-m_driver.getLeftX(), DriverConstants.CONTROLLER_DEADBAND);
-        double rightX = MathUtil.applyDeadband(-m_driver.getRightX(), DriverConstants.CONTROLLER_DEADBAND);
 
         double strafeX = m_strafeX.calculate(MathUtil.applyDeadband(-m_driver.getLeftY(),
                 DriverConstants.CONTROLLER_DEADBAND) * DriverConstants.MAX_STRAFE_SPEED);
