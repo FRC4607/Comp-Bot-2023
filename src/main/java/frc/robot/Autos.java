@@ -63,8 +63,8 @@ public class Autos {
         autoCommands.put("Floor Pickup", new FloorPickup(m_elevatorSubsystem, m_armSubsystem));
         autoCommands.put("Collect Piece", new AutoCollectGamePiece(m_manipulatorSubsystem, true));
         autoCommands.put("Retract", new Retract(m_elevatorSubsystem, m_armSubsystem));
-        autoCommands.put("Auto Level +X", new AutoLevel(1, m_drivetrainSubsystem));
-        autoCommands.put("Auto Level -X", new AutoLevel(-1, m_drivetrainSubsystem));
+        autoCommands.put("Auto Level +X", new AutoLevel(0.5, m_drivetrainSubsystem));
+        autoCommands.put("Auto Level -X", new AutoLevel(-0.5, m_drivetrainSubsystem));
 
         m_chooser = new SendableChooser<>();
         m_commandMap = new HashMap<>();
@@ -81,8 +81,8 @@ public class Autos {
 
         m_chooser.addOption("Middle Auto", "Middle Auto");
         m_commandMap.put("Middle Auto", List.of(
-                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Middle Auto-Blue", 1.0, 1.0)),
-                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Middle Auto-Red", 1.0, 1.0))));
+                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Middle Auto-Blue", 1.0, 1.5)),
+                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Middle Auto-Red", 1.0, 1.5))));
 
         m_chooser.addOption("Two Piece Substation", "Two Piece Substation");
         m_commandMap.put("Two Piece Substation", List.of(

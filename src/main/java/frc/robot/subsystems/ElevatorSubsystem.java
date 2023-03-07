@@ -91,8 +91,8 @@ public class ElevatorSubsystem extends SubsystemBase {
                 ElevatorCalibrations.KV, ElevatorCalibrations.KA);
 
         m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10); // Faults and Applied Output
-        m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10); // Velocity, Bus Voltage, Temp, and Current
-        m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10); // Position
+        m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20); // Velocity, Bus Voltage, Temp, and Current
+        m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20); // Position
         m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535); // Max Period - Analog Sensor
         m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 65535); // Max Period - Alternate Encoder
         m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535); // Max Period - Duty Cycle Encoder Position

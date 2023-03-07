@@ -110,14 +110,15 @@ public class PlaceGamePiece extends CommandBase {
             case retractingArm:
                 if (Math.abs(m_armSubsystem.getAbsoluteEncoderPosition()
                         - ArmCalibrations.POSITION_RETRACTED) < ArmCalibrations.TOLERANCE) {
-                    m_elevatorSubsystem.setElevatorTargetPosition(0);
+                    m_elevatorSubsystem.setElevatorTargetPosition(ElevatorCalibrations.POSITION_RETRACTED);
                     m_manipulatorSubsystem.setSpeed(ManipulatorCalibrations.HOLD_SPEED);
                     m_state = State.retractingElevator;
                 }
                 break;
 
             case retractingElevator:
-                if (Math.abs(m_elevatorSubsystem.getEncoderPosition() - 0) < ElevatorCalibrations.TOLERANCE) {
+                if (Math.abs(m_elevatorSubsystem.getEncoderPosition()
+                        - ElevatorCalibrations.POSITION_RETRACTED) < ElevatorCalibrations.TOLERANCE) {
                     m_state = State.done;
                 }
                 break;

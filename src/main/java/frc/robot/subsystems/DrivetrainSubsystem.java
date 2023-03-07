@@ -197,6 +197,19 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * @param fieldOrientated whether or not to drive relative to the field.
      */
     public void drive(double strafeX, double strafeY, double rotate, boolean fieldOrientated) {
+        drive(strafeX, strafeY, rotate, fieldOrientated, true);
+    }
+    
+    /**
+     * Driver Input.
+     *
+     * @param strafeX         speed in m/s.
+     * @param strafeY         speed in m/s.
+     * @param rotate          rad/s
+     * @param fieldOrientated whether or not to drive relative to the field.
+     * @param autoX           if the modules should go to x when no input is detected
+     */
+    public void drive(double strafeX, double strafeY, double rotate, boolean fieldOrientated, boolean autoX) {
         ChassisSpeeds chassisSpeed;
 
         if (fieldOrientated) {
@@ -207,7 +220,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
         SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(chassisSpeed);
 
-        if (strafeX == 0.0 && strafeY == 0.0 && rotate == 0.0) {
+        if (strafeX == 0.0 && strafeY == 0.0 && rotate == 0.0 && autoX) {
             moduleStates[0].angle = Rotation2d.fromDegrees(45);
             moduleStates[1].angle = Rotation2d.fromDegrees(135);
             moduleStates[2].angle = Rotation2d.fromDegrees(135);

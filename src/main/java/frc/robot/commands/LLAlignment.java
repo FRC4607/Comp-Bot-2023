@@ -58,9 +58,9 @@ public class LLAlignment extends CommandBase {
             if (m_tv) {
                 m_driver.setRumble(RumbleType.kBothRumble, 0);
                 if (Math.abs(m_tx) > m_strafeDeadband) {
-                    m_drive.drive(applyDeadband(m_driver.getLeftY()), -(m_tx * m_strafekP), 0, false);
+                    m_drive.drive(applyDeadband(m_driver.getLeftY()), -(m_tx * m_strafekP), 0, false, false);
                 } else {
-                    m_drive.drive(applyDeadband(m_driver.getLeftY()), 0, 0, false);
+                    m_drive.drive(applyDeadband(m_driver.getLeftY()), 0, 0, false, false);
                 }
             }
             else {
@@ -68,7 +68,7 @@ public class LLAlignment extends CommandBase {
             }
         }
         else {
-            m_drive.drive(0, 0, turnPIDOut, false);
+            m_drive.drive(0, 0, turnPIDOut, false, false);
         }
     }
 

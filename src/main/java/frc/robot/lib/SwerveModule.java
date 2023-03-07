@@ -57,7 +57,7 @@ public class SwerveModule {
     private String m_label;
     private final DataLog m_log;
 
-    private boolean m_pidTuning = true;
+    private boolean m_pidTuning = false;
     private double m_kp;
     private double m_ki;
     private double m_kd;
@@ -123,16 +123,16 @@ public class SwerveModule {
         m_turnMotor.setSmartCurrentLimit(40, 40);
 
         m_driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10); // Faults and Applied Output
-        m_driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10); // Velocity, Bus Voltage, Temp, and Current
-        m_driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10); // Position
+        m_driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20); // Velocity, Bus Voltage, Temp, and Current
+        m_driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20); // Position
         m_driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535); // Max Period - Analog Sensor
         m_driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 65535); // Max Period - Alternate Encoder
         m_driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535); // Max Period - Duty Cycle Encoder Position
         m_driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 65535); // Max Period - Duty Cycle Encoder Velocity
 
         m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10); // Faults and Applied Output
-        m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10); // Velocity, Bus Voltage, Temp, and Current
-        m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10); // Positions
+        m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20); // Velocity, Bus Voltage, Temp, and Current
+        m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20); // Positions
         m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535); // Max Period - Analog Sensor
         m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 65535); // Max Period - Alternate Encoder
         m_turnMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20); // Duty Cycle Encoder Position

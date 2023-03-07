@@ -4,14 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.hal.can.CANStatus;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -41,38 +43,35 @@ public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
     private RobotContainer m_robotContainer = RobotContainer.getInstance();
 
-    private AddressableLED m_leds;
-    private AddressableLEDBuffer m_ledBuffer;
-    private NetworkTableEntry m_allianceColorEntry;
-
-    private boolean m_previousIsRed;
+    private DoubleLogEntry m_roborioCanUtilizationLogEntry;
+    private IntegerLogEntry m_roborioCanOffCountLogEntry;
+    private IntegerLogEntry m_roborioCanRxErrCountLogEntry;
+    private IntegerLogEntry m_roborioCanTxErrCountLogEntry;
+    private IntegerLogEntry m_roborioCanTxFullCountLogEntry;
+    private CANStatus m_canStatus;
 
     @Override
     public void robotInit() {
         DriverStation.silenceJoystickConnectionWarning(true);
-
+        
         m_recording.setBoolean(false);
         DataLogManager.start();
         DataLog log = DataLogManager.getLog();
         DriverStation.startDataLog(log);
+        
+        m_roborioCanUtilizationLogEntry = new DoubleLogEntry(log, "RoboRio CAN Utilization");
+        m_roborioCanOffCountLogEntry = new IntegerLogEntry(log, "RoboRio CAN Off Count");
+        m_roborioCanRxErrCountLogEntry = new IntegerLogEntry(log, "RoboRio CAN Rx Error Count");
+        m_roborioCanTxErrCountLogEntry = new IntegerLogEntry(log, "RoboRio CAN Tx Error Count");
+        m_roborioCanTxFullCountLogEntry = new IntegerLogEntry(log, "RoboRio CAN Tx Full Count");
 
-        m_leds = new AddressableLED(0);
-        m_leds.setLength(38);
-        m_ledBuffer = new AddressableLEDBuffer(38);
-        m_leds.setData(m_ledBuffer);
-        m_leds.start();
-
-        NetworkTableInstance inst = NetworkTableInstance.getDefault();
-        NetworkTable fmsInfo = inst.getTable("FMSInfo");
-        m_allianceColorEntry = fmsInfo.getEntry("IsRedAlliance");
-
-        boolean isRed = m_allianceColorEntry.getBoolean(false);
-
-        m_previousIsRed = isRed;
-        for (int i = 0; i < 38; i++) {
-            m_ledBuffer.setHSV(i, isRed ? 0 : 100, 255, 255);
-        }
-        m_leds.setData(m_ledBuffer);
+        m_canStatus = RobotController.getCANStatus();
+        
+        m_roborioCanUtilizationLogEntry.append(m_canStatus.percentBusUtilization);
+        m_roborioCanOffCountLogEntry.append(m_canStatus.busOffCount);
+        m_roborioCanRxErrCountLogEntry.append(m_canStatus.receiveErrorCount);
+        m_roborioCanTxErrCountLogEntry.append(m_canStatus.transmitErrorCount);
+        m_roborioCanTxFullCountLogEntry.append(m_canStatus.txFullCount);
 
         Calibrations.ArmCalibrations.initPreferences();
         Calibrations.ElevatorCalibrations.initPreferences();
@@ -98,16 +97,13 @@ public class Robot extends TimedRobot {
         }
         CommandScheduler.getInstance().run();
 
-        boolean isRed = m_allianceColorEntry.getBoolean(false);
+        m_canStatus = RobotController.getCANStatus();
 
-        if (isRed != m_previousIsRed) {
-
-            for (int i = 0; i < 38; i++) {
-                m_ledBuffer.setHSV(i, isRed ? 0 : 100, 255, 255);
-            }
-            m_leds.setData(m_ledBuffer);
-        }
-    
+        m_roborioCanUtilizationLogEntry.append(m_canStatus.percentBusUtilization);
+        m_roborioCanOffCountLogEntry.append(m_canStatus.busOffCount);
+        m_roborioCanRxErrCountLogEntry.append(m_canStatus.receiveErrorCount);
+        m_roborioCanTxErrCountLogEntry.append(m_canStatus.transmitErrorCount);
+        m_roborioCanTxFullCountLogEntry.append(m_canStatus.txFullCount);
     }
 
     @Override

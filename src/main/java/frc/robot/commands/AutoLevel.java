@@ -11,9 +11,7 @@ public class AutoLevel extends CommandBase {
     private final DrivetrainSubsystem m_drive;
     private double m_deg;
 
-    private double m_xSpeed;
-
-    private final double m_xSpeedMultiplier;
+    private final double m_xSpeed;
 
     private Pose2d m_startPose;
     
@@ -33,8 +31,7 @@ public class AutoLevel extends CommandBase {
     private boolean m_onStation = false;
 
     public AutoLevel(double xSpeed, DrivetrainSubsystem drive) {
-        m_xSpeedMultiplier = xSpeed;
-        m_xSpeed = m_xSpeedMultiplier * SmartDashboard.getNumber("Robot AutoLevel X Speed", 0);
+        m_xSpeed = xSpeed;
         m_drive = drive;
         addRequirements(m_drive);
     }
@@ -46,7 +43,6 @@ public class AutoLevel extends CommandBase {
         m_lastVel = 0;
         m_end = false;
         m_sign = null;
-        m_xSpeed = m_xSpeedMultiplier * SmartDashboard.getNumber("Robot AutoLevel X Speed", 0);
         m_deg = m_drive.getRobotPitch().getDegrees();
         m_lastTime = RobotController.getFPGATime();
         m_lastPitch = m_drive.getRobotPitch().getDegrees();
@@ -81,11 +77,11 @@ public class AutoLevel extends CommandBase {
         // m_lastTime = t;
         // m_lastPitch = p;
         // m_lastVel = v;
-        if (Math.abs(m_drive.getRobotPitch().getDegrees()) > SmartDashboard.getNumber("Robot AutoLevel Docked Trigger", 15) && !m_onStation) {
+        if (Math.abs(m_drive.getRobotPitch().getDegrees()) > 20 && !m_onStation) {
             m_onStation = true;
         }
-        m_drive.drive(m_xSpeed, 0, 0, true);
-        if (Math.abs(m_drive.getRobotPitch().getDegrees()) < SmartDashboard.getNumber("Robot AutoLevel Engaged Trigger", 5) && m_onStation) {
+        m_drive.drive(m_xSpeed, 0, 0, true, false);
+        if (Math.abs(m_drive.getRobotPitch().getDegrees()) < 10 && m_onStation) {
             end(false);
             return;
         }

@@ -1,9 +1,9 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Calibrations.SwerveCalibrations;
 import frc.robot.Constants.DriverConstants;
 import frc.robot.lib.AccelerationLimiter;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -29,8 +29,8 @@ public class Drive extends CommandBase {
         m_driver = driver;
         m_drivetrainSubsystem = drivetrainSubsystem;
 
-        m_strafeX = new AccelerationLimiter(5.0, 10.0);
-        m_strafeY = new AccelerationLimiter(5.0, 10.0);
+        m_strafeX = new AccelerationLimiter(SwerveCalibrations.MAX_ACCELERATION, SwerveCalibrations.MAX_DECELERATION);
+        m_strafeY = new AccelerationLimiter(SwerveCalibrations.MAX_ACCELERATION, SwerveCalibrations.MAX_DECELERATION);
 
         addRequirements(m_drivetrainSubsystem);
     }

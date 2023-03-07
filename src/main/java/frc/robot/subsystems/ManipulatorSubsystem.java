@@ -39,8 +39,8 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
     private final CANSparkMax m_motor;
     private final RelativeEncoder m_motorEncoder;
-    private final ColorSensorV3 m_colorSensor;
-    private final ColorMatch m_colorMatcher;
+    // private final ColorSensorV3 m_colorSensor;
+    // private final ColorMatch m_colorMatcher;
 
     private final DoubleLogEntry m_motorOutputLog;
     private final IntegerLogEntry m_motorFaultsLog;
@@ -50,11 +50,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
     private final DoubleLogEntry m_motorVoltageLog;
     private final DoubleLogEntry m_motorTempLog;
     private final DoubleLogEntry m_filteredMotorCurrentLog;
-    private final StringLogEntry m_colorSensorPieceLog;
-    private final DoubleLogEntry m_colorSensorConfidenceLog;
-    private final DoubleLogEntry m_colorSensorRedLog;
-    private final DoubleLogEntry m_colorSensorGreenLog;
-    private final DoubleLogEntry m_colorSensorBlueLog;
+    // private final StringLogEntry m_colorSensorPieceLog;
+    // private final DoubleLogEntry m_colorSensorConfidenceLog;
+    // private final DoubleLogEntry m_colorSensorRedLog;
+    // private final DoubleLogEntry m_colorSensorGreenLog;
+    // private final DoubleLogEntry m_colorSensorBlueLog;
     private final StringLogEntry m_currentCommandLog;
 
     private final LinearFilter m_filter;
@@ -66,12 +66,12 @@ public class ManipulatorSubsystem extends SubsystemBase {
      */
     public ManipulatorSubsystem() {
 
-        m_colorSensor =  new ColorSensorV3(I2C.Port.kMXP);
-        m_colorMatcher = new ColorMatch();
-        m_colorMatcher.addColorMatch(ManipulatorCalibrations.CONE);
-        m_colorMatcher.addColorMatch(ManipulatorCalibrations.CUBE);
+        // m_colorSensor =  new ColorSensorV3(I2C.Port.kMXP);
+        // m_colorMatcher = new ColorMatch();
+        // m_colorMatcher.addColorMatch(ManipulatorCalibrations.CONE);
+        // m_colorMatcher.addColorMatch(ManipulatorCalibrations.CUBE);
 
-        m_colorMatcher.setConfidenceThreshold(ManipulatorCalibrations.MATCHER_CONFIDENCE);
+        // m_colorMatcher.setConfidenceThreshold(ManipulatorCalibrations.MATCHER_CONFIDENCE);
 
         m_motor = new CANSparkMax(ManipulatorConstants.MANIPULATOR_MOTOR_CAN_ID, MotorType.kBrushless);
 
@@ -99,11 +99,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
         m_filteredMotorCurrentLog = new DoubleLogEntry(log, "/manipulator/motor/currentFiltered");
 
-        m_colorSensorPieceLog = new StringLogEntry(log, "/manipulator/colorSensor/detectedPiece");
-        m_colorSensorConfidenceLog = new DoubleLogEntry(log, "/manipulator/colorSensor/confidence");
-        m_colorSensorRedLog = new DoubleLogEntry(log, "/manipulator/colorSensor/red");
-        m_colorSensorGreenLog = new DoubleLogEntry(log, "/manipulator/colorSensor/green");
-        m_colorSensorBlueLog = new DoubleLogEntry(log, "/manipulator/colorSensor/blue");
+        // m_colorSensorPieceLog = new StringLogEntry(log, "/manipulator/colorSensor/detectedPiece");
+        // m_colorSensorConfidenceLog = new DoubleLogEntry(log, "/manipulator/colorSensor/confidence");
+        // m_colorSensorRedLog = new DoubleLogEntry(log, "/manipulator/colorSensor/red");
+        // m_colorSensorGreenLog = new DoubleLogEntry(log, "/manipulator/colorSensor/green");
+        // m_colorSensorBlueLog = new DoubleLogEntry(log, "/manipulator/colorSensor/blue");
 
         m_currentCommandLog = new StringLogEntry(log, "/manipulator/command");
 
@@ -134,19 +134,19 @@ public class ManipulatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
-        Color color = m_colorSensor.getColor();
+        // Color color = m_colorSensor.getColor();
 
-        ColorMatchResult matchedColor = m_colorMatcher.matchColor(color);
+        // ColorMatchResult matchedColor = m_colorMatcher.matchColor(color);
 
-        if (matchedColor == null) {
-            m_pieceType = PieceType.None;
-        } else if (matchedColor.color == ManipulatorCalibrations.CONE) {
-            m_pieceType = PieceType.Cone;
-        } else if (matchedColor.color == ManipulatorCalibrations.CUBE) {
-            m_pieceType = PieceType.Cube;
-        } else {
-            m_pieceType = PieceType.None;
-        }
+        // if (matchedColor == null) {
+        //     m_pieceType = PieceType.None;
+        // } else if (matchedColor.color == ManipulatorCalibrations.CONE) {
+        //     m_pieceType = PieceType.Cone;
+        // } else if (matchedColor.color == ManipulatorCalibrations.CUBE) {
+        //     m_pieceType = PieceType.Cube;
+        // } else {
+        //     m_pieceType = PieceType.None;
+        // }
 
         m_filteredCurrent = m_filter.calculate(m_motor.getOutputCurrent());
 
@@ -162,11 +162,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
         m_filteredMotorCurrentLog.append(m_filteredCurrent, timeStamp);
         
-        m_colorSensorPieceLog.append(m_pieceType.toString(), timeStamp);
-        m_colorSensorConfidenceLog.append(matchedColor == null ? 0 : matchedColor.confidence, timeStamp);
-        m_colorSensorRedLog.append(color.red, timeStamp);
-        m_colorSensorGreenLog.append(color.green, timeStamp);
-        m_colorSensorBlueLog.append(color.blue, timeStamp);
+        // m_colorSensorPieceLog.append(m_pieceType.toString(), timeStamp);
+        // m_colorSensorConfidenceLog.append(matchedColor == null ? 0 : matchedColor.confidence, timeStamp);
+        // m_colorSensorRedLog.append(color.red, timeStamp);
+        // m_colorSensorGreenLog.append(color.green, timeStamp);
+        // m_colorSensorBlueLog.append(color.blue, timeStamp);
 
         Command currentCommand = getCurrentCommand();
         m_currentCommandLog.append(currentCommand != null ? currentCommand.getName() : "None", timeStamp);

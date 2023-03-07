@@ -38,12 +38,13 @@ public class Calibrations {
          * Max acceleration in Meters / s. Experimentally determined at voltage of 9
          * volts.
          */
-        public static final double MAX_SPEED_METER = 3.27;
+        public static final double MAX_SPEED_METER = 3.23;
         /**
          * Max acceleration in Meters / s^2. Experimentally determined with a step
          * voltage of 9 volts.
          */
-        public static final double MAX_ACCELERATION = 3.27;
+        public static final double MAX_ACCELERATION = (6.32 + 9.88) / 2;
+        public static final double MAX_DECELERATION = (6.72 + 12.6) / 2;
 
     }
 
@@ -141,6 +142,8 @@ public class Calibrations {
         public static final double ARM_CLEARANCE = 35.0;
         
         public static final double TOLERANCE = 0.05;
+
+        public static final double POSITION_RETRACTED = 0.25;
 
         public static final double ELEVATOR_DRIVER_SPEED = 4.0 / 50.0;
 
