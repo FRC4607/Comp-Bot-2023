@@ -1,0 +1,152 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 1.802758381903169,
+        "y": 4.961761336760599
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.8027583819031667,
+        "y": 4.961761336760599
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "Place Top Node"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 3.64878509116449,
+        "y": 4.86871066268823
+      },
+      "prevControl": {
+        "x": 3.2257717365338285,
+        "y": 4.915235999724414
+      },
+      "nextControl": {
+        "x": 4.071798445795151,
+        "y": 4.822185325652045
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.710747656370759,
+        "y": 4.649999050887781
+      },
+      "prevControl": {
+        "x": 5.262372237258561,
+        "y": 4.908125363204807
+      },
+      "nextControl": {
+        "x": 5.262372237258561,
+        "y": 4.908125363204807
+      },
+      "holonomicAngle": 0.0,
+      "isReversal": true,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [
+          "Collect Piece"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 1.0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 3.6678034921906155,
+        "y": 4.8116554596098515
+      },
+      "prevControl": {
+        "x": 4.481711674443685,
+        "y": 4.7465428050296055
+      },
+      "nextControl": {
+        "x": 2.716883440884321,
+        "y": 4.887729063714356
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 1.8040001916302781,
+        "y": 4.279140230878327
+      },
+      "prevControl": {
+        "x": 2.384061422927118,
+        "y": 4.982821068844985
+      },
+      "nextControl": null,
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "Place Top Node"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "maxVelocity": 2.0,
+  "maxAcceleration": 2.0,
+  "isReversed": null,
+  "markers": [
+    {
+      "position": 0.20000000000000007,
+      "names": [
+        "Floor Pickup"
+      ]
+    },
+    {
+      "position": 2.1,
+      "names": [
+        "Retract"
+      ]
+    },
+    {
+      "position": 1.8,
+      "names": [
+        "Collect Piece"
+      ]
+    }
+  ]
+}

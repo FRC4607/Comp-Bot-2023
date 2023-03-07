@@ -1,0 +1,116 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 1.7740776805346106,
+        "y": 0.487571923265493
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.7740776805346083,
+        "y": 0.487571923265493
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "Place Top Node"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 3.4015458778248533,
+        "y": 0.8843556477148541
+      },
+      "prevControl": {
+        "x": 1.874719372870037,
+        "y": 0.8843556477148541
+      },
+      "nextControl": {
+        "x": 3.772526590629714,
+        "y": 0.8843556477148541
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.476085535800967,
+        "y": 0.8558280461756654
+      },
+      "prevControl": {
+        "x": 4.346310204626048,
+        "y": 0.8558280461756654
+      },
+      "nextControl": {
+        "x": 4.605860866975886,
+        "y": 0.8558280461756654
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.720256856883822,
+        "y": 0.9033740487409814
+      },
+      "prevControl": {
+        "x": 6.2732232825085,
+        "y": 0.9033740487409814
+      },
+      "nextControl": null,
+      "holonomicAngle": 0.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "Floor Pickup"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "markers": [
+    {
+      "position": 2.1,
+      "names": [
+        "Floor Pickup"
+      ]
+    },
+    {
+      "position": 2.8,
+      "names": [
+        "Piece Pickup"
+      ]
+    }
+  ]
+}

@@ -13,7 +13,7 @@ public class Constants {
      */
     public static class SwerveConstants {
 
-        public static final boolean DEBUG = true;
+        public static final boolean DEBUG = false;
 
         public static final double TURN_GEAR_RATIO = (32.0 / 15.0) *  (6.0); // MK4
         public static final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0); // MK4 L2

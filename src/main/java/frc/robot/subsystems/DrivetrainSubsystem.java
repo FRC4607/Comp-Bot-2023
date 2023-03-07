@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.Pigeon2.AxisDirection;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -10,8 +12,10 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations.SwerveCalibrations;
 import frc.robot.Constants.SwerveConstants;
@@ -33,6 +37,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private final DataLog m_log;
 
     private final DoubleLogEntry m_pigeonYawLog;
+    private final DoubleLogEntry m_pigeonPitchLog;
+    private final DoubleLogEntry m_pigeonRollLog;
+    private final DoubleLogEntry m_calculatedPitch;
+    private final StringLogEntry m_currentCommandLog;
+
+
 
     /**
      * Sets up the hardware used in the drivetrain.
@@ -52,18 +62,23 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         m_pigeon = new Pigeon2(SwerveConstants.PIGEON2_CAN_ID);
         m_pigeon.setYaw(0);
+        m_pigeon.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);
 
         for (int i = 0; i < m_swerveModules.length; i++) {
             m_swerveModules[i].homeEncoder();
         }
 
         m_kinematics = new SwerveDriveKinematics(SwerveConstants.POSITIONS);
-        m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroRotation(), getModulePositions());
+        m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroYaw(), getModulePositions());
 
         m_log = DataLogManager.getLog();
 
         m_pigeonYawLog = new DoubleLogEntry(m_log, "swerve/pigeon/yaw");
-
+        m_pigeonPitchLog = new DoubleLogEntry(m_log, "swerve/pigeon/pitch");
+        m_pigeonRollLog = new DoubleLogEntry(m_log, "swerve/pigeon/roll");
+        m_calculatedPitch = new DoubleLogEntry(m_log, "swerve/pigeon/calculated_pitch");
+        m_currentCommandLog = new StringLogEntry(m_log, "/elevator/command");
+    
         logData();
     }
 
@@ -74,7 +89,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
         logData();
 
-        m_odometry.update(getGyroRotation(), getModulePositions());
+        m_odometry.update(getGyroYaw(), getModulePositions());
 
         // SmartDashboard.putNumber("Gyro Yaw (Deg)", getGyroRotation().getDegrees());
         // SmartDashboard.putNumber("Pigeon Yaw (Deg)", m_pigeon.getYaw());
@@ -124,14 +139,30 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     /**
-     * The rotation of the gyro.
+     * The yaw of the gyro.
      *
-     * @return The {@link Rotation2d} of the gyro
+     * @return The {@link Rotation2d} of the gyro's yaw
      */
-    public Rotation2d getGyroRotation() {
-
+    public Rotation2d getGyroYaw() {
         return Rotation2d.fromDegrees(m_pigeon.getYaw());
+    }
 
+    /**
+     * The pitch of the gyro.
+     *
+     * @return The {@link Rotation2d} of the gyro's pitch
+     */
+    public Rotation2d getGyroPitch() {
+        return Rotation2d.fromDegrees(m_pigeon.getPitch());
+    }
+
+    /**
+     * The roll of the gyro.
+     *
+     * @return The {@link Rotation2d} of the gyro's roll
+     */
+    public Rotation2d getGyroRoll() {
+        return Rotation2d.fromDegrees(m_pigeon.getRoll());
     }
 
     /**
@@ -141,6 +172,20 @@ public class DrivetrainSubsystem extends SubsystemBase {
      */
     public Pose2d getPose() {
         return m_odometry.getPoseMeters();
+    }
+
+    /**
+     * Gets the pitch of the robot regardless of the robot's yaw. For the gyro's raw yaw value, use {@code getGyroPitch}.
+
+     * @return A {@link Rotation2d} of the robot's pitch relative to the field.
+     */
+    public Rotation2d getRobotPitch() {
+        // This is probably not the correct way to do this, but it's a close enough approximation
+        double roll = getGyroRoll().getRadians();
+        double pitch = getGyroPitch().getRadians();
+        double yaw = getPose().getRotation().getRadians();
+        double theNumber = Math.cos(yaw) * pitch + Math.sin(yaw) * roll;
+        return Rotation2d.fromRadians(theNumber);
     }
 
     /**
@@ -232,7 +277,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void resetHeading() {
         Pose2d currentPose = getPose();
         Pose2d newPose = new Pose2d(currentPose.getTranslation(), new Rotation2d());
-        m_odometry.resetPosition(getGyroRotation(), getModulePositions(), newPose);
+        m_odometry.resetPosition(getGyroYaw(), getModulePositions(), newPose);
     }
 
     /**
@@ -241,15 +286,20 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * @param pose The pose the odometry is set to.
      */
     public void setPose(Pose2d pose) {
-        m_odometry.resetPosition(getGyroRotation(), getModulePositions(), pose);
+        m_odometry.resetPosition(getGyroYaw(), getModulePositions(), pose);
     }
 
     /**
      * A function that logs the data in the Drivetrain subsystem.
      */
     private void logData() {
-        long timeStamp = (long) Timer.getFPGATimestamp();
+        long timeStamp = (long) (Timer.getFPGATimestamp() * 1e6);
         m_pigeonYawLog.append(m_pigeon.getYaw(), timeStamp);
+        m_pigeonPitchLog.append(m_pigeon.getPitch(), timeStamp);
+        m_pigeonRollLog.append(m_pigeon.getRoll(), timeStamp);
+        m_calculatedPitch.append(getRobotPitch().getDegrees(), timeStamp);
+        Command currentCommand = getCurrentCommand();
+        m_currentCommandLog.append(currentCommand != null ? currentCommand.getName() : "None", timeStamp);
     }
 
 }

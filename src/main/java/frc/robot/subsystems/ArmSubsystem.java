@@ -19,6 +19,7 @@ import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations.ArmCalibrations;
 import frc.robot.Constants.ArmConstants;
@@ -199,6 +200,7 @@ public class ArmSubsystem extends SubsystemBase {
         m_feedforwardLog.append(ff, timeStamp);
         m_pidLog.append(pid, timeStamp);
 
-        m_currentCommandLog.append(getCurrentCommand().getName(), timeStamp);
+        Command currentCommand = getCurrentCommand();
+        m_currentCommandLog.append(currentCommand != null ? currentCommand.getName() : "None", timeStamp);
     }
 }

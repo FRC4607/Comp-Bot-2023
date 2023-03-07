@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * Used for calibrating the robot.
@@ -30,8 +31,8 @@ public class Calibrations {
         public static final double DRIVE_KF = 0.0;
 
         public static final double DRIVE_FF_KS = 0.16;
-        public static final double DRIVE_FF_KV = 2.6825;
-        public static final double DRIVE_FF_KA = 0.808625;
+        public static final double DRIVE_FF_KV = 2.65;
+        public static final double DRIVE_FF_KA = 0.0;
 
         /**
          * Max acceleration in Meters / s. Experimentally determined at voltage of 9
@@ -192,6 +193,13 @@ public class Calibrations {
         public static final double INTAKE_SPEED = -0.8;
         public static final double OUTTAKE_SPEED = 0.5;
         public static final double HOLD_SPEED = -0.1;
+        
+        public static final double PIECE_DETECTION_CURRENT = 30.0;
+        public static final double PIECE_DETECTION_RPM = 500.0;
+
+        public static final Color CONE = new Color(0.367, 0.555, 0.086);
+        public static final Color CUBE = new Color(0.211, 0.312, 0.470);
+        public static final double MATCHER_CONFIDENCE = 0.92;
 
     }
 

@@ -1,112 +1,55 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Calibrations.ArmCalibrations;
-import frc.robot.Calibrations.ElevatorCalibrations;
 import frc.robot.Calibrations.ManipulatorCalibrations;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ManipulatorSubsystem;
 
 /**
  * A command to collect game piece in auto. Not fully functional
  */
 public class AutoCollectGamePiece extends CommandBase {
-    private ElevatorSubsystem m_elevatorSubsystem;
-    private ArmSubsystem m_armSubsystem;
+
     private ManipulatorSubsystem m_manipulatorSubsystem;
-
-    private State m_state;
     private int m_counter;
-
-    private enum State {
-        extendingElevator,
-        extendingArm,
-        collectingPiece,
-        retractingArm,
-        retractingElevator,
-        done
-    }
+    private boolean m_timeout;
 
     /**
      * A command to collect game piece in auto.
      *
-     * @param elevatorSubsystem    The Elevator Subsystem
-     * @param armSubsystem         The Arm Subsystem
      * @param manipulatorSubsystem The Manipulator Subsystem
      */
-    public AutoCollectGamePiece(ElevatorSubsystem elevatorSubsystem, ArmSubsystem armSubsystem,
-            ManipulatorSubsystem manipulatorSubsystem) {
-        m_elevatorSubsystem = elevatorSubsystem;
-        m_armSubsystem = armSubsystem;
+    public AutoCollectGamePiece(ManipulatorSubsystem manipulatorSubsystem, boolean timeout) {
         m_manipulatorSubsystem = manipulatorSubsystem;
-
-        addRequirements(m_elevatorSubsystem, m_armSubsystem, m_manipulatorSubsystem);
+        m_timeout = timeout;
+        addRequirements(m_manipulatorSubsystem);
     }
 
     @Override
     public void initialize() {
-        m_state = State.extendingElevator;
+        m_manipulatorSubsystem.setSpeed(ManipulatorCalibrations.INTAKE_SPEED);
         m_counter = 0;
-        m_elevatorSubsystem
-                .setElevatorTargetPosition(ElevatorCalibrations.pieceCollection() + ElevatorCalibrations.TOLERANCE);
-        m_elevatorSubsystem.resetController();
-        m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_RETRACTED);
-        m_armSubsystem.resetController();
+        System.out.println("Piece Collection Stared");
     }
 
     @Override
     public void execute() {
-        switch (m_state) {
-            case extendingElevator:
-                if (Math.abs(m_elevatorSubsystem.getEncoderPosition()
-                        - ElevatorCalibrations.pieceCollection()) < ElevatorCalibrations.TOLERANCE) {
+        m_counter++;
 
-                    m_armSubsystem.setArmTargetPosition(ArmCalibrations.PIECE_COLLECTION_STATIC);
-                    m_state = State.extendingArm;
-                }
-                break;
-
-            case extendingArm:
-                if (Math.abs(m_armSubsystem.getAbsoluteEncoderPosition()
-                        - ArmCalibrations.PIECE_COLLECTION_STATIC) < ArmCalibrations.TOLERANCE) {
-
-                    m_manipulatorSubsystem.setSpeed(ManipulatorCalibrations.INTAKE_SPEED);
-                    m_state = State.collectingPiece;
-                }
-                break;
-
-            case collectingPiece:
-                if (m_counter > 150) {
-                    m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_RETRACTED);
-                    m_state = State.retractingArm;
-                    m_manipulatorSubsystem.setSpeed(ManipulatorCalibrations.HOLD_SPEED);
-                }
-                m_counter++;
-                break;
-
-            case retractingArm:
-                if (Math.abs(m_armSubsystem.getAbsoluteEncoderPosition()
-                        - ArmCalibrations.POSITION_RETRACTED) < ArmCalibrations.TOLERANCE) {
-                    m_elevatorSubsystem.setElevatorTargetPosition(0);
-                    m_state = State.retractingElevator;
-                }
-                break;
-
-            case retractingElevator:
-                if (Math.abs(m_elevatorSubsystem.getEncoderPosition()) < ElevatorCalibrations.TOLERANCE) {
-                    m_state = State.done;
-                }
-                break;
-
-            default:
-                break;
+        if (m_counter > 50 && m_timeout) {
+            m_manipulatorSubsystem.setSpeed(0);
         }
     }
 
     @Override
+    public void end(boolean interrupted) {
+        m_manipulatorSubsystem.setSpeed(ManipulatorCalibrations.HOLD_SPEED);
+        System.out.println("Piece Collection Ended");
+    }
+
+    @Override
     public boolean isFinished() {
-        return m_state == State.done;
+        return m_manipulatorSubsystem.getCurrent() > ManipulatorCalibrations.PIECE_DETECTION_CURRENT;
+                // && Math.abs(m_manipulatorSubsystem.getSpeed()) < ManipulatorCalibrations.PIECE_DETECTION_RPM;
     }
 
 }

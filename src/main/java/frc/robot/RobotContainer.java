@@ -13,14 +13,18 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AutoCollectGamePiece;
+import frc.robot.commands.AutoLevel;
 import frc.robot.commands.CalibrateArmFF;
 import frc.robot.commands.CalibrateDriveFF;
 import frc.robot.commands.CalibrateElevatorFF;
 import frc.robot.commands.Drive;
 import frc.robot.commands.DriveWithSmartDashboard;
 import frc.robot.commands.FloorPickup;
+import frc.robot.commands.LLAlignment;
 import frc.robot.commands.MoveArm;
 import frc.robot.commands.MoveArmSmartDashboard;
 import frc.robot.commands.MoveElevator;
@@ -65,10 +69,10 @@ public class RobotContainer {
     public DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
     public ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
     public ArmSubsystem m_armSubsystem = new ArmSubsystem();
-    public ManipulatorSubsystem m_motorizedManipulator = new ManipulatorSubsystem();
+    public ManipulatorSubsystem m_manipulatorSubsystem = new ManipulatorSubsystem();
     public PDHSubsystem m_pdhSubsystem = new PDHSubsystem();
 
-    private SendableChooser<Command> m_chooser;
+    private Autos m_autos;
 
     /**
      * The constructor for the robot container.
@@ -78,11 +82,15 @@ public class RobotContainer {
         m_driver = new XboxController(0);
         m_operator = new XboxController(1);
 
+        SmartDashboard.putNumber("Robot AutoLevel X Speed", 0.5);
+        SmartDashboard.putNumber("Robot AutoLevel Docked Trigger", 15);
+        SmartDashboard.putNumber("Robot AutoLevel Engaged Trigger", 5);
+
         m_drivetrainSubsystem.setDefaultCommand(new Drive(m_driver, m_drivetrainSubsystem));
         m_elevatorSubsystem.setDefaultCommand(new MoveElevator(m_driver, m_elevatorSubsystem));
 
-        m_motorizedManipulator.setDefaultCommand(
-                new MoveManipulator(m_operator::getLeftBumper, m_operator::getRightBumper, m_motorizedManipulator));
+        m_manipulatorSubsystem.setDefaultCommand(
+                new MoveManipulator(m_operator::getLeftBumper, m_operator::getRightBumper, m_manipulatorSubsystem));
         // m_armSubsystem.setDefaultCommand(new MoveArm(m_operator, m_armSubsystem));
 
         configureBindings();
@@ -96,40 +104,12 @@ public class RobotContainer {
         SmartDashboard.putData(new MoveElevatorSmartDashboard(m_elevatorSubsystem));
         SmartDashboard.putData(new MoveArmSmartDashboard(m_armSubsystem));
         // SmartDashboard.putData(
-        // new PlaceGamePiece(PieceLevel.MiddleCone, m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
-        // SmartDashboard.putData(new AutoCollectGamePiece(m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
+        // new PlaceGamePiece(PieceLevel.MiddleCone, m_elevatorSubsystem,
+        // m_armSubsystem, m_motorizedManipulator));
 
         // SmartDashboard.putData(new DriveWithSmartDashboard(m_drivetrainSubsystem));
 
-        m_chooser = new SendableChooser<>();
-
-        PathPlannerServer.startServer(5811);
-
-        HashMap<String, Command> autoCommands = new HashMap<String, Command>();
-
-        // autoCommands.put("Place Top Cone",
-        //         new PlaceGamePiece(PieceLevel.TopCone, m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
-        // autoCommands.put("Collect Cone",
-        //         new AutoCollectGamePiece(m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
-
-        // SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-        //         m_drivetrainSubsystem::getPose,
-        //         m_drivetrainSubsystem::setPose,
-        //         new PIDConstants(3.0, 0, 0),
-        //         new PIDConstants(1.0, 0, 0),
-        //         m_drivetrainSubsystem::setChassisSpeeds,
-        //         autoCommands,
-        //         true,
-        //         m_drivetrainSubsystem);
-
-        // m_chooser.setDefaultOption("One Cone",
-        //         autoBuilder.fullAuto(PathPlanner.loadPath("One Cone", new PathConstraints(1.0, 1.0))));
-        // m_chooser.addOption("Two Cone Substation",
-        //         autoBuilder.fullAuto(PathPlanner.loadPath("Two Cone Substation", new PathConstraints(1.5, 1.5))));
-        // m_chooser.addOption("Two Cone Wall",
-        //         autoBuilder.fullAuto(PathPlanner.loadPath("Two Cone Wall", new PathConstraints(1.5, 1.5))));
-
-        // SmartDashboard.putData("Autonomous Command", m_chooser);
+        m_autos = new Autos(m_drivetrainSubsystem, m_elevatorSubsystem, m_armSubsystem, m_manipulatorSubsystem);
     }
 
     private void configureBindings() {
@@ -137,30 +117,36 @@ public class RobotContainer {
         driverStart.onTrue(new ResetHeading(m_drivetrainSubsystem));
 
         JoystickButton driverLeftBumper = new JoystickButton(m_driver, XboxController.Button.kLeftBumper.value);
-        driverLeftBumper.onTrue(new FloorPickup(m_elevatorSubsystem, m_armSubsystem));
+        driverLeftBumper.onTrue(new SequentialCommandGroup(
+                new FloorPickup(m_elevatorSubsystem, m_armSubsystem),
+                new AutoCollectGamePiece(m_manipulatorSubsystem, false),
+                new Retract(m_elevatorSubsystem, m_armSubsystem)));
 
         JoystickButton driverRightBumper = new JoystickButton(m_driver, XboxController.Button.kRightBumper.value);
-        driverRightBumper.onTrue(new ShelfPickup(m_elevatorSubsystem, m_armSubsystem));
+        driverRightBumper.onTrue(new SequentialCommandGroup(
+                new ShelfPickup(m_elevatorSubsystem, m_armSubsystem),
+                new AutoCollectGamePiece(m_manipulatorSubsystem, false),
+                new Retract(m_elevatorSubsystem, m_armSubsystem)));
 
         JoystickButton driverA = new JoystickButton(m_driver, XboxController.Button.kA.value);
         JoystickButton driverB = new JoystickButton(m_driver, XboxController.Button.kB.value);
         driverB.onTrue(new Retract(m_elevatorSubsystem, m_armSubsystem));
 
         JoystickButton driverY = new JoystickButton(m_driver, XboxController.Button.kY.value);
+        driverY.whileTrue(new LLAlignment(0, m_driver, m_drivetrainSubsystem));
         JoystickButton driverX = new JoystickButton(m_driver, XboxController.Button.kX.value);
+        driverX.whileTrue(new LLAlignment(1, m_driver, m_drivetrainSubsystem));
 
         JoystickButton operatorA = new JoystickButton(m_operator, XboxController.Button.kA.value);
         JoystickButton operatorB = new JoystickButton(m_operator, XboxController.Button.kB.value);
         operatorB.onTrue(
-                new PlaceGamePiece(PieceLevel.MiddleCone, m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
+                new PlaceGamePiece(PieceLevel.MiddleCone, m_elevatorSubsystem, m_armSubsystem, m_manipulatorSubsystem));
 
         JoystickButton operatorY = new JoystickButton(m_operator, XboxController.Button.kY.value);
         operatorY.onTrue(
-                new PlaceGamePiece(PieceLevel.TopCone, m_elevatorSubsystem, m_armSubsystem, m_motorizedManipulator));
-                
+                new PlaceGamePiece(PieceLevel.TopCone, m_elevatorSubsystem, m_armSubsystem, m_manipulatorSubsystem));
+
         JoystickButton operatorX = new JoystickButton(m_operator, XboxController.Button.kX.value);
-
-
 
     }
 
@@ -170,6 +156,6 @@ public class RobotContainer {
      * @return The command selected by the drivers
      */
     public Command getAutonomousCommand() {
-        return m_chooser.getSelected();
+        return m_autos.getAutonomousCommand();
     }
 }

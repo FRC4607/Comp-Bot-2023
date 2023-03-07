@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.lib.LimelightHelpers;
 
 /**
  * The Robot Class that contains all the code.
@@ -48,6 +49,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+        DriverStation.silenceJoystickConnectionWarning(true);
+
         m_recording.setBoolean(false);
         DataLogManager.start();
         DataLog log = DataLogManager.getLog();
@@ -73,6 +76,9 @@ public class Robot extends TimedRobot {
 
         Calibrations.ArmCalibrations.initPreferences();
         Calibrations.ElevatorCalibrations.initPreferences();
+
+        LimelightHelpers.setPipelineIndex("limelight", 2);
+        LimelightHelpers.setCameraMode_Driver("limelight");
     }
 
     @Override
