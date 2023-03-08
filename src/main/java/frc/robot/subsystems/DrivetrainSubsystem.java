@@ -99,7 +99,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
             m_gyroRecalibrated = true;
         }
 
-        SmartDashboard.putNumber("Gyro Yaw (Deg)", getGyroRotation().getDegrees());
+        SmartDashboard.putNumber("Gyro Yaw (Deg)", getGyroYaw().getDegrees());
         SmartDashboard.putNumber("Pigeon Yaw (Deg)", m_pigeon.getYaw());
         SmartDashboard.putNumber("Pigeon Pitch (Deg)", m_pigeon.getPitch());
         SmartDashboard.putNumber("ADIS Pitch (Deg)", m_adis16470.getYFilteredAccelAngle());

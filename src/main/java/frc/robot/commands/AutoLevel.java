@@ -93,9 +93,9 @@ public class AutoLevel extends CommandBase {
 
     public Rotation2d getRobotPitch() {
         // This is probably not the correct way to do this, but it's a close enough approximation
-        double roll = m_drive.getPigeonRollRotation().getRadians();
-        double pitch = m_drive.getPigeonPitchRotation().getRadians();
-        double yaw = m_drive.getPigeonYawRotation().getRadians();
+        double roll = m_drive.getGyroRoll().getRadians();
+        double pitch = m_drive.getGyroPitch().getRadians();
+        double yaw = m_drive.getGyroYaw().getRadians();
         double theNumber = Math.cos(yaw) * pitch + Math.sin(yaw) * roll;
         return Rotation2d.fromRadians(theNumber);
     }
