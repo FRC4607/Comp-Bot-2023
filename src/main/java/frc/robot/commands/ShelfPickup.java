@@ -38,8 +38,6 @@ public class ShelfPickup extends CommandBase {
     @Override
     public void initialize() {
         m_state = State.homingArm;
-        // m_elevatorSubsystem.setElevatorPosition(ElevatorCalibrations.shelfPickup() +
-        // ElevatorCalibrations.TOLERANCE);
         m_elevatorSubsystem.resetController();
         m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_RETRACTED);
         m_armSubsystem.resetController();
@@ -53,7 +51,7 @@ public class ShelfPickup extends CommandBase {
                         - ArmCalibrations.POSITION_RETRACTED) < ArmCalibrations.TOLERANCE) {
 
                     m_elevatorSubsystem
-                            .setElevatorTargetPosition(ElevatorCalibrations.shelfPickup() + ElevatorCalibrations.TOLERANCE);
+                            .setElevatorTargetPosition(ElevatorCalibrations.shelfPickup());
                     m_state = State.extendingElevator;
                 }
                 break;

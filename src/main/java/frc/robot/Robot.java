@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.lib.LimelightHelpers;
@@ -99,11 +100,13 @@ public class Robot extends TimedRobot {
 
         m_canStatus = RobotController.getCANStatus();
 
-        m_roborioCanUtilizationLogEntry.append(m_canStatus.percentBusUtilization);
-        m_roborioCanOffCountLogEntry.append(m_canStatus.busOffCount);
-        m_roborioCanRxErrCountLogEntry.append(m_canStatus.receiveErrorCount);
-        m_roborioCanTxErrCountLogEntry.append(m_canStatus.transmitErrorCount);
-        m_roborioCanTxFullCountLogEntry.append(m_canStatus.txFullCount);
+        long timeStamp = (long) (Timer.getFPGATimestamp() * 1e6);
+
+        m_roborioCanUtilizationLogEntry.append(m_canStatus.percentBusUtilization, timeStamp);
+        m_roborioCanOffCountLogEntry.append(m_canStatus.busOffCount, timeStamp);
+        m_roborioCanRxErrCountLogEntry.append(m_canStatus.receiveErrorCount, timeStamp);
+        m_roborioCanTxErrCountLogEntry.append(m_canStatus.transmitErrorCount, timeStamp);
+        m_roborioCanTxFullCountLogEntry.append(m_canStatus.txFullCount, timeStamp);
     }
 
     @Override

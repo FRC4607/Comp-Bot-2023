@@ -82,6 +82,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
         m_motorEncoder = m_motor.getEncoder();
         m_motorEncoder.setPositionConversionFactor(1.0);
 
+        m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20); // Faults and Applied Output
+        m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20); // Velocity, Bus Voltage, Temp, and Current
+        m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 40); // Position
         m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535); // Max Period - Analog Sensor
         m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 65535); // Max Period - Alternate Encoder
         m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535); // Max Period - Duty Cycle Encoder Position

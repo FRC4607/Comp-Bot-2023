@@ -68,8 +68,7 @@ public class PlaceGamePiece extends CommandBase {
         m_state = State.extendingElevator;
         m_counter = 0;
         m_elevatorSubsystem
-                .setElevatorTargetPosition(ElevatorCalibrations.nodePositions()[m_pieceLevel.m_value]
-                        + ElevatorCalibrations.TOLERANCE);
+                .setElevatorTargetPosition(ElevatorCalibrations.nodePositions()[m_pieceLevel.m_value]);
         m_elevatorSubsystem.resetController();
         m_armSubsystem.setArmTargetPosition(ArmCalibrations.POSITION_RETRACTED);
         m_armSubsystem.resetController();

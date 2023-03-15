@@ -141,7 +141,7 @@ public class Calibrations {
         
         public static final double ARM_CLEARANCE = 35.0;
         
-        public static final double TOLERANCE = 0.05;
+        public static final double TOLERANCE = 0.1;
 
         public static final double POSITION_RETRACTED = 0.25;
 

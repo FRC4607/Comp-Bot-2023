@@ -77,7 +77,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         m_pigeonPitchLog = new DoubleLogEntry(m_log, "swerve/pigeon/pitch");
         m_pigeonRollLog = new DoubleLogEntry(m_log, "swerve/pigeon/roll");
         m_calculatedPitch = new DoubleLogEntry(m_log, "swerve/pigeon/calculated_pitch");
-        m_currentCommandLog = new StringLogEntry(m_log, "/elevator/command");
+        m_currentCommandLog = new StringLogEntry(m_log, "/swerve/command");
     
         logData();
     }
@@ -311,6 +311,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         m_pigeonPitchLog.append(m_pigeon.getPitch(), timeStamp);
         m_pigeonRollLog.append(m_pigeon.getRoll(), timeStamp);
         m_calculatedPitch.append(getRobotPitch().getDegrees(), timeStamp);
+
         Command currentCommand = getCurrentCommand();
         m_currentCommandLog.append(currentCommand != null ? currentCommand.getName() : "None", timeStamp);
     }

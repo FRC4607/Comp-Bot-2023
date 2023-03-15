@@ -54,7 +54,7 @@ public class Autos {
         m_armSubsystem = armSubsystem;
         m_manipulatorSubsystem = manipulatorSubsystem;
 
-        PathPlannerServer.startServer(5811);
+        // PathPlannerServer.startServer(5811);
 
         HashMap<String, Command> autoCommands = new HashMap<String, Command>();
 
@@ -94,6 +94,11 @@ public class Autos {
                 autoBuilder.fullAuto(PathPlanner.loadPathGroup("One Piece Wall-Blue", 1.0, 1.0)),
                 autoBuilder.fullAuto(PathPlanner.loadPathGroup("One Piece Wall-Red", 1.0, 1.0))));
 
+        m_chooser.setDefaultOption("Place One Piece", "Place One Piece");
+        m_commandMap.put("Place One Piece", List.of(
+                new PlaceGamePiece(PieceLevel.TopCone, elevatorSubsystem, armSubsystem, manipulatorSubsystem),
+                new PlaceGamePiece(PieceLevel.TopCone, elevatorSubsystem, armSubsystem, manipulatorSubsystem)));
+        
         m_chooser.setDefaultOption("No Auto", "No Auto");
         m_commandMap.put("No Auto", List.of(new InstantCommand(), new InstantCommand()));
 

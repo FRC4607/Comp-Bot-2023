@@ -52,7 +52,7 @@ public class FloorPickup extends CommandBase {
 
                     m_elevatorSubsystem
                             .setElevatorTargetPosition(
-                                    ElevatorCalibrations.pieceCollection() + ElevatorCalibrations.TOLERANCE);
+                                    ElevatorCalibrations.pieceCollection());
                     m_state = State.extendingElevator;
                 }
                 break;

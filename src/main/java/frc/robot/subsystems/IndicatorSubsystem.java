@@ -160,7 +160,7 @@ public class IndicatorSubsystem extends SubsystemBase {
             // m_elementLED1.setData(m_indicatorLEDBuffer);
             // m_elementLED2.setData(m_indicatorLEDBuffer);
 
-            if (!indicatorLEDsUpdated && m_previousAllianceColor.m_value == AllianceColor.NONE.m_value) {
+            if (!indicatorLEDsUpdated && m_previousIndicatorState.m_value == PieceIndicatorState.NONE.m_value) {
                 for (int i = 0; i < m_indicatorLEDBuffer.getLength(); i++) {
                     m_indicatorLEDBuffer.setRGB(i, rgb[0], rgb[1], rgb[2]);
                 }
