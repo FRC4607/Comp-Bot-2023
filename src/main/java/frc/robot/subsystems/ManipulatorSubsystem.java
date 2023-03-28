@@ -110,7 +110,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
         m_currentCommandLog = new StringLogEntry(log, "/manipulator/command");
 
-        m_filter = LinearFilter.movingAverage(25);
+        m_filter = LinearFilter.movingAverage(10);
 
     }
 

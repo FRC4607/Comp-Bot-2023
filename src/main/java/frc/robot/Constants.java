@@ -16,7 +16,7 @@ public class Constants {
         public static final boolean DEBUG = false;
 
         public static final double TURN_GEAR_RATIO = (32.0 / 15.0) *  (6.0); // MK4
-        public static final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0); // MK4 L2
+        public static final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0); // MK4 L3
 
         // These thing could be tested and experimental measured, but currently they are
         // theoretical.
@@ -57,7 +57,7 @@ public class Constants {
      */
     public static class DriverConstants {
 
-        public static final double MAX_STRAFE_SPEED = 3.23;
+        public static final double MAX_STRAFE_SPEED = 4.05;
         public static final double MAX_TURN_SPEED = 1 * Math.PI;
 
         public static final int DRIVER_CONTROLLER_PORT = 0;
@@ -70,14 +70,15 @@ public class Constants {
      */
     public static class ElevatorConstants {
 
-        public static final int ELEVATOR_MOTOR_CAN_ID = 4;
+        public static final int ELEVATOR_FRONT_MOTOR_CAN_ID = 4;
+        public static final int ELEVATOR_BACK_MOTOR_CAN_ID = 5;
 
         public static final int ABSOLUTE_ENCODER_PORT = 0;
         public static final int ENCODER_A_PORT = 1;
         public static final int ENCODER_B_PORT = 2;
         public static final int ENCODER_I_PORT = 3;
 
-        public static final double GEAR_RATIO_MOTOR = 9.0 * 48.0 / 30.0;
+        public static final double GEAR_RATIO_MOTOR = 5.0 * 48.0 / 30.0;
         public static final double GEAR_RATIO_ENCODER = 48.0 / 30.0;
 
     }
@@ -97,5 +98,6 @@ public class Constants {
      */
     public static class ArmConstants {
         public static final int ARM_MOTOR_CAN_ID = 15;
+        public static final double GEAR_RATIO = 75.0;
     }
 }

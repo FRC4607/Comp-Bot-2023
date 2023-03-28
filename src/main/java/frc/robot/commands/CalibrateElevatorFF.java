@@ -20,7 +20,7 @@ public class CalibrateElevatorFF extends CommandBase {
 
     private final double m_quasiStaticRate = 0.25;
     private final double m_stepVoltage = 9.0;
-    private final double m_downStartingVoltage = 2.0;
+    private final double m_downStartingVoltage = 1.0;
     
     private ElevatorSubsystem m_elevatorSubsystem;
     private State m_state;

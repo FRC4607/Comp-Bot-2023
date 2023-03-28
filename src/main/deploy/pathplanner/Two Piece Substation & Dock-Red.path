@@ -163,16 +163,16 @@
     },
     {
       "anchorPoint": {
-        "x": 3.7058402942428676,
-        "y": 4.611962248835529
+        "x": 2.374552222414055,
+        "y": 3.3
       },
       "prevControl": {
-        "x": 3.1380976351792786,
-        "y": 4.639465353426845
+        "x": 1.851546194195593,
+        "y": 3.3190184010261254
       },
       "nextControl": {
-        "x": 6.4539992425180595,
-        "y": 4.4788334416526485
+        "x": 2.8214168523548877,
+        "y": 3.2837503770930607
       },
       "holonomicAngle": 180.0,
       "isReversal": false,
@@ -188,48 +188,22 @@
     },
     {
       "anchorPoint": {
-        "x": 7.3,
-        "y": 4.6
+        "x": 4.038662312200071,
+        "y": 3.2996925780328428
       },
       "prevControl": {
-        "x": 7.3,
-        "y": 5.132854734809197
-      },
-      "nextControl": {
-        "x": 7.3,
-        "y": 4.169452634992205
-      },
-      "holonomicAngle": -90.0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": true,
-      "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 7.3,
-        "y": 3.63
-      },
-      "prevControl": {
-        "x": 7.3,
-        "y": 3.935628722329494
+        "x": 3.4847513823141543,
+        "y": 3.3234655793154997
       },
       "nextControl": null,
-      "holonomicAngle": -90.0,
+      "holonomicAngle": 180.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "Collect Piece",
-          "Retract"
+          "Balance"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -262,19 +236,7 @@
     {
       "position": 5.1,
       "names": [
-        "Elevator Floor"
-      ]
-    },
-    {
-      "position": 7.1,
-      "names": [
-        "Collect Piece"
-      ]
-    },
-    {
-      "position": 6.7,
-      "names": [
-        "Arm Floor"
+        "Elevator Retracted"
       ]
     }
   ]

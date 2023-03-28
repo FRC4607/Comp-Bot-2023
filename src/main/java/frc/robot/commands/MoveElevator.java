@@ -27,11 +27,11 @@ public class MoveElevator extends CommandBase {
 
         m_elevatorSubsystem = elevatorSubsystem;
         addRequirements(m_elevatorSubsystem);
+        SmartDashboard.putBoolean("Open Elevator Control", false);
     }
 
     @Override
     public void initialize() {
-        SmartDashboard.putBoolean("Open Elevator Control", false);
         m_manual = false;
         m_elevatorPosition = m_elevatorSubsystem.getEncoderPosition();
     }

@@ -19,6 +19,9 @@ public class Drive extends CommandBase {
     private AccelerationLimiter m_strafeX;
     private AccelerationLimiter m_strafeY;
 
+    private boolean m_robotRelative;
+    private boolean m_previousButtonInput;
+
     /**
      * Input from the driver.
      *
@@ -37,12 +40,24 @@ public class Drive extends CommandBase {
 
     @Override
     public void initialize() {
+        m_previousButtonInput = false;
+        m_robotRelative = false;
+
         m_strafeX.reset(0);
         m_strafeY.reset(0);
     }
 
     @Override
     public void execute() {
+
+        boolean newButtonInput = m_driver.getYButton();
+
+        if (newButtonInput ^ m_previousButtonInput) {
+            if (newButtonInput) {
+                m_robotRelative = !m_robotRelative;
+            }
+            m_previousButtonInput = newButtonInput;
+        }
 
         double strafeX = m_strafeX.calculate(MathUtil.applyDeadband(-m_driver.getLeftY(),
                 DriverConstants.CONTROLLER_DEADBAND) * DriverConstants.MAX_STRAFE_SPEED);
@@ -52,7 +67,7 @@ public class Drive extends CommandBase {
                 * DriverConstants.MAX_TURN_SPEED;
 
         m_drivetrainSubsystem.drive(strafeX, strafeY, rotate,
-                true);
+                !m_robotRelative);
     }
 
     @Override

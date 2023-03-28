@@ -119,7 +119,7 @@ public class SwerveModule {
         m_driveMotor.setIdleMode(IdleMode.kBrake);
         m_turnMotor.setIdleMode(IdleMode.kBrake);
 
-        m_driveMotor.setSmartCurrentLimit(60, 40);
+        m_driveMotor.setSmartCurrentLimit(80, 40);
         m_turnMotor.setSmartCurrentLimit(40, 40);
 
         m_driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10); // Faults and Applied Output

@@ -73,13 +73,13 @@ public class ArmSubsystem extends SubsystemBase {
         m_motor.setSmartCurrentLimit(40, 40);
 
         m_motorEncoder = m_motor.getEncoder();
-        m_motorEncoder.setPositionConversionFactor(1.0);
+        m_motorEncoder.setPositionConversionFactor(360.0 / ArmConstants.GEAR_RATIO);
 
         m_absoluteEncoder = m_motor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
         m_absoluteEncoder.setPositionConversionFactor(360.0);
         m_absoluteEncoder.setVelocityConversionFactor(360.0);
-        m_absoluteEncoder.setZeroOffset(MathUtil.inputModulus(-84 + 120, 0, 360));
-        m_absoluteEncoder.setInverted(true);
+        m_absoluteEncoder.setInverted(false);
+        m_absoluteEncoder.setZeroOffset(MathUtil.inputModulus(283 - 120, 0, 360));
 
         m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10); // Faults and Applied Output
         m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 40); // Velocity, Bus Voltage, Temp, and Current
@@ -121,6 +121,8 @@ public class ArmSubsystem extends SubsystemBase {
 
         m_currentCommandLog = new StringLogEntry(log, "/arm/command");
 
+        m_motorEncoder.setPosition(getAbsoluteEncoderPosition());
+
 
     }
 
@@ -157,7 +159,7 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public void setArmTargetPosition(double position) {
         m_setpoint = MathUtil.clamp(position, ArmCalibrations.MIN_POSITION, ArmCalibrations.MAX_POSITION);
-        m_pidController.setGoal(m_setpoint - (3.75 + Math.sin(m_setpoint * Math.PI / 180.0) * 17.5));
+        m_pidController.setGoal(m_setpoint);
         m_closedLoop = true;
     }
 
@@ -167,6 +169,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+        SmartDashboard.putNumber("Arm Pos", getAbsoluteEncoderPosition());
 
         long timeStamp = (long) (Timer.getFPGATimestamp() * 1e6);
         

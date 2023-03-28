@@ -1,7 +1,9 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Calibrations.ElevatorCalibrations;
 import frc.robot.subsystems.ElevatorSubsystem;
+import java.util.function.DoubleSupplier;
 
 /**
  * The command that moves the arm.
@@ -9,6 +11,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 public class MoveElevatorToPosition extends CommandBase {
     private ElevatorSubsystem m_elevatorSubsystem;
     private double m_position;
+    private DoubleSupplier m_positionSupplier;
 
     /**
      * Defines what is necessary for this command.
@@ -23,9 +26,31 @@ public class MoveElevatorToPosition extends CommandBase {
 
     }
 
+    /**
+     * Defines what is necessary for this command.
+     *
+     * @param elevatorSubsystem The subsystem responsible for the arm.
+     */
+    public MoveElevatorToPosition(DoubleSupplier positionSupplier, ElevatorSubsystem elevatorSubsystem) {
+        m_positionSupplier = positionSupplier;
+
+        m_elevatorSubsystem = elevatorSubsystem;
+
+        addRequirements(m_elevatorSubsystem);
+    }
+
     @Override
     public void initialize() {
         m_elevatorSubsystem.resetController();
+        if (m_positionSupplier != null) {
+            m_position = m_positionSupplier.getAsDouble();
+        }
+
         m_elevatorSubsystem.setElevatorTargetPosition(m_position);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return Math.abs(m_elevatorSubsystem.getEncoderPosition() - m_position) < ElevatorCalibrations.TOLERANCE;
     }
 }

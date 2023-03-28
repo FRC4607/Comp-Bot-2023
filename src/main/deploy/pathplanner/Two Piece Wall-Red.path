@@ -2,13 +2,13 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.802758381903169,
-        "y": 4.961761336760599
+        "x": 1.7740776805346106,
+        "y": 0.487571923265493
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2889694177964883,
-        "y": 4.992330269358048
+        "x": 2.047896386035307,
+        "y": 0.487571923265493
       },
       "holonomicAngle": 180.0,
       "isReversal": false,
@@ -17,12 +17,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "Arm Retracted",
-          "Elevator Top Node",
-          "Arm Top Node",
-          "Outtake",
-          "Arm Retracted",
-          "Elevator Floor"
+          "Place Top Node"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -31,18 +26,68 @@
     },
     {
       "anchorPoint": {
-        "x": 2.9451042531978313,
-        "y": 4.802146259096789
+        "x": 3.4,
+        "y": 0.65
       },
       "prevControl": {
-        "x": 2.7263926413973842,
-        "y": 4.8306738606359785
+        "x": 2.7068000960582452,
+        "y": 0.65
       },
       "nextControl": {
-        "x": 3.367093908547247,
-        "y": 4.747104130138168
+        "x": 3.7709807128048607,
+        "y": 0.65
       },
       "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": 1.0,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.42,
+        "y": 0.65
+      },
+      "prevControl": {
+        "x": 4.1944959412284595,
+        "y": 0.6580333427914836
+      },
+      "nextControl": {
+        "x": 4.664397371734462,
+        "y": 0.6412936029835736
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": 1.0,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 5.8800089854514965,
+        "y": 1.1
+      },
+      "prevControl": {
+        "x": 5.287773012737029,
+        "y": 1.1
+      },
+      "nextControl": {
+        "x": 6.416336552546946,
+        "y": 1.1
+      },
+      "holonomicAngle": 0.01,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -56,41 +101,16 @@
     },
     {
       "anchorPoint": {
-        "x": 5.2,
-        "y": 4.45
+        "x": 7.013669254423562,
+        "y": 1.1
       },
       "prevControl": {
-        "x": 4.182202471867607,
-        "y": 4.45
+        "x": 6.566635680048241,
+        "y": 1.1
       },
       "nextControl": {
-        "x": 5.391347637453461,
-        "y": 4.45
-      },
-      "holonomicAngle": 0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": true,
-      "stopEvent": {
-        "names": [],
-        "executionBehavior": "sequential",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 6.78,
-        "y": 4.45
-      },
-      "prevControl": {
-        "x": 6.521648363740645,
-        "y": 4.45
-      },
-      "nextControl": {
-        "x": 6.521648363740645,
-        "y": 4.45
+        "x": 6.566635680048241,
+        "y": 1.1
       },
       "holonomicAngle": 0.0,
       "isReversal": true,
@@ -99,62 +119,7 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "Collect Piece"
-        ],
-        "executionBehavior": "sequential",
-        "waitBehavior": "none",
-        "waitTime": 1.0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 3.677312692703679,
-        "y": 4.67852665242697
-      },
-      "prevControl": {
-        "x": 4.491220874956747,
-        "y": 4.613413997846724
-      },
-      "nextControl": {
-        "x": 2.7263926413973847,
-        "y": 4.754600256531474
-      },
-      "holonomicAngle": 180.0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": false,
-      "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 1.8135093921433407,
-        "y": 4.421778238574271
-      },
-      "prevControl": {
-        "x": 1.9561473998392849,
-        "y": 4.573925446783278
-      },
-      "nextControl": {
-        "x": 1.9561473998392849,
-        "y": 4.573925446783278
-      },
-      "holonomicAngle": 180.0,
-      "isReversal": true,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": true,
-      "stopEvent": {
-        "names": [
-          "Elevator Top Node",
-          "Arm Top Node",
-          "Outtake",
-          "Arm Retracted"
+          "Piece Pickup"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -163,45 +128,20 @@
     },
     {
       "anchorPoint": {
-        "x": 3.7058402942428676,
-        "y": 4.611962248835529
+        "x": 4.432201894957052,
+        "y": 0.85
       },
       "prevControl": {
-        "x": 3.1380976351792786,
-        "y": 4.639465353426845
+        "x": 5.303438417776356,
+        "y": 0.8312818456168877
       },
       "nextControl": {
-        "x": 6.4539992425180595,
-        "y": 4.4788334416526485
+        "x": 3.974640220130977,
+        "y": 0.8598305223034896
       },
       "holonomicAngle": 180.0,
       "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": false,
-      "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 7.3,
-        "y": 4.6
-      },
-      "prevControl": {
-        "x": 7.3,
-        "y": 5.132854734809197
-      },
-      "nextControl": {
-        "x": 7.3,
-        "y": 4.169452634992205
-      },
-      "holonomicAngle": -90.0,
-      "isReversal": false,
-      "velOverride": null,
+      "velOverride": 1.0,
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
@@ -213,23 +153,47 @@
     },
     {
       "anchorPoint": {
-        "x": 7.3,
-        "y": 3.63
+        "x": 3.4078100856449445,
+        "y": 0.85
       },
       "prevControl": {
-        "x": 7.3,
-        "y": 3.935628722329494
+        "x": 3.738634973284929,
+        "y": 0.8499999999999999
+      },
+      "nextControl": {
+        "x": 2.7863339316632776,
+        "y": 0.8500000000000001
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": 1.0,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 1.7756124694743196,
+        "y": 1.0032453756071842
+      },
+      "prevControl": {
+        "x": 2.2468327017578886,
+        "y": 0.8325134073884997
       },
       "nextControl": null,
-      "holonomicAngle": -90.0,
+      "holonomicAngle": 180.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "Collect Piece",
-          "Retract"
+          "Place Top Node"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -238,43 +202,25 @@
     }
   ],
   "maxVelocity": 3.0,
-  "maxAcceleration": 4.22,
+  "maxAcceleration": 5.0,
   "isReversed": null,
   "markers": [
     {
-      "position": 1.9,
+      "position": 1.236363636363577,
       "names": [
-        "Arm Floor"
+        "Floor Pickup"
       ]
     },
     {
-      "position": 2.1,
+      "position": 2.8,
       "names": [
-        "Collect Piece"
+        "Piece Pickup"
       ]
     },
     {
-      "position": 3.1,
+      "position": 4.01,
       "names": [
-        "Arm Retracted"
-      ]
-    },
-    {
-      "position": 5.1,
-      "names": [
-        "Elevator Floor"
-      ]
-    },
-    {
-      "position": 7.1,
-      "names": [
-        "Collect Piece"
-      ]
-    },
-    {
-      "position": 6.7,
-      "names": [
-        "Arm Floor"
+        "Retract"
       ]
     }
   ]

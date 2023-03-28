@@ -26,7 +26,7 @@ public class CalibrateDriveFF extends CommandBase {
     /** Divide by 50 because there are 50 loops per 1 second with a 20ms control loop. */
     private static final double m_rampRateVpl = 0.25 / 50;
     private static final double m_maxRampVoltage = 4.0;
-    private static final double m_stepVoltage = 9.0;
+    private static final double m_stepVoltage = 10.0;
     private static final int m_delay = 100;
     private boolean m_isFinished;
     private State m_state;

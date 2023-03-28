@@ -30,20 +30,20 @@ public class Calibrations {
         public static final double DRIVE_KD = 0.0;
         public static final double DRIVE_KF = 0.0;
 
-        public static final double DRIVE_FF_KS = 0.16;
-        public static final double DRIVE_FF_KV = 2.65;
+        public static final double DRIVE_FF_KS = 0.15;
+        public static final double DRIVE_FF_KV = 2.415;
         public static final double DRIVE_FF_KA = 0.0;
 
         /**
          * Max acceleration in Meters / s. Experimentally determined at voltage of 9
          * volts.
          */
-        public static final double MAX_SPEED_METER = 3.23;
+        public static final double MAX_SPEED_METER = 4.05;
         /**
          * Max acceleration in Meters / s^2. Experimentally determined with a step
          * voltage of 9 volts.
          */
-        public static final double MAX_ACCELERATION = (6.32 + 9.88) / 2;
+        public static final double MAX_ACCELERATION = 5.627;
         public static final double MAX_DECELERATION = (6.72 + 12.6) / 2;
 
     }
@@ -56,9 +56,9 @@ public class Calibrations {
     public static final class ArmCalibrations {
 
         public static final double KS = 0.321;
-        public static final double KV = 0.046;
+        public static final double KV = 0.020;
         public static final double KA = 0.0;
-        public static final double KG = 1.5;
+        public static final double KG = -0.94;
 
         public static final double KP = 0.1;
         public static final double KI = 0.0;
@@ -66,18 +66,19 @@ public class Calibrations {
 
         public static final double MIN_POSITION = 20.0;
         public static final double MAX_POSITION = 170.0;
-        public static final double MAX_VELOCITY = 295.0;
-        public static final double MAX_ACCELERATION = 1920.0 / 5.0 / 2;
+        public static final double MAX_VELOCITY = 295.0 / 2.0;
+        public static final double MAX_ACCELERATION = 1920.0 / 5.0;
 
         public static final double ELEVATOR_CLEARANCE = 30.0;
 
-        public static final double TOLERANCE = 5.0;
+        public static final double TOLERANCE = 10.0;
 
         public static final double ARM_OPERATOR_SPEED = 2.0;
 
         public static final double POSITION_RETRACTED = 20.0;
-        public static final double SHELF_PICKUP_STATIC = 40.0;
-        public static final double PIECE_COLLECTION_STATIC = 170.0;
+        public static final double SHELF_PICKUP_STATIC = 30.0;
+        public static final double UPRIGHT_CONE_STATIC = 140.0;
+        public static final double PIECE_COLLECTION_STATIC = 165.0;
         public static final double[] NODE_POSITIONS_STATIC = { 40, 70, 45, 70 };
 
 
@@ -87,6 +88,7 @@ public class Calibrations {
         public static void initPreferences() {
             Preferences.initDouble("ArmPieceCollection", PIECE_COLLECTION_STATIC);
             Preferences.initDouble("ArmShelfPickup", SHELF_PICKUP_STATIC);
+            Preferences.initDouble("ArmUprightCone", UPRIGHT_CONE_STATIC);
 
             Preferences.initDouble("ArmTopCone", NODE_POSITIONS_STATIC[0]);
             Preferences.initDouble("ArmTopCube", NODE_POSITIONS_STATIC[1]);
@@ -96,6 +98,10 @@ public class Calibrations {
 
         public static double pieceCollection() {
             return Preferences.getDouble("ArmPieceCollection", PIECE_COLLECTION_STATIC);
+        }
+
+        public static double uprightCone() {
+            return Preferences.getDouble("ArmUprightCone", UPRIGHT_CONE_STATIC);
         }
 
         public static double shelfPickup() {
@@ -116,7 +122,15 @@ public class Calibrations {
             };
     
             return preferences;
-        }    
+        }
+
+        public static double topNode() {
+            return Preferences.getDouble("ArmTopCone", NODE_POSITIONS_STATIC[0]);
+        }
+
+        public static double middleNode() {
+            return Preferences.getDouble("ArmMiddleCone", NODE_POSITIONS_STATIC[2]);
+        }
     }
 
     /**
@@ -126,30 +140,33 @@ public class Calibrations {
      */
     public static final class ElevatorCalibrations {
 
-        public static final double KS = 0.3375;
-        public static final double KV = 1.95;
+        public static final double KS = 2.0;
+        public static final double KV = 0.86;
         public static final double KA = 0.0;
-        public static final double KG = 0.25;
+        public static final double KG = 0.925;
 
-        public static final double KP = 10.0;
+        public static final double KP = 5.0;
         public static final double KI = 0.0;
         public static final double KD = 0.0;
 
         public static final double MAX_POSITION = 5.5;
-        public static final double MAX_VELOCITY = 4.0;
-        public static final double MAX_ACCELERATION = 34.0;
+        public static final double MAX_VELOCITY_UP = 7.0;
+        public static final double MAX_ACCELERATION_UP = 160.0 * 0.5;
+        public static final double MAX_VELOCITY_DOWN = 5.0;
+        public static final double MAX_ACCELERATION_DOWN = 40.0;
         
         public static final double ARM_CLEARANCE = 35.0;
         
-        public static final double TOLERANCE = 0.1;
-
-        public static final double POSITION_RETRACTED = 0.25;
-
+        public static final double TOLERANCE = 0.15;
+        
+        public static final double POSITION_RETRACTED = 0.0;
+        
         public static final double ELEVATOR_DRIVER_SPEED = 4.0 / 50.0;
-
-        private static final double PIECE_COLLECTION_STATIC = 2.475;
-        private static final double SHELF_PICKUP_STATIC = 3.3;
-        public static final double[] NODE_POSITIONS_STATIC = { 5.08, 5.08, 3.0, 3.25 };
+        
+        private static final double PIECE_COLLECTION_STATIC = 2.41;
+        private static final double UPRIGHT_CONE_STATIC = 2.475;
+        private static final double SHELF_PICKUP_STATIC = 3.6;
+        public static final double[] NODE_POSITIONS_STATIC = { 5.12, 5.08, 2.6, 3.25 };
 
         /**
          * Initializes the preset arm positions into the preferences tables if the value is not initialized.
@@ -157,6 +174,7 @@ public class Calibrations {
         public static void initPreferences() {
             Preferences.initDouble("ElevatorPieceCollection", PIECE_COLLECTION_STATIC);
             Preferences.initDouble("ElevatorShelfPickup", SHELF_PICKUP_STATIC);
+            Preferences.initDouble("ElevatorUprightCone", UPRIGHT_CONE_STATIC);
 
             Preferences.initDouble("ElevatorTopCone", NODE_POSITIONS_STATIC[0]);
             Preferences.initDouble("ElevatorTopCube", NODE_POSITIONS_STATIC[1]);
@@ -166,6 +184,10 @@ public class Calibrations {
 
         public static double pieceCollection() {
             return Preferences.getDouble("ElevatorPieceCollection", PIECE_COLLECTION_STATIC);
+        }
+
+        public static double uprightCone() {
+            return Preferences.getDouble("ElevatorUprightCone", PIECE_COLLECTION_STATIC);
         }
 
         public static double shelfPickup() {
@@ -186,6 +208,14 @@ public class Calibrations {
             };
     
             return preferences;
+        }
+
+        public static double topNode() {
+            return Preferences.getDouble("ElevatorTopCone", NODE_POSITIONS_STATIC[0]);
+        }
+
+        public static double middleNode() {
+            return Preferences.getDouble("ElevatorMiddleCone", NODE_POSITIONS_STATIC[2]);
         }
     }
 

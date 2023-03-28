@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.Pigeon2.AxisDirection;
-
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -11,6 +11,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleArrayLogEntry;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -21,6 +22,7 @@ import frc.robot.Calibrations.SwerveCalibrations;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.lib.SwerveModule;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Declares the swerve drivetrain as a subsystem.
@@ -34,6 +36,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private SwerveDriveKinematics m_kinematics;
     private SwerveDriveOdometry m_odometry;
 
+    private boolean m_xMode = false;
+
     private final DataLog m_log;
 
     private final DoubleLogEntry m_pigeonYawLog;
@@ -41,8 +45,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private final DoubleLogEntry m_pigeonRollLog;
     private final DoubleLogEntry m_calculatedPitch;
     private final StringLogEntry m_currentCommandLog;
-
-
+    private final DoubleArrayLogEntry m_odometryLog;
+    private final DoubleArrayLogEntry m_pathLog;
+    private final DoubleArrayLogEntry m_pathTargetLog;
+    private final DoubleArrayLogEntry m_pathErrorLog;
 
     /**
      * Sets up the hardware used in the drivetrain.
@@ -61,8 +67,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
 
         m_pigeon = new Pigeon2(SwerveConstants.PIGEON2_CAN_ID);
-        m_pigeon.setYaw(0);
         m_pigeon.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);
+        m_pigeon.setYaw(0);
 
         for (int i = 0; i < m_swerveModules.length; i++) {
             m_swerveModules[i].homeEncoder();
@@ -78,7 +84,28 @@ public class DrivetrainSubsystem extends SubsystemBase {
         m_pigeonRollLog = new DoubleLogEntry(m_log, "swerve/pigeon/roll");
         m_calculatedPitch = new DoubleLogEntry(m_log, "swerve/pigeon/calculated_pitch");
         m_currentCommandLog = new StringLogEntry(m_log, "/swerve/command");
-    
+        m_odometryLog = new DoubleArrayLogEntry(m_log, "/swerve/odometry");
+        m_pathLog = new DoubleArrayLogEntry(m_log, "/swerve/path");
+        m_pathTargetLog = new DoubleArrayLogEntry(m_log, "/swerve/targetPose");
+        m_pathErrorLog = new DoubleArrayLogEntry(m_log, "/swerve/errorPose");
+
+        PPSwerveControllerCommand.setLoggingCallbacks((path) -> {
+            long timeStamp = (long) (Timer.getFPGATimestamp() * 1e6);
+
+            List<double[]> states = path.getStates().stream().map((state) -> {
+                return new double[] { state.poseMeters.getX(), state.poseMeters.getY(),
+                        state.poseMeters.getRotation().getRadians() };
+            }).toList();
+            for (double[] state : states) {
+                m_pathLog.append(state, timeStamp);
+            }
+
+        }, (pose) -> {
+            m_pathTargetLog.append(new double[] { pose.getX(), pose.getY(), pose.getRotation().getRadians() });
+        }, null, (translation, rotation) -> {
+            m_pathErrorLog.append(new double[] { translation.getX(), translation.getY(), rotation.getRadians() });
+        });
+
         logData();
     }
 
@@ -175,17 +202,27 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     /**
-     * Gets the pitch of the robot regardless of the robot's yaw. For the gyro's raw yaw value, use {@code getGyroPitch}.
-
+     * Gets the pitch of the robot regardless of the robot's yaw. For the gyro's raw
+     * yaw value, use {@code getGyroPitch}.
+     * 
      * @return A {@link Rotation2d} of the robot's pitch relative to the field.
      */
     public Rotation2d getRobotPitch() {
-        // This is probably not the correct way to do this, but it's a close enough approximation
+        // This is probably not the correct way to do this, but it's a close enough
+        // approximation
         double roll = getGyroRoll().getRadians();
         double pitch = getGyroPitch().getRadians();
         double yaw = getPose().getRotation().getRadians();
         double theNumber = Math.cos(yaw) * pitch + Math.sin(yaw) * roll;
         return Rotation2d.fromRadians(theNumber);
+    }
+
+    public void toggleXMode() {
+        m_xMode = !m_xMode;
+    }
+
+    public void setXMode(boolean xMode) {
+        m_xMode = xMode;
     }
 
     /**
@@ -197,9 +234,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * @param fieldOrientated whether or not to drive relative to the field.
      */
     public void drive(double strafeX, double strafeY, double rotate, boolean fieldOrientated) {
-        drive(strafeX, strafeY, rotate, fieldOrientated, true);
+        drive(strafeX, strafeY, rotate, fieldOrientated, m_xMode);
     }
-    
+
     /**
      * Driver Input.
      *
@@ -207,7 +244,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * @param strafeY         speed in m/s.
      * @param rotate          rad/s
      * @param fieldOrientated whether or not to drive relative to the field.
-     * @param autoX           if the modules should go to x when no input is detected
+     * @param autoX           if the modules should go to x when no input is
+     *                        detected
      */
     public void drive(double strafeX, double strafeY, double rotate, boolean fieldOrientated, boolean autoX) {
         ChassisSpeeds chassisSpeed;
@@ -307,6 +345,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
      */
     private void logData() {
         long timeStamp = (long) (Timer.getFPGATimestamp() * 1e6);
+
+        m_odometryLog.append(new double[] { m_odometry.getPoseMeters().getX(), m_odometry.getPoseMeters().getY(),
+                m_odometry.getPoseMeters().getRotation().getRadians() }, timeStamp);
+
         m_pigeonYawLog.append(m_pigeon.getYaw(), timeStamp);
         m_pigeonPitchLog.append(m_pigeon.getPitch(), timeStamp);
         m_pigeonRollLog.append(m_pigeon.getRoll(), timeStamp);
@@ -315,5 +357,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
         Command currentCommand = getCurrentCommand();
         m_currentCommandLog.append(currentCommand != null ? currentCommand.getName() : "None", timeStamp);
     }
+
 
 }

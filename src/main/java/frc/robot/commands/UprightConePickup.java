@@ -9,11 +9,9 @@ import frc.robot.subsystems.ElevatorSubsystem;
 /**
  * A command to collect game piece in auto. Not fully functional
  */
-public class FloorPickup extends CommandBase {
+public class UprightConePickup extends CommandBase {
     private ElevatorSubsystem m_elevatorSubsystem;
     private ArmSubsystem m_armSubsystem;
-
-    private boolean m_slow;
 
     private State m_state;
 
@@ -30,11 +28,9 @@ public class FloorPickup extends CommandBase {
      * @param elevatorSubsystem The Elevator Subsystem
      * @param armSubsystem      The Arm Subsystem
      */
-    public FloorPickup(ElevatorSubsystem elevatorSubsystem, ArmSubsystem armSubsystem, boolean slow) {
+    public UprightConePickup(ElevatorSubsystem elevatorSubsystem, ArmSubsystem armSubsystem) {
         m_elevatorSubsystem = elevatorSubsystem;
         m_armSubsystem = armSubsystem;
-
-        m_slow = slow;
 
         addRequirements(m_elevatorSubsystem, m_armSubsystem);
     }
@@ -56,22 +52,22 @@ public class FloorPickup extends CommandBase {
 
                     m_elevatorSubsystem
                             .setElevatorTargetPosition(
-                                    ElevatorCalibrations.pieceCollection(), m_slow);
+                                    ElevatorCalibrations.uprightCone());
                     m_state = State.extendingElevator;
                 }
                 break;
             case extendingElevator:
                 if (Math.abs(m_elevatorSubsystem.getEncoderPosition()
-                        - ElevatorCalibrations.pieceCollection()) < ElevatorCalibrations.TOLERANCE) {
+                        - ElevatorCalibrations.uprightCone()) < ElevatorCalibrations.TOLERANCE) {
 
-                    m_armSubsystem.setArmTargetPosition(ArmCalibrations.pieceCollection());
+                    m_armSubsystem.setArmTargetPosition(ArmCalibrations.uprightCone());
                     m_state = State.extendingArm;
                 }
                 break;
 
             case extendingArm:
                 if (Math.abs(m_armSubsystem.getAbsoluteEncoderPosition()
-                        - ArmCalibrations.pieceCollection()) < ArmCalibrations.TOLERANCE) {
+                        - ArmCalibrations.uprightCone()) < ArmCalibrations.TOLERANCE) {
                     m_state = State.done;
                 }
                 break;

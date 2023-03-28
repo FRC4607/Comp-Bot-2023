@@ -16,11 +16,11 @@ public class LLAlignment extends CommandBase {
 
     private final DrivetrainSubsystem m_drive;
     private final int m_pipeline;
-    private final double m_strafeDeadband = 0.05;
-    private final double m_strafekP = 0.05;
+    private final double m_strafeDeadband = 0.02;
+    private final double m_strafekP = 0.1;
     private final double m_turnDeadband = Math.toRadians(3);
     private final double m_driverDeadband = 0.1;
-    private final PIDController m_turnPID = new PIDController(4.5, 0, 0);
+    private final PIDController m_turnPID = new PIDController(9, 0, 0);
     private final XboxController m_driver;
     private double m_tx;
     private boolean m_tv;
@@ -86,7 +86,7 @@ public class LLAlignment extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        LimelightHelpers.setPipelineIndex("limelight", 3);
+        LimelightHelpers.setPipelineIndex("limelight", 0);
         LimelightHelpers.setCameraMode_Driver("limelight");
         m_drive.drive(0, 0, 0, false);
         m_driver.setRumble(RumbleType.kBothRumble, 0);
