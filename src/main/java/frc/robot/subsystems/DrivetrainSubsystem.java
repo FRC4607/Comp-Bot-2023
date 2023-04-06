@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.Pigeon2.AxisDirection;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -16,10 +18,12 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations.SwerveCalibrations;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.lib.LimelightThread;
 import frc.robot.lib.SwerveModule;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +38,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private Pigeon2 m_pigeon;
 
     private SwerveDriveKinematics m_kinematics;
-    private SwerveDriveOdometry m_odometry;
+    private SwerveDrivePoseEstimator m_odometry;
 
     private boolean m_xMode = false;
 
@@ -49,6 +53,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private final DoubleArrayLogEntry m_pathLog;
     private final DoubleArrayLogEntry m_pathTargetLog;
     private final DoubleArrayLogEntry m_pathErrorLog;
+
+    private final LimelightThread m_llThread;
+    private final Thread m_threadObj;
 
     /**
      * Sets up the hardware used in the drivetrain.
@@ -75,7 +82,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
 
         m_kinematics = new SwerveDriveKinematics(SwerveConstants.POSITIONS);
-        m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroYaw(), getModulePositions());
+        m_odometry = new SwerveDrivePoseEstimator(m_kinematics, getGyroYaw(), getModulePositions(), new Pose2d());
 
         m_log = DataLogManager.getLog();
 
@@ -107,6 +114,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
         });
 
         logData();
+
+        m_llThread = new LimelightThread(this);
+        m_threadObj = m_llThread.start();
     }
 
     @Override
@@ -116,8 +126,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
         logData();
 
-        m_odometry.update(getGyroYaw(), getModulePositions());
+        synchronized (m_odometry) {
+            m_odometry.update(getGyroYaw(), getModulePositions());
+        }
 
+        SmartDashboard.putNumber("Calc Pitch", getRobotPitch().getDegrees());
         // SmartDashboard.putNumber("Gyro Yaw (Deg)", getGyroRotation().getDegrees());
         // SmartDashboard.putNumber("Pigeon Yaw (Deg)", m_pigeon.getYaw());
     }
@@ -198,7 +211,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * @return The Pose estimation from the odometry
      */
     public Pose2d getPose() {
-        return m_odometry.getPoseMeters();
+        synchronized (m_odometry) {
+            return m_odometry.getEstimatedPosition();
+        }
     }
 
     /**
@@ -251,8 +266,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
         ChassisSpeeds chassisSpeed;
 
         if (fieldOrientated) {
-            chassisSpeed = ChassisSpeeds.fromFieldRelativeSpeeds(strafeX, strafeY, rotate,
-                    m_odometry.getPoseMeters().getRotation());
+            synchronized (m_odometry) {
+                chassisSpeed = ChassisSpeeds.fromFieldRelativeSpeeds(strafeX, strafeY, rotate,
+                        m_odometry.getEstimatedPosition().getRotation());
+            }
         } else {
             chassisSpeed = new ChassisSpeeds(strafeX, strafeY, rotate);
         }
@@ -328,7 +345,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void resetHeading() {
         Pose2d currentPose = getPose();
         Pose2d newPose = new Pose2d(currentPose.getTranslation(), new Rotation2d());
-        m_odometry.resetPosition(getGyroYaw(), getModulePositions(), newPose);
+        synchronized (m_odometry) {
+            m_odometry.resetPosition(getGyroYaw(), getModulePositions(), newPose);
+        }
     }
 
     /**
@@ -337,7 +356,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * @param pose The pose the odometry is set to.
      */
     public void setPose(Pose2d pose) {
-        m_odometry.resetPosition(getGyroYaw(), getModulePositions(), pose);
+        synchronized (m_odometry) {
+            m_odometry.resetPosition(getGyroYaw(), getModulePositions(), pose);
+        }
     }
 
     /**
@@ -346,8 +367,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private void logData() {
         long timeStamp = (long) (Timer.getFPGATimestamp() * 1e6);
 
-        m_odometryLog.append(new double[] { m_odometry.getPoseMeters().getX(), m_odometry.getPoseMeters().getY(),
-                m_odometry.getPoseMeters().getRotation().getRadians() }, timeStamp);
+        synchronized (m_odometry) {
+            m_odometryLog.append(new double[] { m_odometry.getEstimatedPosition().getX(), m_odometry.getEstimatedPosition().getY(),
+                    m_odometry.getEstimatedPosition().getRotation().getRadians() }, timeStamp);
+            }
 
         m_pigeonYawLog.append(m_pigeon.getYaw(), timeStamp);
         m_pigeonPitchLog.append(m_pigeon.getPitch(), timeStamp);
@@ -358,5 +381,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
         m_currentCommandLog.append(currentCommand != null ? currentCommand.getName() : "None", timeStamp);
     }
 
-
+    public void synchronizedVisionUpdate(Pose2d newPose, double timestampSeconds) {
+        synchronized (m_odometry) {
+            m_odometry.addVisionMeasurement(newPose, timestampSeconds);
+        }
+    }
 }
