@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Calibrations.ArmCalibrations;
 import frc.robot.Calibrations.ElevatorCalibrations;
 import frc.robot.commands.AutoCollectGamePiece;
+import frc.robot.commands.AutoLevel;
 import frc.robot.commands.CalibrateDriveFF;
 import frc.robot.commands.Drive;
 import frc.robot.commands.FloorPickup;
@@ -72,8 +74,6 @@ public class RobotContainer {
     public PDHSubsystem m_pdhSubsystem = new PDHSubsystem();
     public IndicatorSubsystem m_indicatorSubsystem = new IndicatorSubsystem();
 
-    public Timer m_matchTimer = new Timer();
-
     private Autos m_autos;
 
     /**
@@ -86,7 +86,7 @@ public class RobotContainer {
         m_driver = new XboxController(0);
         m_operator = new XboxController(1);
 
-        m_drivetrainSubsystem.setDefaultCommand(new Drive(m_driver, m_operator, m_drivetrainSubsystem));
+        m_drivetrainSubsystem.setDefaultCommand(new Drive(m_driver, m_drivetrainSubsystem));
         m_elevatorSubsystem.setDefaultCommand(new MoveElevator(m_driver, m_elevatorSubsystem));
 
         m_indicatorSubsystem.setDefaultCommand(new OperatorIndicatorLights(m_operator, m_indicatorSubsystem));
@@ -97,7 +97,6 @@ public class RobotContainer {
 
         SmartDashboard.putData(new SwerveSetHomes(m_drivetrainSubsystem));
 
-        // SmartDashboard.putData(new AutoLevel(0.5, m_drivetrainSubsystem));
         // SmartDashboard.putData(new CalibrateTurnFF(m_drivetrainSubsystem));
         SmartDashboard.putData(new CalibrateDriveFF(m_drivetrainSubsystem));
         // SmartDashboard.putData(new CalibrateElevatorFF(m_elevatorSubsystem));
@@ -157,8 +156,8 @@ public class RobotContainer {
         operatorB.onTrue(new SequentialCommandGroup(
                 new MoveArmToPosition(ArmCalibrations.POSITION_RETRACTED, m_armSubsystem),
                 new MoveElevatorToPosition(ElevatorCalibrations::middleNode, m_elevatorSubsystem),
-                new WaitUntilCommand(operatorB),
                 new MoveArmToPosition(ArmCalibrations::middleNode, m_armSubsystem),
+                new WaitUntilCommand(operatorB),
                 new Outtake(m_manipulatorSubsystem).withTimeout(0.5),
                 new Retract(m_elevatorSubsystem, m_armSubsystem)));
 
@@ -169,8 +168,8 @@ public class RobotContainer {
         operatorY.onTrue(new SequentialCommandGroup(
                 new MoveArmToPosition(ArmCalibrations.POSITION_RETRACTED, m_armSubsystem),
                 new MoveElevatorToPosition(ElevatorCalibrations::topNode, m_elevatorSubsystem),
-                new WaitUntilCommand(operatorY),
                 new MoveArmToPosition(ArmCalibrations::topNode, m_armSubsystem),
+                new WaitUntilCommand(operatorY),
                 new Outtake(m_manipulatorSubsystem).withTimeout(0.5),
                 new Retract(m_elevatorSubsystem, m_armSubsystem)));
 

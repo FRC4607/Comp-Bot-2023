@@ -69,10 +69,11 @@ public class Autos {
         autoCommands.put("Floor Pickup", new FloorPickup(m_elevatorSubsystem, m_armSubsystem, true));
         autoCommands.put("Floor Pickup Fast", new FloorPickup(m_elevatorSubsystem, m_armSubsystem, false));
         autoCommands.put("Collect Piece", new AutoCollectGamePiece(m_manipulatorSubsystem, true));
+        autoCommands.put("Collect Piece No Stop", new AutoCollectGamePiece(m_manipulatorSubsystem, false).withTimeout(1));
         autoCommands.put("Retract", new Retract(m_elevatorSubsystem, m_armSubsystem));
-        autoCommands.put("Balance", new InstantCommand(() -> {
+        autoCommands.put("Balance", new AutoLevel(0.75, drivetrainSubsystem).andThen(new InstantCommand(() -> {
             m_drivetrainSubsystem.setXMode(true);
-        }));
+        })));
 
         autoCommands.put("Elevator Retracted",
                 new MoveElevatorToPosition(ElevatorCalibrations.POSITION_RETRACTED, m_elevatorSubsystem));

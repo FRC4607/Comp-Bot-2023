@@ -99,7 +99,7 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "Collect Piece"
+          "Collect Piece No Stop"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",

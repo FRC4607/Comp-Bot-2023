@@ -1,8 +1,10 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -61,6 +63,8 @@ public class IndicatorSubsystem extends SubsystemBase {
     private boolean m_endgameLEDHigh = true;
 
     private NetworkTableEntry m_allianceColorEntry;
+    private StringPublisher m_pieceEntry;
+    private DoublePublisher m_timeEntry;
 
     private int m_refreshCounter;
     private int m_effectTimer;
@@ -80,6 +84,10 @@ public class IndicatorSubsystem extends SubsystemBase {
         NetworkTable fmsInfo = inst.getTable("FMSInfo");
         m_allianceColorEntry = fmsInfo.getEntry("IsRedAlliance");
 
+        NetworkTable colorTable = inst.getTable("Boat");
+        m_pieceEntry = colorTable.getStringTopic("Gas").publish();
+        m_timeEntry = colorTable.getDoubleTopic("GasTime").publish();
+
         m_indicatorLED = new AddressableLED(0);
         m_indicatorLED.setLength(m_indicatorLEDBuffer.getLength());
         m_indicatorLED.start();
@@ -91,6 +99,8 @@ public class IndicatorSubsystem extends SubsystemBase {
         // m_elementLED2 = new AddressableLED(2);
         // m_elementLED2.setLength(m_ledBuffer.getLength());
         // m_elementLED2.start();
+        
+
     }
 
     /**
@@ -190,5 +200,7 @@ public class IndicatorSubsystem extends SubsystemBase {
             // }
 
         }
+        m_pieceEntry.accept(m_currentIndicatorState.name());
+        m_timeEntry.accept(DriverStation.getMatchTime());
     }
 }

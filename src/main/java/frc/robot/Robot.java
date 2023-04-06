@@ -39,6 +39,7 @@ public class Robot extends TimedRobot {
 
     private final NetworkTable m_piTable = NetworkTableInstance.getDefault().getTable("PiTable");
     private final NetworkTableEntry m_recording = m_piTable.getEntry("RecordingEnabled");
+    private final NetworkTableEntry m_fsEntry = m_piTable.getEntry("IsFSOpen");
     private boolean m_startSet = false;
 
     private Command m_autonomousCommand;
@@ -56,6 +57,7 @@ public class Robot extends TimedRobot {
         DriverStation.silenceJoystickConnectionWarning(true);
         
         m_recording.setBoolean(false);
+        m_fsEntry.setBoolean(false);
         DataLogManager.start();
         DataLog log = DataLogManager.getLog();
         DriverStation.startDataLog(log);
@@ -77,7 +79,7 @@ public class Robot extends TimedRobot {
         Calibrations.ArmCalibrations.initPreferences();
         Calibrations.ElevatorCalibrations.initPreferences();
 
-        LimelightHelpers.setPipelineIndex("limelight", 2);
+        LimelightHelpers.setPipelineIndex("limelight", 0);
         LimelightHelpers.setCameraMode_Driver("limelight");
     }
 
@@ -137,10 +139,6 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
         }
-
-        m_robotContainer.m_matchTimer.stop();
-        m_robotContainer.m_matchTimer.reset();
-        m_robotContainer.m_matchTimer.start();
     }
 
     @Override

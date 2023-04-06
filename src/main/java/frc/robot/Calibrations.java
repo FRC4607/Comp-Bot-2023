@@ -60,7 +60,7 @@ public class Calibrations {
         public static final double KA = 0.0;
         public static final double KG = -0.94;
 
-        public static final double KP = 0.1;
+        public static final double KP = 0.05;
         public static final double KI = 0.0;
         public static final double KD = 0.0;
 
@@ -165,7 +165,7 @@ public class Calibrations {
         
         private static final double PIECE_COLLECTION_STATIC = 2.41;
         private static final double UPRIGHT_CONE_STATIC = 2.475;
-        private static final double SHELF_PICKUP_STATIC = 3.6;
+        private static final double SHELF_PICKUP_STATIC = 3.53;
         public static final double[] NODE_POSITIONS_STATIC = { 5.12, 5.08, 2.6, 3.25 };
 
         /**

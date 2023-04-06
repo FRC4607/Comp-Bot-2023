@@ -6,6 +6,7 @@ import edu.wpi.first.util.datalog.FloatArrayLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -36,6 +37,7 @@ public class PDHSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         long timeStamp = (long) (Timer.getFPGATimestamp() * 1e6);
+
 
         m_voltage.append(m_pdh.getVoltage(), timeStamp);
         m_temperature.append(m_pdh.getTemperature(), timeStamp);

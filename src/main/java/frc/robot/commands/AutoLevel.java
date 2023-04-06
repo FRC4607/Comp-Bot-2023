@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
@@ -22,8 +23,6 @@ public class AutoLevel extends CommandBase {
 
     private SignChange m_sign = null;
 
-    private boolean m_onStation = false;
-
     private long m_startTime;
 
     public AutoLevel(double xSpeed, DrivetrainSubsystem drive) {
@@ -34,7 +33,6 @@ public class AutoLevel extends CommandBase {
 
     @Override
     public void initialize() {
-        m_onStation = false;
         m_startPose = m_drive.getPose();
         m_end = false;
         m_sign = m_drive.getRobotPitch().getDegrees() > 0 ? SignChange.POSITIVE : SignChange.NEGATIVE;
@@ -43,16 +41,18 @@ public class AutoLevel extends CommandBase {
 
     @Override
     public void execute() {
-        if (Math.abs(m_drive.getRobotPitch().getDegrees()) < 11 && m_onStation) {
+        if (Math.abs(m_drive.getRobotPitch().getDegrees() - 1.14) < 13.5) {
             end(false);
             return;
+        } else {
+            m_end = false;
         }
         switch (m_sign) {
             case POSITIVE: 
-                m_drive.drive(-m_xSpeed, 0, 0, true);
+                m_drive.drive(m_xSpeed, 0, 0, true);
                 break;
             case NEGATIVE: 
-                m_drive.drive(m_xSpeed, 0, 0, true);
+                m_drive.drive(-m_xSpeed, 0, 0, true);
                 break;
             default:
                 break;
@@ -68,10 +68,9 @@ public class AutoLevel extends CommandBase {
 
     @Override
     public boolean isFinished() {
-
-        if ((m_end && (RobotController.getFPGATime() - m_startTime) > (0.25 * 1e6))
+        if ((m_end && (RobotController.getFPGATime() - m_startTime) > (1.0 * 1e6))
             || (m_drive.getPose().minus(m_startPose).getTranslation().getNorm() > 3)
-            || (RobotContainer.getInstance().m_matchTimer.get() > 14.25)) {
+            || (DriverStation.getMatchTime() < 0.75)) {
             m_end = false;
             return true;
         } else {
