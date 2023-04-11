@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.util.Color;
 
@@ -60,18 +61,18 @@ public class Calibrations {
         public static final double KA = 0.0;
         public static final double KG = -0.94;
 
-        public static final double KP = 0.05;
+        public static final double KP = 0.1;
         public static final double KI = 0.0;
         public static final double KD = 0.0;
 
         public static final double MIN_POSITION = 20.0;
         public static final double MAX_POSITION = 170.0;
-        public static final double MAX_VELOCITY = 295.0 / 2.0;
-        public static final double MAX_ACCELERATION = 1920.0 / 5.0;
+        public static final double MAX_VELOCITY = 295.0 * 0.6;
+        public static final double MAX_ACCELERATION = 1920.0 * 0.3;
 
         public static final double ELEVATOR_CLEARANCE = 30.0;
 
-        public static final double TOLERANCE = 10.0;
+        public static final double TOLERANCE = 3.0;
 
         public static final double ARM_OPERATOR_SPEED = 2.0;
 
@@ -80,6 +81,9 @@ public class Calibrations {
         public static final double UPRIGHT_CONE_STATIC = 140.0;
         public static final double PIECE_COLLECTION_STATIC = 165.0;
         public static final double[] NODE_POSITIONS_STATIC = { 40, 70, 45, 70 };
+        // This is defined as "what does the encoder read when the system is in the position I want to be zero?"
+        // REV tuner read 205.137 when the arm was vertical, subtract 120 to convert to the correct position.
+        public static final double ABSOLUTE_ENCODER_OFFSET = MathUtil.inputModulus(205.137 - 120, 0, 360);
 
 
         /**

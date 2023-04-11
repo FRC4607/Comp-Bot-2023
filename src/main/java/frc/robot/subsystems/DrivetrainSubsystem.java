@@ -54,8 +54,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private final DoubleArrayLogEntry m_pathTargetLog;
     private final DoubleArrayLogEntry m_pathErrorLog;
 
-    private final LimelightThread m_llThread;
-    private final Thread m_threadObj;
+    // private final LimelightThread m_llThread;
+    // private final Thread m_threadObj;
 
     /**
      * Sets up the hardware used in the drivetrain.
@@ -115,8 +115,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         logData();
 
-        m_llThread = new LimelightThread(this);
-        m_threadObj = m_llThread.start();
+        // m_llThread = new LimelightThread(this);
+        // m_threadObj = m_llThread.start();
     }
 
     @Override

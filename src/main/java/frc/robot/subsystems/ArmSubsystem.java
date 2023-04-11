@@ -78,8 +78,9 @@ public class ArmSubsystem extends SubsystemBase {
         m_absoluteEncoder = m_motor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
         m_absoluteEncoder.setPositionConversionFactor(360.0);
         m_absoluteEncoder.setVelocityConversionFactor(360.0);
-        m_absoluteEncoder.setInverted(false);
-        m_absoluteEncoder.setZeroOffset(MathUtil.inputModulus(283 - 120, 0, 360));
+        m_absoluteEncoder.setInverted(true); // New encoder is inverted
+        // sus
+        m_absoluteEncoder.setZeroOffset(ArmCalibrations.ABSOLUTE_ENCODER_OFFSET);
 
         m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10); // Faults and Applied Output
         m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 40); // Velocity, Bus Voltage, Temp, and Current
@@ -148,6 +149,7 @@ public class ArmSubsystem extends SubsystemBase {
      * @return The position on degrees
      */
     public double getAbsoluteEncoderPosition() {
+        // sus
         return m_absoluteEncoder.getPosition() - 120;
     }
 
@@ -175,6 +177,7 @@ public class ArmSubsystem extends SubsystemBase {
         long timeStamp = (long) (Timer.getFPGATimestamp() * 1e6);
         
         double pid = m_pidController.calculate(getAbsoluteEncoderPosition());
+        // sus
         double ff = m_feedforward.calculate((m_pidController.getSetpoint().position - 90.0) * Math.PI / 180.0,
                 m_pidController.getSetpoint().velocity);
 
