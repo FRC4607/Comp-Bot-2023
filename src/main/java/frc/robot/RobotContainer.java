@@ -123,22 +123,27 @@ public class RobotContainer {
         }));
 
         JoystickButton driverLeftBumper = new JoystickButton(m_driver, XboxController.Button.kLeftBumper.value);
+        // driverLeftBumper.onTrue(new FloorPickup(m_elevatorSubsystem, m_armSubsystem,
+        // false));
         driverLeftBumper.onTrue(new SequentialCommandGroup(
                 new FloorPickup(m_elevatorSubsystem, m_armSubsystem, false),
                 new AutoCollectGamePiece(m_manipulatorSubsystem, false),
                 new Retract(m_elevatorSubsystem, m_armSubsystem)));
 
         JoystickButton driverRightBumper = new JoystickButton(m_driver, XboxController.Button.kRightBumper.value);
+        // driverRightBumper.onTrue(new ShelfPickup(m_elevatorSubsystem,
+        // m_armSubsystem));
         driverRightBumper.onTrue(new SequentialCommandGroup(
                 new ShelfPickup(m_elevatorSubsystem, m_armSubsystem),
-                new AutoCollectGamePiece(m_manipulatorSubsystem, false),
+                new Intake(m_manipulatorSubsystem).until(driverRightBumper),
                 new Retract(m_elevatorSubsystem, m_armSubsystem)));
 
         JoystickButton driverA = new JoystickButton(m_driver, XboxController.Button.kA.value);
-        driverA.onTrue(new SequentialCommandGroup(
-                new UprightConePickup(m_elevatorSubsystem, m_armSubsystem),
-                new AutoCollectGamePiece(m_manipulatorSubsystem, false),
-                new Retract(m_elevatorSubsystem, m_armSubsystem)));
+        driverA.onTrue(new UprightConePickup(m_elevatorSubsystem, m_armSubsystem));
+        // driverA.onTrue(new SequentialCommandGroup(
+        //         new UprightConePickup(m_elevatorSubsystem, m_armSubsystem),
+        //         new AutoCollectGamePiece(m_manipulatorSubsystem, false),
+        //         new Retract(m_elevatorSubsystem, m_armSubsystem)));
 
         JoystickButton driverB = new JoystickButton(m_driver, XboxController.Button.kB.value);
         driverB.onTrue(new Retract(m_elevatorSubsystem, m_armSubsystem));
@@ -151,7 +156,8 @@ public class RobotContainer {
         JoystickButton operatorA = new JoystickButton(m_operator, XboxController.Button.kA.value);
         JoystickButton operatorB = new JoystickButton(m_operator, XboxController.Button.kB.value);
         // operatorB.onTrue(
-        //         new PlaceGamePiece(PieceLevel.MiddleCone, m_elevatorSubsystem, m_armSubsystem, m_manipulatorSubsystem));
+        // new PlaceGamePiece(PieceLevel.MiddleCone, m_elevatorSubsystem,
+        // m_armSubsystem, m_manipulatorSubsystem));
 
         operatorB.onTrue(new SequentialCommandGroup(
                 new MoveArmToPosition(ArmCalibrations.POSITION_RETRACTED, m_armSubsystem),
@@ -163,7 +169,8 @@ public class RobotContainer {
 
         JoystickButton operatorY = new JoystickButton(m_operator, XboxController.Button.kY.value);
         // operatorY.onTrue(
-        //         new PlaceGamePiece(PieceLevel.TopCone, m_elevatorSubsystem, m_armSubsystem, m_manipulatorSubsystem));
+        // new PlaceGamePiece(PieceLevel.TopCone, m_elevatorSubsystem, m_armSubsystem,
+        // m_manipulatorSubsystem));
 
         operatorY.onTrue(new SequentialCommandGroup(
                 new MoveArmToPosition(ArmCalibrations.POSITION_RETRACTED, m_armSubsystem),

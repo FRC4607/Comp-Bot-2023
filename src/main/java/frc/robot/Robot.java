@@ -80,7 +80,7 @@ public class Robot extends TimedRobot {
         Calibrations.ElevatorCalibrations.initPreferences();
 
         LimelightHelpers.setPipelineIndex("limelight", 0);
-        LimelightHelpers.setCameraMode_Driver("limelight");
+        LimelightHelpers.setCameraMode_Processor("limelight");
     }
 
     @Override

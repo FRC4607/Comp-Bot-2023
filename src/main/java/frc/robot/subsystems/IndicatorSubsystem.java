@@ -75,6 +75,8 @@ public class IndicatorSubsystem extends SubsystemBase {
     private AddressableLED m_indicatorLED;
     private AddressableLEDBuffer m_indicatorLEDBuffer = new AddressableLEDBuffer(38);
 
+    private final NetworkTableEntry m_piEntry = NetworkTableInstance.getDefault().getTable("Boat").getEntry("Gas");
+
     /**
      * The subsystem responsible for the LED lights.
      */
@@ -133,20 +135,19 @@ public class IndicatorSubsystem extends SubsystemBase {
             switch (m_currentIndicatorState) {
                 case CONE:
                     rgb = new int[] { 235, 255, 0 };
+                    m_piEntry.setString("CONE");
                     break;
 
                 case CUBE:
                     rgb = new int[] { 66, 6, 156 };
+                    m_piEntry.setString("CUBE");
                     break;
 
                 case NONE:
-                    rgb = newAllianceColor.m_value == AllianceColor.RED.m_value ? new int[] { 255, 0, 0 }
-                            : new int[] { 0, 0, 255 };
-                    break;
-
                 default:
                     rgb = newAllianceColor.m_value == AllianceColor.RED.m_value ? new int[] { 255, 0, 0 }
                             : new int[] { 0, 0, 255 };
+                    m_piEntry.setString("NONE");
                     break;
             }
 

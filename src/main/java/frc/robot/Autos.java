@@ -69,7 +69,8 @@ public class Autos {
         autoCommands.put("Floor Pickup", new FloorPickup(m_elevatorSubsystem, m_armSubsystem, true));
         autoCommands.put("Floor Pickup Fast", new FloorPickup(m_elevatorSubsystem, m_armSubsystem, false));
         autoCommands.put("Collect Piece", new AutoCollectGamePiece(m_manipulatorSubsystem, true));
-        autoCommands.put("Collect Piece No Stop", new AutoCollectGamePiece(m_manipulatorSubsystem, false).withTimeout(1));
+        autoCommands.put("Collect Piece No Stop",
+                new AutoCollectGamePiece(m_manipulatorSubsystem, false).withTimeout(1));
         autoCommands.put("Retract", new Retract(m_elevatorSubsystem, m_armSubsystem));
         autoCommands.put("Balance", new AutoLevel(0.75, drivetrainSubsystem).andThen(new InstantCommand(() -> {
             m_drivetrainSubsystem.setXMode(true);
@@ -115,15 +116,27 @@ public class Autos {
                 autoBuilder.fullAuto(PathPlanner.loadPathGroup("Middle Auto-Blue", 1.0, 1.5)),
                 autoBuilder.fullAuto(PathPlanner.loadPathGroup("Middle Auto-Red", 1.0, 1.5))));
 
+        m_chooser.addOption("Middle Auto No Piece", "Middle Auto No Piece");
+        m_commandMap.put("Middle Auto No Piece", List.of(
+                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Middle Auto No Piece-Blue", 1.0, 1.5)),
+                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Middle Auto No Piece-Red", 1.0, 1.5))));
+
+        PathConstraints movingConstraints = new PathConstraints(3.0, 3.0);
+        PathConstraints approachConstraints = new PathConstraints(3.0, 2.5);
+
         m_chooser.addOption("Two Piece Substation & Dock", "Two Piece Substation & Dock");
         m_commandMap.put("Two Piece Substation & Dock", List.of(
-                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Two Piece Substation & Dock-Blue", 2.2, 2.2)),
-                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Two Piece Substation & Dock-Red", 2.2, 2.2))));
+                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Two Piece Substation & Dock-Blue", movingConstraints,
+                        approachConstraints, movingConstraints, movingConstraints)),
+                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Two Piece Substation & Dock-Red", movingConstraints,
+                        approachConstraints, movingConstraints, movingConstraints))));
 
         m_chooser.addOption("Two Piece Substation", "Two Piece Substation");
         m_commandMap.put("Two Piece Substation", List.of(
-                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Two Piece Substation-Blue", 3.0, 2.5)),
-                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Two Piece Substation-Red", 3.0, 2.5))));
+                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Two Piece Substation-Blue", movingConstraints,
+                        approachConstraints, movingConstraints, movingConstraints, approachConstraints)),
+                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Two Piece Substation-Red", movingConstraints,
+                        approachConstraints, movingConstraints, movingConstraints, approachConstraints))));
 
         m_chooser.addOption("One Piece Wall", "One Piece Wall");
         m_commandMap.put("One Piece Wall", List.of(

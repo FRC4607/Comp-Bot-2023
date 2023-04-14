@@ -151,6 +151,8 @@ public class SwerveModule {
                 SwerveConstants.WHEEL_CIRCUMFERENCE_METERS / SwerveConstants.DRIVE_GEAR_RATIO);
         m_driveEncoder.setVelocityConversionFactor(
                 SwerveConstants.WHEEL_CIRCUMFERENCE_METERS / SwerveConstants.DRIVE_GEAR_RATIO / 60);
+        m_driveEncoder.setMeasurementPeriod(8);
+        m_driveEncoder.setAverageDepth(4);
 
         m_driveMotor.setInverted(driverReversed);
 
@@ -218,7 +220,8 @@ public class SwerveModule {
         m_driveMotorCurrentLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/current", m_label));
         m_driveMotorVoltageLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/voltage", m_label));
         m_driveMotorTempLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/temp", m_label));
-        m_driveCommandedVoltageLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/drive/commandedVoltage", m_label));
+        m_driveCommandedVoltageLog = new DoubleLogEntry(m_log,
+                String.format("/swerve/%s/drive/commandedVoltage", m_label));
 
         m_turnMotorOutputLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/output", m_label));
         m_turnMotorFaultsLog = new IntegerLogEntry(m_log, String.format("/swerve/%s/turn/faults", m_label));
@@ -228,7 +231,8 @@ public class SwerveModule {
         m_turnMotorCurrentLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/current", m_label));
         m_turnMotorVoltageLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/voltage", m_label));
         m_turnMotorTempLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/temp", m_label));
-        m_turnCommandedVoltageLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/commandedVoltage", m_label));
+        m_turnCommandedVoltageLog = new DoubleLogEntry(m_log,
+                String.format("/swerve/%s/turn/commandedVoltage", m_label));
         m_turnMotorAbsoluteEncoderLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/turn/absolute", m_label));
 
         m_homeLog = new DoubleLogEntry(m_log, String.format("/swerve/%s/home", m_label));
@@ -384,7 +388,7 @@ public class SwerveModule {
      */
     private void logData() {
         long timeStamp = (long) (Timer.getFPGATimestamp() * 1e6);
-        
+
         m_driveMotorOutputLog.append(m_driveMotor.getAppliedOutput(), timeStamp);
         m_driveMotorFaultsLog.append(m_driveMotor.getFaults(), timeStamp);
         m_driveMotorSetpointLog.append(m_driveTarget, timeStamp);

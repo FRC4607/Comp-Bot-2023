@@ -87,7 +87,7 @@ public class LLAlignment extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         LimelightHelpers.setPipelineIndex("limelight", 0);
-        LimelightHelpers.setCameraMode_Driver("limelight");
+        LimelightHelpers.setCameraMode_Processor("limelight");
         m_drive.drive(0, 0, 0, false);
         m_driver.setRumble(RumbleType.kBothRumble, 0);
     }

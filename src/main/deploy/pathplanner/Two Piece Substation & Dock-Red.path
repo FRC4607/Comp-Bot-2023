@@ -57,19 +57,19 @@
     {
       "anchorPoint": {
         "x": 5.2,
-        "y": 4.5
+        "y": 4.55
       },
       "prevControl": {
         "x": 4.182202471867607,
-        "y": 4.5
+        "y": 4.55
       },
       "nextControl": {
         "x": 5.391347637453461,
-        "y": 4.5
+        "y": 4.55
       },
       "holonomicAngle": 0,
       "isReversal": false,
-      "velOverride": null,
+      "velOverride": 1.0,
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
@@ -82,15 +82,15 @@
     {
       "anchorPoint": {
         "x": 6.78,
-        "y": 4.5
+        "y": 4.55
       },
       "prevControl": {
         "x": 6.521648363740645,
-        "y": 4.5
+        "y": 4.55
       },
       "nextControl": {
         "x": 6.521648363740645,
-        "y": 4.5
+        "y": 4.55
       },
       "holonomicAngle": 0.0,
       "isReversal": true,
@@ -133,16 +133,16 @@
     },
     {
       "anchorPoint": {
-        "x": 1.8135093921433407,
-        "y": 4.421778238574271
+        "x": 1.7961003056605618,
+        "y": 4.322274837778413
       },
       "prevControl": {
-        "x": 1.9561473998392849,
-        "y": 4.573925446783278
+        "x": 1.938738313356506,
+        "y": 4.47442204598742
       },
       "nextControl": {
-        "x": 1.9561473998392849,
-        "y": 4.573925446783278
+        "x": 1.938738313356506,
+        "y": 4.47442204598742
       },
       "holonomicAngle": 180.0,
       "isReversal": true,
@@ -237,6 +237,12 @@
       "position": 5.1,
       "names": [
         "Elevator Retracted"
+      ]
+    },
+    {
+      "position": 4.4,
+      "names": [
+        "Elevator Top Node"
       ]
     }
   ]

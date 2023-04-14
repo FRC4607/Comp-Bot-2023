@@ -26,7 +26,7 @@ public class Calibrations {
         public static final double TURN_MIN_VELOCITY = 0.001;
 
         // Kind of tuned - So little error because of feed forward that it is hard to tune.
-        public static final double DRIVE_KP = 0.1;
+        public static final double DRIVE_KP = 0.5;
         public static final double DRIVE_KI = 0.0;
         public static final double DRIVE_KD = 0.0;
         public static final double DRIVE_KF = 0.0;
@@ -149,9 +149,9 @@ public class Calibrations {
         public static final double KA = 0.0;
         public static final double KG = 0.925;
 
-        public static final double KP = 5.0;
+        public static final double KP = 15.0;
         public static final double KI = 0.0;
-        public static final double KD = 0.0;
+        public static final double KD = 1.0;
 
         public static final double MAX_POSITION = 5.5;
         public static final double MAX_VELOCITY_UP = 7.0;

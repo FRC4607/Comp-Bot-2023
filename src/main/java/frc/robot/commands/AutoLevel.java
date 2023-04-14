@@ -10,7 +10,7 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 public class AutoLevel extends CommandBase {
     private final DrivetrainSubsystem m_drive;
 
-    private double m_xSpeed;
+    private final double m_xSpeed;
 
     private Pose2d m_startPose;
 
@@ -41,7 +41,8 @@ public class AutoLevel extends CommandBase {
 
     @Override
     public void execute() {
-        if (Math.abs(m_drive.getRobotPitch().getDegrees() - 1.14) < 13.5) {
+        if (Math.abs(m_drive.getRobotPitch().getDegrees() - 1.6) < 9) {
+            System.out.println("end criteria met, setting m_end");
             end(false);
             return;
         } else {
@@ -57,7 +58,7 @@ public class AutoLevel extends CommandBase {
             default:
                 break;
         }
-        m_sign = m_drive.getRobotPitch().getDegrees() > 0 ? SignChange.POSITIVE : SignChange.NEGATIVE;
+        m_sign = (m_drive.getRobotPitch().getDegrees() - 1.6) > 0 ? SignChange.POSITIVE : SignChange.NEGATIVE;
     }
 
     @Override
@@ -68,9 +69,16 @@ public class AutoLevel extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        if ((m_end && (RobotController.getFPGATime() - m_startTime) > (1.0 * 1e6))
+        if (m_end
             || (m_drive.getPose().minus(m_startPose).getTranslation().getNorm() > 3)
-            || (DriverStation.getMatchTime() < 0.75)) {
+            || (DriverStation.getMatchTime() < 0.075)) {
+            if (m_end) {
+                System.out.println("Ended because m_end was set to true");
+            } else if (m_drive.getPose().minus(m_startPose).getTranslation().getNorm() > 3) {
+                System.out.println("Ended due to 3 meter failsafe");
+            } else {
+                System.out.println("Ended due to end of period stop");;
+            }
             m_end = false;
             return true;
         } else {

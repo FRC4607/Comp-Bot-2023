@@ -34,7 +34,7 @@ public class LimelightThread implements Runnable {
                 }
             }
             try {
-                Thread.sleep(1); // 1 ms delay
+                Thread.sleep(25); // 25 ms delay
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

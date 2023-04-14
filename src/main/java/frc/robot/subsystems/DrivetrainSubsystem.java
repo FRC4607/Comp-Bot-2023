@@ -7,6 +7,7 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -252,6 +253,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         drive(strafeX, strafeY, rotate, fieldOrientated, m_xMode);
     }
 
+    private final Pose2d m_zeroPose = new Pose2d();
+
     /**
      * Driver Input.
      *
@@ -265,14 +268,24 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void drive(double strafeX, double strafeY, double rotate, boolean fieldOrientated, boolean autoX) {
         ChassisSpeeds chassisSpeed;
 
+        
         if (fieldOrientated) {
             synchronized (m_odometry) {
                 chassisSpeed = ChassisSpeeds.fromFieldRelativeSpeeds(strafeX, strafeY, rotate,
-                        m_odometry.getEstimatedPosition().getRotation());
+                m_odometry.getEstimatedPosition().getRotation());
             }
         } else {
             chassisSpeed = new ChassisSpeeds(strafeX, strafeY, rotate);
         }
+        
+        // Pose2d robotPoseVel = new Pose2d(chassisSpeed.vxMetersPerSecond * 0.02,
+        //         chassisSpeed.vyMetersPerSecond * 0.02,
+        //         Rotation2d.fromRadians(chassisSpeed.omegaRadiansPerSecond * 0.02));
+        // Twist2d twistVel = m_zeroPose.log(robotPoseVel);
+        // ChassisSpeeds updatedChassisSpeeds = new ChassisSpeeds(
+        //         twistVel.dx / 0.02, twistVel.dy / 0.02,
+        //         twistVel.dtheta / 0.02);
+
         SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(chassisSpeed);
 
         if (strafeX == 0.0 && strafeY == 0.0 && rotate == 0.0 && autoX) {
@@ -293,6 +306,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * @param chassisSpeeds The Target speeds of the Drivetrain
      */
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+        // Pose2d robotPoseVel = new Pose2d(chassisSpeeds.vxMetersPerSecond * 0.02,
+        //         chassisSpeeds.vyMetersPerSecond * 0.02,
+        //         Rotation2d.fromRadians(chassisSpeeds.omegaRadiansPerSecond * 0.02));
+        // Twist2d twistVel = m_zeroPose.log(robotPoseVel);
+        // ChassisSpeeds updatedChassisSpeeds = new ChassisSpeeds(
+        //         twistVel.dx / 0.02, twistVel.dy / 0.02,
+        //         twistVel.dtheta / 0.02);
+
         setModuleStates(m_kinematics.toSwerveModuleStates(chassisSpeeds));
     }
 
@@ -368,9 +389,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
         long timeStamp = (long) (Timer.getFPGATimestamp() * 1e6);
 
         synchronized (m_odometry) {
-            m_odometryLog.append(new double[] { m_odometry.getEstimatedPosition().getX(), m_odometry.getEstimatedPosition().getY(),
-                    m_odometry.getEstimatedPosition().getRotation().getRadians() }, timeStamp);
-            }
+            m_odometryLog.append(
+                    new double[] { m_odometry.getEstimatedPosition().getX(), m_odometry.getEstimatedPosition().getY(),
+                            m_odometry.getEstimatedPosition().getRotation().getRadians() },
+                    timeStamp);
+        }
 
         m_pigeonYawLog.append(m_pigeon.getYaw(), timeStamp);
         m_pigeonPitchLog.append(m_pigeon.getPitch(), timeStamp);
