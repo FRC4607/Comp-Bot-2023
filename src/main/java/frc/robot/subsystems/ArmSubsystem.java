@@ -17,9 +17,11 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations.ArmCalibrations;
 import frc.robot.Constants.ArmConstants;
@@ -52,6 +54,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final DoubleLogEntry m_feedforwardLog;
     private final DoubleLogEntry m_pidLog;
     private final StringLogEntry m_currentCommandLog;
+    private final BooleanLogEntry m_faultLog;
 
     private final ProfiledPIDController m_pidController;
     private final ArmFeedforward m_feedforward;
@@ -59,6 +62,8 @@ public class ArmSubsystem extends SubsystemBase {
     private double m_setpoint;
     private boolean m_closedLoop;
     private double m_commandedVoltage = 0.0;
+
+    private boolean m_faulted = false;
 
     /**
      * Defines the wrist subsystem.
@@ -120,6 +125,8 @@ public class ArmSubsystem extends SubsystemBase {
         m_feedforwardLog = new DoubleLogEntry(log, "/arm/feedforward");
         m_pidLog = new DoubleLogEntry(log, "/arm/pid");
 
+        m_faultLog = new BooleanLogEntry(log, "/arm/fault");
+
         m_currentCommandLog = new StringLogEntry(log, "/arm/command");
 
         m_motorEncoder.setPosition(getAbsoluteEncoderPosition());
@@ -169,10 +176,22 @@ public class ArmSubsystem extends SubsystemBase {
         m_pidController.reset(getAbsoluteEncoderPosition());
     }
 
+    public boolean getFaulted() {
+        return m_faulted;
+    }
+
     @Override
     public void periodic() {
 
         SmartDashboard.putNumber("Arm Pos", getAbsoluteEncoderPosition());
+
+        if (Math.abs(getAbsoluteEncoderPosition() - m_motorEncoder.getPosition()) > 90.0) {
+            if (!m_faulted) {
+                CommandScheduler.getInstance().cancelAll();
+                DriverStation.reportError("Lost Arm Encoder", false);
+            }
+            m_faulted = true;
+        }
 
         long timeStamp = (long) (Timer.getFPGATimestamp() * 1e6);
         
@@ -181,7 +200,7 @@ public class ArmSubsystem extends SubsystemBase {
         double ff = m_feedforward.calculate((m_pidController.getSetpoint().position - 90.0) * Math.PI / 180.0,
                 m_pidController.getSetpoint().velocity);
 
-        if (m_closedLoop) {
+        if (m_closedLoop && !m_faulted) {
             m_commandedVoltage = pid + ff;
             m_motor.setVoltage(m_commandedVoltage);
         }
@@ -205,6 +224,8 @@ public class ArmSubsystem extends SubsystemBase {
         m_setpointVelocityLog.append(m_pidController.getSetpoint().velocity, timeStamp);
         m_feedforwardLog.append(ff, timeStamp);
         m_pidLog.append(pid, timeStamp);
+
+        m_faultLog.append(m_faulted, timeStamp);
 
         Command currentCommand = getCurrentCommand();
         m_currentCommandLog.append(currentCommand != null ? currentCommand.getName() : "None", timeStamp);
