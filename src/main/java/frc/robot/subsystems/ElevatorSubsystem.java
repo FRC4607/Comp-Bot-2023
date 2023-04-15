@@ -239,8 +239,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Elevator Pos", getEncoderPosition());
-        SmartDashboard.putNumber("Elevator Voltage", m_commandedVoltage);
+        // SmartDashboard.putNumber("Elevator Pos", getEncoderPosition());
+        // SmartDashboard.putNumber("Elevator Voltage", m_commandedVoltage);
 
         double pid = m_pidController.calculate(getEncoderPosition());
         double ff = m_pidController.getSetpoint().position < 0.02 ? 0

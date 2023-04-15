@@ -100,14 +100,15 @@ public class RobotContainer {
         configureBindings();
 
         SmartDashboard.putData(new SwerveSetHomes(m_drivetrainSubsystem));
+        SmartDashboard.putData("Run Auto", new InstantCommand(() -> getAutonomousCommand().schedule()));
 
         // SmartDashboard.putData(new CalibrateTurnFF(m_drivetrainSubsystem));
-        SmartDashboard.putData(new CalibrateDriveFF(m_drivetrainSubsystem));
+        // SmartDashboard.putData(new CalibrateDriveFF(m_drivetrainSubsystem));
         // SmartDashboard.putData(new CalibrateElevatorFF(m_elevatorSubsystem));
         // SmartDashboard.putData(new CalibrateArmFF(m_armSubsystem));
         // SmartDashboard.putData(new ControlSwerveModule(m_drivetrainSubsystem));
-        SmartDashboard.putData(new MoveElevatorSmartDashboard(m_elevatorSubsystem));
-        SmartDashboard.putData(new MoveArmSmartDashboard(m_armSubsystem));
+        // SmartDashboard.putData(new MoveElevatorSmartDashboard(m_elevatorSubsystem));
+        // SmartDashboard.putData(new MoveArmSmartDashboard(m_armSubsystem));
         // SmartDashboard.putData(
         // new PlaceGamePiece(PieceLevel.MiddleCone, m_elevatorSubsystem,
         // m_armSubsystem, m_motorizedManipulator));

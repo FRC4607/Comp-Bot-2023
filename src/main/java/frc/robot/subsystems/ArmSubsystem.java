@@ -102,7 +102,7 @@ public class ArmSubsystem extends SubsystemBase {
                 new Constraints(ArmCalibrations.MAX_VELOCITY, ArmCalibrations.MAX_ACCELERATION));
         m_pidController.reset(getAbsoluteEncoderPosition());
 
-        SmartDashboard.putData(m_pidController);
+        // SmartDashboard.putData(m_pidController);
 
         m_feedforward = new ArmFeedforward(ArmCalibrations.KS, ArmCalibrations.KG, ArmCalibrations.KV,
                 ArmCalibrations.KA);
@@ -186,7 +186,7 @@ public class ArmSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
-        SmartDashboard.putNumber("Arm Pos", getAbsoluteEncoderPosition());
+        // SmartDashboard.putNumber("Arm Pos", getAbsoluteEncoderPosition());
 
         if (Math.abs(getAbsoluteEncoderPosition() - m_motorEncoder.getPosition()) > 90.0 && DriverStation.isAutonomous()) {
             if (!m_faulted) {

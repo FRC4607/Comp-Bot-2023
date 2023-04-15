@@ -131,7 +131,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
             m_odometry.update(getGyroYaw(), getModulePositions());
         }
 
-        SmartDashboard.putNumber("Calc Pitch", getRobotPitch().getDegrees());
+        // SmartDashboard.putNumber("Calc Pitch", getRobotPitch().getDegrees());
         // SmartDashboard.putNumber("Gyro Yaw (Deg)", getGyroRotation().getDegrees());
         // SmartDashboard.putNumber("Pigeon Yaw (Deg)", m_pigeon.getYaw());
     }

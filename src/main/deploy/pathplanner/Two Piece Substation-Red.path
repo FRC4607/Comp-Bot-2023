@@ -275,6 +275,12 @@
       "names": [
         "Arm Floor"
       ]
+    },
+    {
+      "position": 4.1,
+      "names": [
+        "Elevator Top Node"
+      ]
     }
   ]
 }

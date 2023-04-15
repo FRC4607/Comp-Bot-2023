@@ -30,7 +30,34 @@
         "y": 2.2
       },
       "prevControl": {
-        "x": 4.4975162268307205,
+        "x": 5.233623603450108,
+        "y": 2.2
+      },
+      "nextControl": {
+        "x": 5.233623603450108,
+        "y": 2.2
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": true,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "Auto Level -X"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.1242451168176375,
+        "y": 2.2
+      },
+      "prevControl": {
+        "x": 4.761072905310558,
         "y": 2.2
       },
       "nextControl": null,
@@ -40,10 +67,8 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "Auto Level -X"
-        ],
-        "executionBehavior": "sequential",
+        "names": [],
+        "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
       }
