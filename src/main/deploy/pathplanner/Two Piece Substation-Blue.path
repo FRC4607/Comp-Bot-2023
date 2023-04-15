@@ -57,19 +57,19 @@
     {
       "anchorPoint": {
         "x": 5.2,
-        "y": 4.45
+        "y": 4.55
       },
       "prevControl": {
         "x": 4.182202471867607,
-        "y": 4.45
+        "y": 4.55
       },
       "nextControl": {
         "x": 5.391347637453461,
-        "y": 4.45
+        "y": 4.55
       },
       "holonomicAngle": 0,
       "isReversal": false,
-      "velOverride": null,
+      "velOverride": 1.0,
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
@@ -82,15 +82,15 @@
     {
       "anchorPoint": {
         "x": 6.78,
-        "y": 4.45
+        "y": 4.55
       },
       "prevControl": {
         "x": 6.521648363740645,
-        "y": 4.45
+        "y": 4.55
       },
       "nextControl": {
         "x": 6.521648363740645,
-        "y": 4.45
+        "y": 4.55
       },
       "holonomicAngle": 0.0,
       "isReversal": true,
@@ -133,16 +133,16 @@
     },
     {
       "anchorPoint": {
-        "x": 1.8135093921433407,
-        "y": 4.421778238574271
+        "x": 1.7961003056605618,
+        "y": 4.322274837778413
       },
       "prevControl": {
-        "x": 1.9561473998392849,
-        "y": 4.573925446783278
+        "x": 1.938738313356506,
+        "y": 4.47442204598742
       },
       "nextControl": {
-        "x": 1.9561473998392849,
-        "y": 4.573925446783278
+        "x": 1.938738313356506,
+        "y": 4.47442204598742
       },
       "holonomicAngle": 180.0,
       "isReversal": true,
@@ -151,7 +151,6 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "Elevator Top Node",
           "Arm Top Node",
           "Outtake",
           "Arm Retracted"
@@ -188,15 +187,15 @@
     },
     {
       "anchorPoint": {
-        "x": 7.55,
+        "x": 7.5,
         "y": 4.6
       },
       "prevControl": {
-        "x": 7.55,
+        "x": 7.5,
         "y": 5.132854734809197
       },
       "nextControl": {
-        "x": 7.55,
+        "x": 7.5,
         "y": 4.169452634992205
       },
       "holonomicAngle": -90.0,
@@ -213,11 +212,11 @@
     },
     {
       "anchorPoint": {
-        "x": 7.55,
+        "x": 7.5,
         "y": 3.63
       },
       "prevControl": {
-        "x": 7.55,
+        "x": 7.5,
         "y": 3.935628722329494
       },
       "nextControl": null,
