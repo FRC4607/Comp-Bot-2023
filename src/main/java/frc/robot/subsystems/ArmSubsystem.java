@@ -11,6 +11,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
@@ -131,7 +134,7 @@ public class ArmSubsystem extends SubsystemBase {
 
         m_motorEncoder.setPosition(getAbsoluteEncoderPosition());
 
-
+        SmartDashboard.putBoolean("Arm Fault", m_faulted);
     }
 
     /**
@@ -185,13 +188,17 @@ public class ArmSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("Arm Pos", getAbsoluteEncoderPosition());
 
-        if (Math.abs(getAbsoluteEncoderPosition() - m_motorEncoder.getPosition()) > 90.0) {
+        if (Math.abs(getAbsoluteEncoderPosition() - m_motorEncoder.getPosition()) > 90.0 && DriverStation.isAutonomous()) {
             if (!m_faulted) {
                 CommandScheduler.getInstance().cancelAll();
                 DriverStation.reportError("Lost Arm Encoder", false);
+                SmartDashboard.putBoolean("Arm Fault", m_faulted);
+
             }
             m_faulted = true;
         }
+
+        m_faulted = SmartDashboard.getBoolean("Arm Fault", m_faulted);
 
         long timeStamp = (long) (Timer.getFPGATimestamp() * 1e6);
         
