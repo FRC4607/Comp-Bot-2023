@@ -72,9 +72,9 @@ public class Autos {
         autoCommands.put("Collect Piece No Stop",
                 new AutoCollectGamePiece(m_manipulatorSubsystem, false).withTimeout(1));
         autoCommands.put("Retract", new Retract(m_elevatorSubsystem, m_armSubsystem));
-        autoCommands.put("Balance", new AutoLevel(0.75, drivetrainSubsystem).andThen(new InstantCommand(() -> {
+        autoCommands.put("Balance", new InstantCommand(() -> {
             m_drivetrainSubsystem.setXMode(true);
-        })));
+        }).andThen(new AutoLevel(0.60, drivetrainSubsystem)));
 
         autoCommands.put("Elevator Retracted",
                 new MoveElevatorToPosition(ElevatorCalibrations.POSITION_RETRACTED, m_elevatorSubsystem));
@@ -156,15 +156,6 @@ public class Autos {
         m_commandMap.put("Place One Piece", List.of(
                 new PlaceGamePiece(PieceLevel.TopCone, elevatorSubsystem, armSubsystem, manipulatorSubsystem),
                 new PlaceGamePiece(PieceLevel.TopCone, elevatorSubsystem, armSubsystem, manipulatorSubsystem)));
-
-        m_chooser.setDefaultOption("Test", "Test");
-        m_commandMap.put("Test", List.of(
-                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Two Piece Substation-Blue Copy",
-                        Calibrations.SwerveCalibrations.MAX_SPEED_METER * 0.75,
-                        Calibrations.SwerveCalibrations.MAX_ACCELERATION * 0.75)),
-                autoBuilder.fullAuto(PathPlanner.loadPathGroup("Two Piece Substation-Blue Copy",
-                        Calibrations.SwerveCalibrations.MAX_SPEED_METER * 0.75,
-                        Calibrations.SwerveCalibrations.MAX_ACCELERATION * 0.75))));
 
         m_chooser.setDefaultOption("No Auto", "No Auto");
         m_commandMap.put("No Auto", List.of(new InstantCommand(), new InstantCommand()));

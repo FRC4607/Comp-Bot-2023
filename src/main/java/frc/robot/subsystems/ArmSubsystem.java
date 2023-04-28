@@ -77,7 +77,7 @@ public class ArmSubsystem extends SubsystemBase {
 
         m_motor.restoreFactoryDefaults();
         m_motor.setIdleMode(IdleMode.kBrake);
-        m_motor.setInverted(false);
+        m_motor.setInverted(true);
         m_motor.setSmartCurrentLimit(40, 40);
 
         m_motorEncoder = m_motor.getEncoder();
@@ -186,17 +186,17 @@ public class ArmSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
-        // SmartDashboard.putNumber("Arm Pos", getAbsoluteEncoderPosition());
+        SmartDashboard.putNumber("Arm Pos", getAbsoluteEncoderPosition());
 
-        if (Math.abs(getAbsoluteEncoderPosition() - m_motorEncoder.getPosition()) > 90.0 && DriverStation.isAutonomous()) {
-            if (!m_faulted) {
-                CommandScheduler.getInstance().cancelAll();
-                DriverStation.reportError("Lost Arm Encoder", false);
-                SmartDashboard.putBoolean("Arm Fault", m_faulted);
+        // if (Math.abs(getAbsoluteEncoderPosition() - m_motorEncoder.getPosition()) > 90.0 && DriverStation.isAutonomous()) {
+        //     if (!m_faulted) {
+        //         CommandScheduler.getInstance().cancelAll();
+        //         DriverStation.reportError("Lost Arm Encoder", false);
+        //         SmartDashboard.putBoolean("Arm Fault", true);
 
-            }
-            m_faulted = true;
-        }
+        //     }
+        //     m_faulted = true;
+        // }
 
         m_faulted = SmartDashboard.getBoolean("Arm Fault", m_faulted);
 

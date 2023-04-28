@@ -41,7 +41,7 @@ public class AutoLevel extends CommandBase {
 
     @Override
     public void execute() {
-        if (Math.abs(m_drive.getRobotPitch().getDegrees() - 1.6) < 9) {
+        if (Math.abs(m_drive.getRobotPitch().getDegrees() - 1.6) < 16.0) {
             System.out.println("end criteria met, setting m_end");
             end(false);
             return;
@@ -70,8 +70,8 @@ public class AutoLevel extends CommandBase {
     @Override
     public boolean isFinished() {
         if (m_end
-            || (m_drive.getPose().minus(m_startPose).getTranslation().getNorm() > 3)
-            || (DriverStation.getMatchTime() < 0.075)) {
+            || (m_drive.getPose().minus(m_startPose).getTranslation().getNorm() > 3)) {
+            //|| (DriverStation.getMatchTime() < 0.075)) {
             if (m_end) {
                 System.out.println("Ended because m_end was set to true");
             } else if (m_drive.getPose().minus(m_startPose).getTranslation().getNorm() > 3) {

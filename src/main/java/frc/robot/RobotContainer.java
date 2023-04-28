@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -100,7 +101,7 @@ public class RobotContainer {
         configureBindings();
 
         SmartDashboard.putData(new SwerveSetHomes(m_drivetrainSubsystem));
-        SmartDashboard.putData("Run Auto", new InstantCommand(() -> getAutonomousCommand().schedule()));
+        // SmartDashboard.putData("Run Auto", new InstantCommand(() -> getAutonomousCommand().schedule()));
 
         // SmartDashboard.putData(new CalibrateTurnFF(m_drivetrainSubsystem));
         // SmartDashboard.putData(new CalibrateDriveFF(m_drivetrainSubsystem));
@@ -114,6 +115,11 @@ public class RobotContainer {
         // m_armSubsystem, m_motorizedManipulator));
 
         // SmartDashboard.putData(new DriveWithSmartDashboard(m_drivetrainSubsystem));
+
+        SmartDashboard.putData(new AutoLevel(0.75, m_drivetrainSubsystem));
+        SmartDashboard.putData("Cancel All Commands", new InstantCommand(() -> {
+            CommandScheduler.getInstance().cancelAll();
+        }));
 
         m_autos = new Autos(m_drivetrainSubsystem, m_elevatorSubsystem, m_armSubsystem, m_manipulatorSubsystem);
     }
