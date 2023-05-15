@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Calibrations.ManipulatorCalibrations;
 import frc.robot.subsystems.ManipulatorSubsystem;
@@ -28,7 +29,7 @@ public class AutoCollectGamePiece extends CommandBase {
     public void initialize() {
         m_manipulatorSubsystem.setSpeed(ManipulatorCalibrations.INTAKE_SPEED);
         m_counter = 0;
-        System.out.println("Piece Collection Stared");
+        DataLogManager.log("Piece Collection Stared, m_timeout = " + m_timeout);
     }
 
     @Override
@@ -36,6 +37,7 @@ public class AutoCollectGamePiece extends CommandBase {
         m_counter++;
 
         if (m_counter > 50 && m_timeout) {
+            DataLogManager.log("Counter exceeded");
             m_manipulatorSubsystem.setSpeed(0);
         }
     }
@@ -43,7 +45,7 @@ public class AutoCollectGamePiece extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         m_manipulatorSubsystem.setSpeed(ManipulatorCalibrations.HOLD_SPEED);
-        System.out.println("Piece Collection Ended");
+        DataLogManager.log("Piece Collection Ended, m_timeout = " + m_timeout);
     }
 
     @Override

@@ -81,7 +81,8 @@ public class Autos {
         autoCommands.put("Elevator Floor",
                 new MoveElevatorToPosition(ElevatorCalibrations.pieceCollection(), m_elevatorSubsystem));
         autoCommands.put("Elevator Top Node",
-                new MoveElevatorToPosition(ElevatorCalibrations.nodePositions()[0], m_elevatorSubsystem));
+                new MoveElevatorToPosition(ElevatorCalibrations.nodePositions()[0], m_elevatorSubsystem)
+                        .deadlineWith(new MoveArmToPosition(ArmCalibrations.POSITION_RETRACTED, m_armSubsystem)));
 
         autoCommands.put("Arm Retracted",
                 new MoveArmToPosition(ArmCalibrations.POSITION_RETRACTED, m_armSubsystem));

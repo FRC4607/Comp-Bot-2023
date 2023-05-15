@@ -19,6 +19,7 @@ import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -410,7 +411,7 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
             try {
                 double calTime =  (Math.pow(2.0, m_calibration_time) / 2000 * 64 * 1.1 * 1000);
                 // System.out.print("Calibration Time:");
-                // System.out.println(calTime);
+                // DataLogManager.log(calTime);
 
                 Thread.sleep((long) calTime);
             } catch (InterruptedException e) {
@@ -491,7 +492,7 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
                 } catch (InterruptedException e) {
                 }
             }
-            System.out.println("Paused the IMU processing thread successfully!");
+            DataLogManager.log("Paused the IMU processing thread successfully!");
             // Maybe we're in auto SPI mode? If so, kill auto SPI, and then SPI.
             if (m_spi != null && m_auto_configured) {
                 m_spi.stopAuto();
@@ -510,12 +511,12 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
                     m_spi.readAutoReceivedData(trashBuffer, Math.min(data_count, 200), 0);
                     data_count = m_spi.readAutoReceivedData(trashBuffer, 0, 0);
                 }
-                System.out.println("Paused auto SPI successfully.");
+                DataLogManager.log("Paused auto SPI successfully.");
             }
         }
         // There doesn't seem to be a SPI port active. Let's try to set one up
         if (m_spi == null) {
-            System.out.println("Setting up a new SPI port.");
+            DataLogManager.log("Setting up a new SPI port.");
             m_spi = new SPI(m_spi_port);
             m_spi.setClockRate(2000000);
             m_spi.setMode(SPI.Mode.kMode3);
@@ -587,12 +588,12 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
             m_first_run = true;
             m_thread_active = true;
             m_acquire_task.start();
-            System.out.println("Processing thread activated!");
+            DataLogManager.log("Processing thread activated!");
         } else {
             // The thread was running, re-init run variables and start it up again.
             m_first_run = true;
             m_thread_active = true;
-            System.out.println("Processing thread activated!");
+            DataLogManager.log("Processing thread activated!");
         }
         // Looks like the thread didn't start for some reason. Abort.
         if (!m_acquire_task.isAlive()) {
@@ -638,7 +639,7 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
         }
         m_scaled_sample_rate = (((m_reg + 1.0) / 2000.0) * 1000000.0);
         writeRegister(DEC_RATE, m_reg);
-        System.out.println("Decimation register: " + readRegister(DEC_RATE));
+        DataLogManager.log("Decimation register: " + readRegister(DEC_RATE));
         if (!switchToAutoSPI()) {
             DriverStation.reportError("Failed to configure/reconfigure auto SPI.", false);
             return 2;
@@ -751,7 +752,7 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
                 m_spi = null;
             }
         }
-        System.out.println("Finished cleaning up after the IMU driver.");
+        DataLogManager.log("Finished cleaning up after the IMU driver.");
     }
 
     /** */
@@ -816,7 +817,7 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
                     m_dt = ((double) buffer[i] - previous_timestamp) / 1000000.0;
 
                     /*
-                     * System.out.println(((toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5],
+                     * DataLogManager.log(((toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5],
                      * buffer[i + 6]))*delta_angle_sf) / ((10000.0 / (buffer[i] -
                      * previous_timestamp)) / 100.0));
                      * // DEBUG: Plot Sub-Array Data in Terminal
@@ -824,8 +825,8 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
                      * System.out.print(buffer[j]);
                      * System.out.print(" ,");
                      * }
-                     * System.out.println(" ");
-                     * //System.out.println(((toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5],
+                     * DataLogManager.log(" ");
+                     * //DataLogManager.log(((toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5],
                      * buffer[i + 6]))*delta_angle_sf) / ((10000.0 / (buffer[i] -
                      * previous_timestamp)) / 100.0) + "," + buffer[3] + "," + buffer[4] + "," +
                      * buffer[5] + "," + buffer[6]

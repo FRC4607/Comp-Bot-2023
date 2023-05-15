@@ -78,12 +78,13 @@ public class Calibrations {
 
         public static final double POSITION_RETRACTED = 20.0;
         public static final double SHELF_PICKUP_STATIC = 30.0;
+        public static final double SHELF_PICKUP_ALT_STATIC = 30.0;
         public static final double UPRIGHT_CONE_STATIC = 140.0;
         public static final double PIECE_COLLECTION_STATIC = 165.0;
         public static final double[] NODE_POSITIONS_STATIC = { 40, 70, 45, 70 };
         // This is defined as "what does the encoder read when the system is in the position I want to be zero?"
         // REV tuner read 205.137 when the arm was vertical, subtract 120 to convert to the correct position.
-        public static final double ABSOLUTE_ENCODER_OFFSET = MathUtil.inputModulus(203.4 - 120, 0, 360);
+        public static final double ABSOLUTE_ENCODER_OFFSET = MathUtil.inputModulus(144.713 - 120, 0, 360);
 
 
         /**
@@ -92,6 +93,7 @@ public class Calibrations {
         public static void initPreferences() {
             Preferences.initDouble("ArmPieceCollection", PIECE_COLLECTION_STATIC);
             Preferences.initDouble("ArmShelfPickup", SHELF_PICKUP_STATIC);
+            Preferences.initDouble("ArmShelfPickupAlt", SHELF_PICKUP_STATIC);
             Preferences.initDouble("ArmUprightCone", UPRIGHT_CONE_STATIC);
 
             Preferences.initDouble("ArmTopCone", NODE_POSITIONS_STATIC[0]);
@@ -110,6 +112,10 @@ public class Calibrations {
 
         public static double shelfPickup() {
             return Preferences.getDouble("ArmShelfPickup", SHELF_PICKUP_STATIC);
+        }
+
+        public static double shelfPickupAlt() {
+            return Preferences.getDouble("ArmShelfPickupAlt", SHELF_PICKUP_ALT_STATIC);
         }
 
         /**
@@ -170,6 +176,7 @@ public class Calibrations {
         private static final double PIECE_COLLECTION_STATIC = 2.41;
         private static final double UPRIGHT_CONE_STATIC = 2.475;
         private static final double SHELF_PICKUP_STATIC = 3.53;
+        private static final double SHELF_PICKUP_ALT_STATIC = 3.53;
         public static final double[] NODE_POSITIONS_STATIC = { 5.12, 5.08, 2.6, 3.25 };
 
         /**
@@ -178,6 +185,7 @@ public class Calibrations {
         public static void initPreferences() {
             Preferences.initDouble("ElevatorPieceCollection", PIECE_COLLECTION_STATIC);
             Preferences.initDouble("ElevatorShelfPickup", SHELF_PICKUP_STATIC);
+            Preferences.initDouble("ElevatorShelfPickupAlt", SHELF_PICKUP_ALT_STATIC);
             Preferences.initDouble("ElevatorUprightCone", UPRIGHT_CONE_STATIC);
 
             Preferences.initDouble("ElevatorTopCone", NODE_POSITIONS_STATIC[0]);
@@ -196,6 +204,10 @@ public class Calibrations {
 
         public static double shelfPickup() {
             return Preferences.getDouble("ElevatorShelfPickup", SHELF_PICKUP_STATIC);
+        }
+
+        public static double shelfPickupAlt() {
+            return Preferences.getDouble("ElevatorShelfPickupAlt", SHELF_PICKUP_ALT_STATIC);
         }
 
         /**

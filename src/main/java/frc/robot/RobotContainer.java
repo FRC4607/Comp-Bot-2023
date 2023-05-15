@@ -160,7 +160,13 @@ public class RobotContainer {
         driverB.onTrue(new Retract(m_elevatorSubsystem, m_armSubsystem));
 
         JoystickButton driverY = new JoystickButton(m_driver, XboxController.Button.kY.value);
-        // driverY.whileTrue(new LLAlignment(0, m_driver, m_drivetrainSubsystem));
+        driverY.onTrue(new SequentialCommandGroup(
+                new MoveArmToPosition(ArmCalibrations.POSITION_RETRACTED, m_armSubsystem),
+                new MoveElevatorToPosition(ElevatorCalibrations::shelfPickupAlt, m_elevatorSubsystem),
+                new MoveArmToPosition(ArmCalibrations::shelfPickupAlt, m_armSubsystem),
+                new Intake(m_manipulatorSubsystem).until(driverRightBumper),
+                new Retract(m_elevatorSubsystem, m_armSubsystem)));
+
         JoystickButton driverX = new JoystickButton(m_driver, XboxController.Button.kX.value);
         driverX.whileTrue(new LLAlignment(2, m_driver, m_drivetrainSubsystem));
 

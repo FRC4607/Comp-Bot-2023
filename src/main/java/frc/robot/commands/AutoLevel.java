@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -41,8 +42,8 @@ public class AutoLevel extends CommandBase {
 
     @Override
     public void execute() {
-        if (Math.abs(m_drive.getRobotPitch().getDegrees() - 1.6) < 16.0) {
-            System.out.println("end criteria met, setting m_end");
+        if (Math.abs(m_drive.getRobotPitch().getDegrees() - 1.6) < 10.0) {
+            DataLogManager.log("end criteria met, setting m_end");
             end(false);
             return;
         } else {
@@ -73,11 +74,11 @@ public class AutoLevel extends CommandBase {
             || (m_drive.getPose().minus(m_startPose).getTranslation().getNorm() > 3)) {
             //|| (DriverStation.getMatchTime() < 0.075)) {
             if (m_end) {
-                System.out.println("Ended because m_end was set to true");
+                DataLogManager.log("Ended because m_end was set to true");
             } else if (m_drive.getPose().minus(m_startPose).getTranslation().getNorm() > 3) {
-                System.out.println("Ended due to 3 meter failsafe");
+                DataLogManager.log("Ended due to 3 meter failsafe");
             } else {
-                System.out.println("Ended due to end of period stop");;
+                DataLogManager.log("Ended due to end of period stop");;
             }
             m_end = false;
             return true;

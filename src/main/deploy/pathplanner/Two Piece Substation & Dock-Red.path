@@ -17,7 +17,6 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "Arm Retracted",
           "Elevator Top Node",
           "Arm Top Node",
           "Outtake",
