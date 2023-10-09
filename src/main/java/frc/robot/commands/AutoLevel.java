@@ -42,7 +42,7 @@ public class AutoLevel extends CommandBase {
 
     @Override
     public void execute() {
-        if (Math.abs(m_drive.getRobotPitch().getDegrees() - 1.6) < 10.0) {
+        if (Math.abs(m_drive.getRobotPitch().getDegrees() + 2) < 12.5) {
             DataLogManager.log("end criteria met, setting m_end");
             end(false);
             return;
@@ -59,7 +59,7 @@ public class AutoLevel extends CommandBase {
             default:
                 break;
         }
-        m_sign = (m_drive.getRobotPitch().getDegrees() - 1.6) > 0 ? SignChange.POSITIVE : SignChange.NEGATIVE;
+        m_sign = (m_drive.getRobotPitch().getDegrees() + 2) > 0 ? SignChange.POSITIVE : SignChange.NEGATIVE;
     }
 
     @Override

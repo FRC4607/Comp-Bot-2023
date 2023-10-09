@@ -84,7 +84,7 @@ public class Calibrations {
         public static final double[] NODE_POSITIONS_STATIC = { 40, 70, 45, 70 };
         // This is defined as "what does the encoder read when the system is in the position I want to be zero?"
         // REV tuner read 205.137 when the arm was vertical, subtract 120 to convert to the correct position.
-        public static final double ABSOLUTE_ENCODER_OFFSET = MathUtil.inputModulus(144.713 - 120, 0, 360);
+        public static final double ABSOLUTE_ENCODER_OFFSET = MathUtil.inputModulus(82.5 - 120, 0, 360);
 
 
         /**
